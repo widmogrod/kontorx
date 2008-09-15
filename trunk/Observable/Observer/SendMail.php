@@ -94,7 +94,7 @@ abstract class KontorX_Observable_Observer_SendMail implements KontorX_Observabl
 	protected function _setupView() {
 		if (array_key_exists('scriptPath', $this->_config)) {
 			$scriptPath = $this->_config['scriptPath'];
-			$scriptPath = str_replace('{{APP_PATHNAME}}', APP_PATHNAME, $scriptPath);
+			$scriptPath = str_replace('{{APP_MODULES_PATHNAME}}', APP_MODULES_PATHNAME, $scriptPath);
 			$this->_view->setScriptPath($scriptPath);
 		}
 		if (array_key_exists('viewSufix', $this->_config)) {
