@@ -178,8 +178,15 @@ abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Ro
 	protected function _postDelete() {
 		$path = $this->_getUploadPath();
 		$file = $this->{$this->_fieldFilename};
+                $filename = "$path/$file";
 
-		if (@unlink("$path/$file") === false){
+                if (!file_exists($filename)) {
+                    $message = "Plik do usunięcia nie istnieje";
+                    $this->addMessage($message);
+                    return;
+                }
+            
+		if (@unlink($filename) === false){
 			$message = "Nie udało się usunąć grafiki wraz z edycją rekordu";
 			require_once 'KontorX/Db/Table/Row/FileUpload/Exception.php';
 			throw new KontorX_Db_Table_Row_FileUpload_Exception($message);
