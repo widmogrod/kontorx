@@ -1,4 +1,6 @@
 <?php
+require_once 'Zend/Controller/Action.php';
+
 /**
  * Akcja
  * 
@@ -9,6 +11,9 @@
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 abstract class KontorX_Controller_Action extends Zend_Controller_Action {
+
+	protected $_viewScriptPathSpec = ':controller:language:action.:suffix';
+
 	/**
 	 * Inicjuje podstawową konfigurację dla akcji
 	 */
@@ -29,8 +34,61 @@ abstract class KontorX_Controller_Action extends Zend_Controller_Action {
 		// view
 		$helperPath = 'KontorX/View/Helper';
 		$this->view->addHelperPath($helperPath, 'KontorX_View_Helper');
+
+//		if ($this->_helper->hasHelper('viewRenderer')) {
+//			$language = $this->_getLanguage();
+//			if (null === $language) {
+//				// nie istnieje controller/pl/action.phtml
+//				// to wywolaj default
+//				$language = DIRECTORY_SEPARATOR;
+//			}
+//			$this->_helper->viewRenderer->setViewScriptPathSpec($this->_viewScriptPathSpec);
+//		}
+
 //		$helperPath = '../application/modules/product/views/helpers/';
 //		$this->view->addHelperPath($helperPath, 'Product_View_Helper');
+	}
+
+	/**
+	 * @var string
+	 */
+	protected $_language = null;
+
+	/**
+	 * Zwraca skrót umiędzynaradawianej watość Języka np. pl, en itd. lub wartosc domyslna
+	 *
+	 * @return string
+	 */
+	public function getLanguage() {
+		return $this->_getLanguage($this->_getDefaultLanguage());
+	}
+	
+	/**
+	 * Zwraca skrót umiędzynaradawianej watość Języka np. pl, en itd. lub null
+	 *
+	 * @param string $default
+	 * @return string
+	 */
+	public  function _getLanguage($default = null) {
+		if (null === $this->_language) {
+			$front = $this->getFrontController();
+			if (null === ($i18n  = $front->getParam('i18n'))) {
+				$i18n = $default;
+			}
+    		$this->_language = $this->_getParam('language_url', $i18n);
+		}
+
+		return $this->_language;
+	}
+
+	/**
+	 * Czy domyślną wartość umiędzynarodowienia
+	 * // TODO Pobranie języka z konfiguracji
+	 * 
+	 * @return string
+	 */
+	protected function _getDefaultLanguage() {
+		return 'pl';
 	}
 	
 	/**
