@@ -1,241 +1,332 @@
 <?php
 /**
  * Plugin_Acl
- * 
+ *
  * // TODO Dodać możliwośc definiwania jaki modul definiuje jaka akcje noauth noacl
- * 
+ *
  * @category 	KontorX
  * @package 	KontorX_Acl_Controller_Plugin
- * @version 	0.1.4
+ * @version 	0.1.6
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Acl_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract {
-	const NO_ACL = 1;
-	const NO_AUTH = 2;
-	
-	const WILDCARD = '*';
+    const WILDCARD = '*';
 
-	/**
-	 * @var Zend_Auth
-	 */
-	protected $_auth;
+    protected $_default = array(
+        'acl' => array(
+            'module'      => self::WILDCARD,
+            'controller'  => 'auth',
+            'action'      => 'login'
+        ),
+        'auth' => array(
+            'module'      => 'default',
+            'controller'  => 'error',
+            'action'      => 'privileges'
+        )
+    );
+
+    public function __construct(Zend_Acl $acl = null) {
+        if (null !== $acl) {
+            $this->setAcl($acl);
+        }
+    }
+
+    public function preDispatch(Zend_Controller_Request_Abstract $request) {
+        // pobieranie roli
+        $auth = $this->getAuth();
+        $identity = $auth->getIdentity();
+        if (null !== $identity || isset($identity->role)) {
+            $role = $auth->getIdentity()->role;
+        } else {
+            $role = $this->getDefaultRole();
+        }
+
+        // przygotowanie resource
+        $resource = $this->prepareResource(
+            $request->getControllerName(),
+            $request->getModuleName());
+
+        // sprawdzam prawa dostepu
+        $acl = $this->getAcl();
+        if ($acl->has($resource)) {
+            // czy rola istnieje
+            if ($acl->hasRole($role)) {
+                $helper = $this->getAcl()->getHelperInstance();
+                $helper->setAccess(
+                    $acl->isAllowed($role, $resource, $request->getActionName())
+                );
+            }
+        }
+    }
+
     /**
-     * @var Zend_Acl
+     * Przygotowuje resource
+     * @return string $resource
      */
-    protected $_acl;
-    
+    public function prepareResource($controller, $module) {
+        $resource = $module . '_' . $controller;
+        $resource = strtolower($resource);
+        return $resource;
+    }
+
     /**
-     * @var Zend_Controller_Front
+     * @var KontorX_Acl
      */
-    protected $_frontController = null;
+    protected $_acl = null;
 
-	/**
-	 * @var array
-	 */
-	protected $_noauth = array('module' => self::WILDCARD,
-                             'controller' => 'auth',
-                             'action' => 'login');
-
-	/**
-	 * @var array
-	 */
-    protected $_noacl = array('module' => 'default',
-                            'controller' => 'error',
-                            'action' => 'privileges');
-
-	/**
-	 * @var string
-	 */
-	protected $_defaultRole = 'guest';
-	
-	/**
-	 * @var string
-	 */
-	protected $_defaultResource = null;
-    
-	public function __construct(Zend_Acl $acl) {
+    /**
+     * Ustawienie @see Zend_Acl
+     */
+    public function setAcl(Zend_Acl $acl) {
         $this->_acl = $acl;
-        $this->_auth = Zend_Auth::getInstance();
-        $this->_frontController = Zend_Controller_Front::getInstance();
-	}
-	
-	public function preDispatch(Zend_Controller_Request_Abstract $request) {
-		if ($hasIdentity = $this->_auth->hasIdentity()) {
-			$role = $this->_auth->getIdentity()->role;
-		} else {
-			$role = $this->getDefaultRole();
-		}
+    }
 
-		$action 	= $request->getActionName();
-		$action		= strtolower($action);
-		$controller = $request->getControllerName();
-		$controller	= strtolower($controller);
-		$module 	= $request->getModuleName();
-		$module		= strtolower($module);
+    /**
+     * Zwraca @see KontorX_Acl
+     *
+     * @return KontorX_Acl
+     */
+    public function getAcl() {
+        if (null === $this->_acl) {
+            require_once 'KontorX/Acl.php';
+            $this->_acl = KontorX_Acl::getInstance();
+        }
+        return $this->_acl;
+    }
 
-		$resource = $module . '_' . $controller;
-		if (!$this->_acl->has($resource)) {
-			// nie wprowadzam  tego, poniewaz nie przekazuje informacji o tym
-			// czy strona istnieje czy tez nie ..
-//			$resource = $this->getDefaultResource();
-			return;
-		}
+    /**
+     * @var Zend_Auth
+     */
+    protected $_auth = null;
 
-		if (!$this->_acl->hasRole($role)) {
-			$error->type = '';
-			return;
-		}
+    /**
+     * Zwraca @see Zend_Auth
+     *
+     * @return Zend_Auth
+     */
+    public function getAuth() {
+        if (null === $this->_auth) {
+            require_once 'Zend/Auth.php';
+            $this->_auth = Zend_Auth::getInstance();
+        }
+        return $this->_auth;
+    }
 
-		if ($this->_acl->isAllowed($role, $resource, $action)) {
-			return;
-		}
+    /**
+     * Ustawienie uchwytu dla braku uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAuthErrorHandler($action, $controller, $module) {
+        $this->_default['auth'] = array(
+            'module' => (string) $module,
+            'controller' => (string) $controller,
+            'action' => (string) $action
+        );
+        return $this;
+    }
 
-//		$error = new ArrayObject(array());
-		if ($hasIdentity){
-//			$error->type = self::NO_ACL;
-			$errorModule		= $this->getNoAclModule();
-			$errorController	= $this->getNoAclController();
-			$errorAction		= $this->getNoAclAction();
-		} else {
-//			$error->type = self::NO_AUTH;
-			$errorModule		= $this->getNoAuthModule();
-			$errorController	= $this->getNoAuthController();
-			$errorAction		= $this->getNoAuthAction();
-		}
+    /**
+     * Ustawienie modułu dla braku uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAuthModule($module) {
+        $this->_default['auth']['module'] = (string) $module;
+        return $this;
+    }
 
-//		$request->setParam('acl_handler', $error)
-        $request->setModuleName($errorModule)
-				->setControllerName($errorController)
-				->setActionName($errorAction)
-				->setDispatched(false);
-	}
+    /**
+     * Zwraca nazwe modułu dla braku uprawnień
+     *
+     * @return string $module
+     */
+    public function getNoAuthModule() {
+        $module = $this->_default['auth']['module'] ;
+        if ($module === self::WILDCARD) {
+            $front = $this->getFrontController();
+            $request = $front->getRequest();
 
-	public function setDefaultRole($role) {
-		$this->_defaultRole = (string) $role;
-	}
+            $module = $request->getModuleName();
+            if (null == $module) {
+                $module = $front->getDefaultModule();
+            }
+        }
+        return $module;
+    }
 
-	public function getDefaultRole() {
-		return $this->_defaultRole;
-	}
+    /**
+     * Ustawienie kontrollera dla braku uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAuthController($controller) {
+        $this->_default['auth']['controller'] = (string) $controller;
+        return $this;
+    }
 
-	public function setDefaultResource($resource) {
-		$this->_defaultResource = (string) $resource;
-	}
+    /**
+     * Zwraca nazwe kontrollera dla braku uprawnień
+     *
+     * @return string $controller
+     */
+    public function getNoAuthController() {
+        $controller = $this->_default['auth']['controller'] ;
+        if ($controller === self::WILDCARD) {
+            $front = $this->getFrontController();
+            $request = $front->getRequest();
 
-	public function getDefaultResource() {
-		return $this->_defaultResource;
-	}
-	
-	public function setNoAclErrorHandler($action, $controller, $module) {
-		$this->_noacl = array(
-			'module' => strtolower($module),
-			'controller' => strtolower($controller),
-			'action' => strtolower($action)
-		);
-	}
+            $controller = $request->getControllerName();
+            if (null == $controller) {
+                $controller = $front->getDefaultControllerName();
+            }
+        }
+        return $controller;
+    }
 
-	public function setNoAuthErrorHandler($action, $controller, $module) {
-		$this->_noauth = array(
-			'module' => strtolower($module),
-			'controller' => strtolower($controller),
-			'action' => strtolower($action)
-		);
-	}
+    /**
+     * Ustawienie akcji dla braku uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAuthAction($action) {
+        $this->_default['auth']['action'] = (string) $action;
+    }
 
-	public function setNoAuthModule($module) {
-		$this->_noauth['module'] = (string) $module;
-	}
+     /**
+     * Zwraca nazwe kontrollera dla braku uprawnień
+     *
+     * @return string $action
+     */
+    public function getNoAuthAction() {
+        return $this->_default['auth']['action'];
+    }
 
-	public function getNoAuthModule() {
-		$module = $this->_noauth['module'] ;
-		if ($module === self::WILDCARD) {
-			$front = $this->getFrontController();
-			$request = $front->getRequest();
-		
-			$module = $request->getModuleName();
-			if (null == $module) {
-				$module = $front->getDefaultModule();
-			}
-		}
-		return $module;
-	}
+    /**
+     * Ustwienie uchwytu dla niepoprawnych uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAclErrorHandler($action, $controller, $module) {
+        $this->_default['acl'] = array(
+            'module' => (string) $module,
+            'controller' => (string) $controller,
+            'action' => (string) $action
+        );
+        return $this;
+    }
 
-	public function setNoAuthController($controller) {
-		$this->_noauth['controller'] = (string) $controller;
-	}
-	
-	public function getNoAuthController() {
-		$controller = $this->_noauth['controller'] ;
-		if ($controller === self::WILDCARD) {
-			$front = $this->getFrontController();
-			$request = $front->getRequest();
+    /**
+     * Ustawienie modułu niepoprawnych uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAclModule($module) {
+        $this->_default['acl']['module'] = (string) $module;
+        return $this;
+    }
 
-			$controller = $request->getControllerName();
-			if (null == $controller) {
-				$controller = $front->getDefaultControllerName();
-			}
-		}
-		return $controller;
-	}
+    /**
+     * Zwraca nazwe modułu dla niepoprawnych uprawnień
+     *
+     * @return string $module
+     */
+    public function getNoAclModule() {
+        $module = $this->_default['acl']['module'];
+        if ($module === self::WILDCARD) {
+            $front = $this->getFrontController();
+            $request = $front->getRequest();
 
-	public function setNoAuthAction($action) {
-		$this->_noauth['action'] = (string) $action;
-	}
+            $module = $request->getModuleName();
+            if (null == $module) {
+                $module = $front->getDefaultModule();
+            }
+        }
+        return $module;
+    }
 
-	public function getNoAuthAction() {
-		return $this->_noauth['action'];
-	}
+    /**
+     * Ustawienie kontrollera niepoprawnych uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAclController($controller) {
+        $this->_default['acl']['controller'] = (string) $controller;
+        return $this;
+    }
 
-	public function setNoAclModule($module) {
-		$this->_noAcl['module'] = (string) $module;
-	}
+    /**
+     * Zwraca nazwe kontrollera dla niepoprawnych uprawnień
+     *
+     * @return string $controller
+     */
+    public function getNoAclController() {
+        $controller = $this->_default['acl']['controller'];
+        if ($controller === self::WILDCARD) {
+            $front = $this->getFrontController();
+            $request = $front->getRequest();
 
-	public function getNoAclModule() {
-		$module = $this->_noacl['module'] ;
-		if ($module === self::WILDCARD) {
-			$front = $this->getFrontController();
-			$request = $front->getRequest();
-		
-			$module = $request->getModuleName();
-			if (null == $module) {
-				$module = $front->getDefaultModule();
-			}
-		}
-		return $module;
-	}
+            $controller = $request->getControllerName();
+            if (null == $controller) {
+                $controller = $front->getDefaultControllerName();
+            }
+        }
+        return $controller;
+    }
 
-	public function setNoAclController($controller) {
-		$this->_noacl['controller'] = (string) $controller;
-	}
+    /**
+     * Ustawienie akcji niepoprawnych uprawnień
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setNoAclAction($action) {
+        $this->_default['acl']['action'] = (string) $action;
+        return $this;
+    }
 
-	public function getNoAclController() {
-		$controller = $this->_noacl['controller'] ;
-		if ($controller === self::WILDCARD) {
-			$front = $this->getFrontController();
-			$request = $front->getRequest();
+    /**
+     * Zwraca nazwe akcji dla niepoprawnych uprawnień
+     *
+     * @return string $action
+     */
+    public function getNoAclAction() {
+        return $this->_default['acl']['action'];
+    }
 
-			$controller = $request->getControllerName();
-			if (null == $controller) {
-				$controller = $front->getDefaultControllerName();
-			}
-		}
-		return $controller;
-	}
+    /**
+     * @var string
+     */
+    protected $_defaultRole = 'guest';
 
-	public function setNoAclAction($action) {
-		$this->_noacl['action'] = (string) $action;
-	}
+    /**
+     * Ustawia nazwe domyślnej roli
+     *
+     * @return KontorX_Acl_Controller_Plugin_Acl
+     */
+    public function setDefaultRole($role) {
+        $this->_defaultRole = (string) $role;
+        return $this;
+    }
 
-	public function getNoAclAction() {
-		return $this->_noacl['action'];
-	}
+    /**
+     * Zwraca nazwe domyślnej roli
+     *
+     * @return string $role
+     */
+    public function getDefaultRole() {
+        return $this->_defaultRole;
+    }
 
-	/**
-	 * @return Zend_Controller_Front
-	 */
-	protected function getFrontController() {
-		return $this->_frontController;
-	}
+    protected $_frontController;
+
+    /**
+     * @return Zend_Controller_Front
+     */
+    public function getFrontController() {
+        if (null === $this->_frontController) {
+            $this->_frontController = Zend_Controller_Front::getInstance();
+        }
+        return $this->_frontController;
+    }
 }
-?>

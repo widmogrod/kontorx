@@ -16,6 +16,13 @@ class KontorX_Acl extends Zend_Acl {
 	 */
 	protected $_pluginClass = 'KontorX_Acl_Controller_Plugin_Acl';
 
+    /**
+	 * Nazwa klasy pomocnika akcji sprawdzajacego uprawnienia
+	 *
+	 * @var string
+	 */
+    protected $_helperClass = 'KontorX_Acl_Controller_Action_Helper_Acl';
+
 	/**
 	 * Instacja klasy pluginu sprawdzajacego uprawnienia
 	 *
@@ -38,6 +45,7 @@ class KontorX_Acl extends Zend_Acl {
 	private function __construct($options) {
 		$this->setConfig($options);
 		$this->_initPlugin();
+        $this->_initHelper();
 	}
 
 	/**
@@ -108,6 +116,48 @@ class KontorX_Acl extends Zend_Acl {
      */
     public function getPluginInstance() {
     	return $this->_pluginInstance;
+    }
+
+    /**
+     * Initialize action helper
+     * 
+     * @return void
+     */
+    protected function _initHelper(){
+        $helperClass = $this->getHelperClass();
+        require_once 'Zend/Controller/Action/HelperBroker.php';
+        if (!Zend_Controller_Action_HelperBroker::hasHelper('acl')) {
+            require_once 'Zend/Loader.php';
+            Zend_Loader::loadClass($helperClass);
+            $this->_helperInstance = new $helperClass($this);
+            $this->_helperInstance->setPluginInstance($this->getPluginInstance());
+            Zend_Controller_Action_HelperBroker::getStack()->offsetSet(-10, $this->_helperInstance);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getHelperClass(){
+        return $this->_helperClass;
+    }
+
+    /**
+     * @param  string $helperClass
+     * @return KontorX_Acl_Controller_Action_Helper_Acl
+     */
+    public function setHelperClass($helperClass){
+        $this->_helperClass = (string) $helperClass;
+        return $this;
+    }
+
+    protected $_helperInstance = null;
+
+    /**
+     * @return KontorX_Acl_Controller_Action_Helper_Acl
+     */
+    public function getHelperInstance() {
+    	return $this->_helperInstance;
     }
     
 	/**
