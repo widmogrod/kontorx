@@ -1,4 +1,6 @@
 <?php
+require_once 'Zend/Form.php';
+
 /**
  * KontorX_Form_DbTable
  *
