@@ -6,7 +6,7 @@ require_once 'Zend/Controller/Action/Helper/Abstract.php';
  * 
  * @category 	KontorX
  * @package 	KontorX_Controller_Action_Helper
- * @version 	0.1.2
+ * @version 	0.1.4
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
@@ -86,67 +86,4 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
 
         return APP_MODULES_PATHNAME . "$module/$fileName";
 	}
-
-	/**
-	 * Przechowuje wczytane obiekty modelu
-	 *
-	 * @var array
-	 */
-	protected $_storeModel = array();
-	
-	public function model($model, $module = null) {
-		$dispatcher = $this->getFrontController()->getDispatcher();
-        $request    = $this->getRequest();
-
-        if (null === $module) {
-            $module = $request->getModuleName();
-            if ($module != $dispatcher->getDefaultModule()) {
-                $this->addModelIncludePath($module);
-            }
-        }
-
-        // TODO
-        
-        Zend_Loader::loadClass($model);
-        $model = new $model();
-	}
-
-	public function loadModelAsSingleton($model, $module = null) {
-		$uniqKey = $model.$module;
-		if (array_key_exists($uniqKey, $this->_modelsSingleton)) {
-			return $this->_modelsSingleton[$uniqKey];
-		}
-
-		$model = $this->loadModel($model, $module);
-		$this->_modelsSingleton[$uniqKey] = $model;
-		return $model;
-	}
-
-	public function addModelIncludePath($module) {
-		$this->_addIncludePath('models', $module);
-		return $this;
-	}
-
-	public function addIncludePath($dirname, $module) {
-		$this->_addIncludePath($dirname, $module);
-		return $this;
-	}
-
-	protected function _addIncludePath($dirname, $module) {
-		$path = APP_MODULES_PATHNAME . basename($module) . '/' . $dirname;
-
-		if (!is_dir($path)) {
-//			$error = "include path `$path` dosen't exsists";
-//			throw new Zend_Controller_Action_Exception($error);
-			return false;
-		}
-		
-		if (strstr(get_include_path(), $path) === false) {
-			set_include_path(
-				get_include_path() . PATH_SEPARATOR .
-				$path
-			);
-		}
-	}
 }
-?>

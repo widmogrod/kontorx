@@ -129,7 +129,7 @@ class KontorX_Acl extends Zend_Acl {
         if (!Zend_Controller_Action_HelperBroker::hasHelper('acl')) {
             require_once 'Zend/Loader.php';
             Zend_Loader::loadClass($helperClass);
-            $this->_helperInstance = new $helperClass($this);
+            $this->_helperInstance = new $helperClass();
             $this->_helperInstance->setPluginInstance($this->getPluginInstance());
             Zend_Controller_Action_HelperBroker::getStack()->offsetSet(-10, $this->_helperInstance);
         }
