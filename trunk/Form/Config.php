@@ -5,12 +5,14 @@ require_once 'Zend/Form.php';
  * KontorX_Form_Config
  *
  * @package 	KontorX_Form
- * @version 	0.1.0
+ * @version 	0.1.4
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Form_Config extends Zend_Form {
 
+	protected $_instanceOptions = null;
+	
     /**
      * Konstruktor
      *
@@ -19,38 +21,76 @@ class KontorX_Form_Config extends Zend_Form {
      */
     public function __construct(Zend_Config $model, $options = null) {
         $this->setConfigModel($model);
+        
+        $this->_instanceOptions = $options;
         parent::__construct($options);
+        
+        $this->setIsArray(true);
+
+        // go! ..
+        $this->setupFormFromConfigModel();
     }
-
-    public function init() {
-        $model = $this->getConfigModel();
-        if (null === $model) {
-            require_once 'Zend/Form/Exception.php';
-            throw new Zend_Form_Exception("Config model is no set");
-        }
-
-        $this->_setupFormFromConfig($model);
+    
+    /**
+     * Inicjujemy generacje formularza KontorX_Form_Config
+     *
+     */
+    public function setupFormFromConfigModel() {
+    	$model = $this->getConfigModel();
+    	$this->_setupFormFromConfigModel($model);
     }
-
+    
     /**
      * Przygotowuje formularz z @Zend_Config
      * @param Zend_Config $model
      */
-    protected function _setupFormFromConfig($model) {
-        foreach ($model as $config) {
-            
+    protected function _setupFormFromConfigModel($model) {
+        foreach ($model as $elementName => $config) {
+        	$elementName = (string) $elementName;
+        	if ($config instanceof Zend_Config) {
+        		$form = $this->_initSubFormContainer($config);
+        		$form->setLegend($elementName);
+        		$this->addSubForm($form, $elementName);
+        	} else {
+        		list($element, $elementOptions) = $this->_createElement($config, $elementName);
+        		$this->addElement($element, $elementName, $elementOptions);
+        	}
         }
     }
 
+    /**
+     * Inicjuje nowy KontorX_Form_Config instance
+     *
+     * @param Zend_Config $config
+     * @return KontorX_Form_Config
+     */
+    protected function _initSubFormContainer(Zend_Config $config) {
+    	$form = new self($config, $this->_instanceOptions);
+        $form->addDecorator('DtDdWrapper');
+        $form->addDecorator('Fieldset');
+        $form->removeDecorator('Form');
+        return $form;
+    }
+    
     /**
      * @var Zend_Config
      */
     protected $_configModel = null;
 
+    /**
+     * Ustawia modelu danych
+     *
+     * @param Zend_Config $model
+     */
     public function setConfigModel(Zend_Config $model) {
         $this->_configModel = $model;
     }
     
+    /**
+     * Zwraca model danych
+     *
+     * @return Zend_Config
+     */
     public function getConfigModel() {
         return $this->_configModel;
     }
@@ -58,71 +98,28 @@ class KontorX_Form_Config extends Zend_Form {
     /**
      * Tworzy Form_Element
      *
-     * @param array $options
-     * @param bool $loop
+     * @param mixed $config
+     * @param string $elementName
      * @return array
      */
-    protected function _createElement(array $options, $loop = false) {
+    protected function _createElement($config, $elementName) {
         // TODO Dodać możliwośc pobierania nazwy z opisu pola w DB (?)
         $element = null;
-        $elementName = $options['COLUMN_NAME'];
         $elementOptions = array(
-            'label' => $elementName
+            'label' => $elementName,
+        	'value' => $config
         );
 
-        $dataType = strtoupper($options['DATA_TYPE']);
-        switch ($dataType) {
-            case 'TIMESTAMP':
-            case 'DATETIME':
-                $element = 'text';
-                // dodanie atrybutu class
-                if (isset($elementOptions['class'])) {
-                    $elementOptions['class'] += ' datetime';
-                } else {
-                    $elementOptions['class'] = 'datetime';
-                }
-
-            break;
-            case 'VARCHAR':
-                if ($options['LENGTH'] < 100) {
-                    $element = 'text';
-                } else {
-                    $element = 'textarea';
-                    $elementOptions += array('class' => 'medium');
-                }
-            break;
-            case 'TINYINT':
-            case 'INTEGER':
-            case 'FLOAT':
-            case 'BOOL':
-            case 'BOOLEAN':
-                switch($options['LENGTH']) {
-                    case 1:
-                    $element = 'checkbox';
-                    break;
-                    default:
-                    $element = 'text';
-                }
-            break;
-            case 'TEXT':
-                $element = 'textarea';
-            break;
-            default:
-                if ($loop) {
-                    $element = 'text';
-                    break;
-                }
-
-                if (!preg_match('#(?P<type>\w+)\((?P<length>[0-9]+)\)#i', $dataType, $matched)) {
-                    $element = 'text';
-                    break;
-                }
-
-                $options['DATA_TYPE'] = $matched['type'];
-                $options['LENGTH'] 	  = $matched['length'];
-                return $this->_createElement($options, true);
+        // TODO Narazie nie działa!
+        if (is_bool($config)) {
+        	$element = 'checkbox';
+        	if (true === $config) {
+        		$elementOptions['checked'] = 'checked';
+        	}
+        } else {
+        	 $element = 'text';
         }
 
-        return array($element, $elementName, $elementOptions);
+        return array($element, $elementOptions);
     }
 }

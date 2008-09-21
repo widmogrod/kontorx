@@ -4,6 +4,7 @@ require_once 'Zend/Controller/Plugin/Abstract.php';
 /**
  * KontorX_Controller_Plugin_System
  *
+ * @version 0.2.0
  * @author widmogrod
  */
 class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
@@ -31,10 +32,9 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			// tylko finalny loop
 			return;
 		}
+
 		// inicjujemy layout
-		if ($this->isLayout()) {
-			$this->_initLayout();
-		}
+		$this->_initLayout();
 	}
 
 	/**
@@ -93,21 +93,30 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @return void
 	 */
 	protected function _initLayout() {
-		$config 		= $this->getConfig();
-		$configDefault  = $this->getDefaultConfig();
-
 		require_once 'Zend/Layout.php';
 		$layout = Zend_Layout::getMvcInstance();
-
-		// TODO To jeszczeni nie działa!
-		// problem z filtrami będę chciał się w to zagłębić!
 		if (null === $layout) {
-			$layout = Zend_Layout::startMvc();
+			// TODO To jeszczeni nie działa!
+			// problem z filtrami będę chciał się w to zagłębić!
+//			$layout = Zend_Layout::startMvc();
+			require_once 'Zend/Controller/Exception.php';
+			throw new Zend_Controller_Exception("Zend_Layout is not initializet with MVC");
 		}
 
+		// czy jest wyłączony layout
 		if (!$layout->isEnabled()) {
 			return;
 		}
+
+		// jezeli layout włączony, ale nie jest ustawiony template ..
+		if (!$this->isLayout()) {
+			// to wyłanczam layout!
+			$layout->disableLayout();
+			return;
+		}
+		
+		$config 		= $this->getConfig();
+		$configDefault  = $this->getDefaultConfig();
 		
 		// ustawiamy nazwę skórki
 		$templateName = $this->getTemplateName();
@@ -266,6 +275,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	}
 
 	const APPLICATION_MODULES_DIRNAME = 'modules';
+	const APPLICATION_CONFIGURATION_DIRNAME = 'configuration';
 	
 	/**
 	 * @var string
@@ -292,6 +302,9 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		switch ($type) {
 			case self::APPLICATION_MODULES_DIRNAME:
 				$return .= '/modules/';
+				break;
+			case self::APPLICATION_CONFIGURATION_DIRNAME:
+				$return .= '/configuration/';
 				break;
 		}
 		return $return;

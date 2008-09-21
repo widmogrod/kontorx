@@ -6,14 +6,13 @@ require_once 'Zend/Controller/Action.php';
  * 
  * @category 	KontorX
  * @package 	KontorX_Controller_Action
- * @version 	0.2.1
+ * @version 	0.2.2
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 abstract class KontorX_Controller_Action extends Zend_Controller_Action {
 
 	public function init() {
-		$this->view->messages = $this->_helper->flashMessenger->getMessages();
 		$this->_helper->system->addModelIncludePath();
 	}
 
@@ -30,5 +29,9 @@ abstract class KontorX_Controller_Action extends Zend_Controller_Action {
 		$view->addHelperPath($helperPath, 'KontorX_View_Helper');
 		
 		return $view;
+	}
+
+	public function postDispatch() {
+		$this->view->messages = $this->_helper->flashMessenger->getMessages();
 	}
 }
