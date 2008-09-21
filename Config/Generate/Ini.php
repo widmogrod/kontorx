@@ -43,7 +43,7 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
 			$result .= "[$sectionName]";
 			$result .= "\n\t";
 			// TODO a co jezeli $sectionData nie jest array ?!
-			$result .= $this->_generateHelper_1($sectionData);
+			$result .= $this->_generateHelper_1((array) $sectionData);
 			$result .= "\n";
 		}
 		return $result;
