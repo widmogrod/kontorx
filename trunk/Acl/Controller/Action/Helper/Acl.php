@@ -45,15 +45,18 @@ class KontorX_Acl_Controller_Action_Helper_Acl extends Zend_Controller_Action_He
         }
 
         $plugin  = $this->getPluginInstance();
-        if ($this->isRequiredAuthorization()) {
-            $action     = $plugin->getNoAuthAction();
-            $controller = $plugin->getNoAuthController();
-            $module     = $plugin->getNoAuthModule();
-        } else
         if ($this->accessDeny()) {
-            $action     = $plugin->getNoAclAction();
-            $controller = $plugin->getNoAclController();
-            $module     = $plugin->getNoAclModule();
+        	// użytkownik nie zalogowany
+			if ($this->isRequiredAuthorization()) {
+	            $action     = $plugin->getNoAclAction();
+	            $controller = $plugin->getNoAclController();
+	            $module     = $plugin->getNoAclModule();
+	        } else {
+	        	// brak przywilejów
+	        	$action     = $plugin->getNoAuthAction();
+	            $controller = $plugin->getNoAuthController();
+	            $module     = $plugin->getNoAuthModule();
+	        }
         } else {
             // continue without forwarding
             return;
@@ -94,7 +97,7 @@ class KontorX_Acl_Controller_Action_Helper_Acl extends Zend_Controller_Action_He
     /**
      * @var bool
      */
-    protected $_requiredAuthorization = false;
+    protected $_requiredAuthorization = true;
 
     /**
      * Ustawia flage boolean czy dostęp wymaga autoryzacji!
@@ -114,7 +117,7 @@ class KontorX_Acl_Controller_Action_Helper_Acl extends Zend_Controller_Action_He
      */
     public function isRequiredAuthorization() {
         if ($this->_requiredAuthorization) {
-             $auth = $this->getAuth();
+             $auth = $this->getPluginInstance()->getAuth();
              return !$auth->hasIdentity();
         }
         return false;
