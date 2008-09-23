@@ -6,7 +6,7 @@
  *
  * @category 	KontorX
  * @package 	KontorX_Acl_Controller_Plugin
- * @version 	0.1.6
+ * @version 	0.1.7
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
@@ -49,14 +49,24 @@ class KontorX_Acl_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract 
 
         // sprawdzam prawa dostepu
         $acl = $this->getAcl();
+		$helper = $acl->getHelperInstance();
         if ($acl->has($resource)) {
             // czy rola istnieje
             if ($acl->hasRole($role)) {
-                $helper = $this->getAcl()->getHelperInstance();
                 $helper->setAccess(
                     $acl->isAllowed($role, $resource, $request->getActionName())
                 );
+            } else {
+            	// to jest kwestja dyskusyjna
+            	// taka informacja powinna być ustawiona samym ACL
+            	// czy jest dostęp czy nie ma!
+            	$helper->setAccess(false);
             }
+        } else {
+        	// to jest kwestja dyskusyjna
+            	// taka informacja powinna być ustawiona samym ACL
+            	// czy jest dostęp czy nie ma!
+        	$helper->setAccess(false);
         }
     }
 
