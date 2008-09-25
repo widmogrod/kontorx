@@ -7,7 +7,7 @@ require_once 'Zend/Db/Table/Row/Abstract.php';
  * @category	KontorX
  * @package		KontorX_Db
  * @subpackage	Table
- * @version		0.2.7
+ * @version		0.2.8
  */
 abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abstract {
 	/**
@@ -70,6 +70,31 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 		$this->_parentRow = $row;
 	}
 
+	/**
+	 * @var bool
+	 */
+	protected $_isRoot = false;
+	
+	/**
+	 * Ustawiamy flage, żeby _update zrobił root ..
+	 * ale nie może być ustawiony parentRow()
+	 * @param bool $flag
+	 */
+	public function setRoot($flag = true) {
+		$this->_isRoot = (bool) $flag;
+	}
+
+	/**
+	 * Czy rekord updatowany będzie root?
+	 * 
+	 * Czy będzie root? zalerzy jeszcze czy jest parentRow!
+	 *
+	 * @return bool
+	 */
+	public function isRoot () {
+		return $this->_isRoot;
+	}
+	
 	/**
 	 * Zwraca obiekt @see Zend_Db_Table_Row_Abstract rodzica
 	 *
@@ -317,14 +342,18 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 		// czy jest parent row
 		$parentRow = $this->getParentRow();
 		if (null === $parentRow) {
-			return;
+			// czy zapisujemy jako root?
+			if (!$this->isRoot()) {
+				return;
+			}
+			$level = '';
+		} else {
+			// generowanie nowej wartości dla zagnieżdzenia
+			$level = $parentRow->{$this->_level};
+			$level = ($level == '')
+				? $parentRow->{current($this->_primary)}
+				: $level . $this->_separator . $parentRow->{current($this->_primary)};
 		}
-
-		// generowanie nowej wartości dla zagnieżdzenia
-		$level = $parentRow->{$this->_level};
-		$level = ($level == '')
-			? $parentRow->{current($this->_primary)}
-			: $level . $this->_separator . $parentRow->{current($this->_primary)};
 
 		// stara wartosc zagniezdzenia
 		$levelOld = $this->{$this->_level};
