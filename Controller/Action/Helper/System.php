@@ -41,6 +41,38 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 			}
 		}
     }
+
+    public function postDispatch() {
+    	$action = $this->getActionController();
+    	$request = $action->getRequest();
+
+    	if (!$request->isDispatched()) {
+    		return;
+    	}
+
+    	// setup view module/controller/action additional path!
+    	
+    	$view = $action->initView();
+
+    	// setup
+		$helperPath = 'KontorX/View/Helper';
+		$view->addHelperPath($helperPath, 'KontorX_View_Helper');
+
+		// poszerzenie możliwości przeszukiwania katalogów widoku akcji!
+		// specyfikacja szablonów mieści się w katalogu z templatem!
+		$plugin = $this->getPluginInstance();
+		$templateName = $plugin->getTemplateName(true);
+		// pobieramy katalogi szablonu
+		list($path, $pathI18n) = $plugin->getTemplatePaths($templateName);
+		// nazwa kontrollera
+		$module = $request->getModuleName();
+		// tworzenie scieżki
+		$scriptPath = "$path/ext/$module/scripts/";
+
+		$view->addScriptPath($scriptPath);
+				// narazie wielojezykowosc jest off!
+//				->addScriptPath("$pathI18n/scripts");
+    }
     
     /**
      * @return KontorX_Controller_Plugin_System

@@ -41,12 +41,12 @@ class KontorX_Acl_Controller_Plugin_Acl extends Zend_Controller_Plugin_Abstract 
         } else {
             $role = $this->getDefaultRole();
         }
-
+//Zend_Debug::dump($role);
         // przygotowanie resource
         $resource = $this->prepareResource(
             $request->getControllerName(),
             $request->getModuleName());
-
+//Zend_Debug::dump($resource);
         // sprawdzam prawa dostepu
         $acl = $this->getAcl();
 		$helper = $acl->getHelperInstance();
