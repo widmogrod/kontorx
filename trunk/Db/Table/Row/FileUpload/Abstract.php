@@ -11,7 +11,7 @@ require_once 'Zend/Db/Table/Row/Abstract.php';
  * @category	KontorX
  * @package		KontorX_Db
  * @subpackage	Table
- * @version		0.1.3
+ * @version		0.1.5
  */
 abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Row_Abstract {
 	
@@ -92,8 +92,8 @@ abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Ro
 	 * Zwraca nazwe katalogu do ktorego uploadujemy pliki
 	 *
 	 */
-	public function getUploadPath() {
-		return $this->_getUploadPath();
+	public static function getUploadPath() {
+		return self::$_uploadPath;
 	}
 	
 	/**
@@ -163,10 +163,9 @@ abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Ro
 				// nieudane kasowanie pliku
 				$message = "Nie udało się usunąć grafiki wraz z edycją rekordu";
 				$this->addMessage($message);
-			} else {
-				// dodaj informacje o nowym pliku
-				$this->{$this->_fieldFilename} = $upload->getGenerateUniqFileName();
 			}
+			// dodaj informacje o nowym pliku
+			$this->{$this->_fieldFilename} = $upload->getGenerateUniqFileName();
 		}
 		$upload->clean();
 	}

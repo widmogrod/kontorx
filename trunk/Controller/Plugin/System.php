@@ -124,15 +124,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			$templateName = $config['template']['name'];
 		}
 
-		$templatePath = $config['template']['path'];
 		// katalog z szablonem default
-		$layoutPathDefault  	= $templatePath . '/' . $configDefault['template']['name'];
-		$layoutPathDefault  	= $this->getPublicHtmlPath($layoutPathDefault);
-		$layoutPathDefaultI18n 	= $layoutPathDefault . '/' . $this->getLanguage();
+		list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault['template']['name']);
 		// katalog z szablonem template
-		$layoutPathTemplate 	= $templatePath . '/' . $templateName;
-		$layoutPathTemplate 	= $this->getPublicHtmlPath($layoutPathTemplate);
-		$layoutPathTemplateI18n	= $layoutPathTemplate . '/' . $this->getLanguage();
+		list($layoutPathTemplate, $layoutPathTemplateI18n) = $this->getTemplatePaths($templateName);
 		// ustawianie przeszukiwania katalogów
 		// zasada LIFO stąd ta kolejność
 		// możliwości nadpisywania tworzenia niepełnego szablonu!
@@ -201,6 +196,30 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 				$headLink->appendStylesheet($file->href);
 			}
 		}
+	}
+
+	/**
+	 * @var string
+	 */
+	protected $_templatePath = null;
+	
+	/**
+	 * Zwraca tablicę z katalogami z szablonu.
+	 *
+	 * @param string $templateName
+	 * @return array()
+	 */
+	public function getTemplatePaths($templateName) {
+		if (null === $this->_templatePath) {
+			$config 		= $this->getConfig();
+			$this->_templatePath = $config['template']['path'];
+		}
+
+		$path 	= $this->_templatePath . '/' . $templateName;
+		$path 	= $this->getPublicHtmlPath($path);
+		$pathI18n	= $path . '/' . $this->getLanguage();
+
+		return array($path, $pathI18n);
 	}
 	
 	/**
@@ -382,9 +401,14 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	/**
 	 * Zwraca nazwę skórki
 	 *
+	 * @param bool $forse
 	 * @return string
 	 */
-	public function getTemplateName() {
+	public function getTemplateName($forse = false) {
+		if (true === $forse && null === $this->_templateName) {
+			$config = $this->getConfig();
+			$this->_templateName = $config['template']['name'];
+		}
 		return $this->_templateName;
 	}
 
