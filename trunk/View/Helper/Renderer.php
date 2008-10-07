@@ -69,7 +69,7 @@ class KontorX_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 			: $content;
 
 		$content = $this->_preContent($content);
-		$content = preg_replace("/{{(\w+):(.+[^}}]+)}}/ie","\$this->_parse('$1','$2')", $content);
+		$content = preg_replace("/{{(\w+):([a-z0-9_\-\.=;:^}}]+)}}/ie","\$this->_parse('$1','$2')", $content);
 		$content = $this->_postContent($content);
 		return $content;
 	}
