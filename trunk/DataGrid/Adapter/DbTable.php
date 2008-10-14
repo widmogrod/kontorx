@@ -33,16 +33,13 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 	 * @param array $filters
 	 * @return array
 	 */
-	public function fetchData(array $columns = null, array $filters = null) {
+	public function fetchData() {
 		$table = $this->getTable();
 		$select = $table->select();
 
 		// przygotowanie zapytania {@see Zend_Db_Select}
-		if (null !== ($columns = $this->getColumns($columns))) {
+		if (null !== ($columns = $this->getColumns())) {
 			$this->_prepareColumns($columns, $select);
-		}
-		if (null !== ($filters = $this->getFilters($filters))) {
-			$this->_prepareFilters($filters, $select);
 		}
 		if ($this->isPagination()) {
 			list($pageNumber, $itemCountPerPage) = $this->getPagination();
@@ -83,23 +80,5 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 						$table->info(Zend_Db_Table::COLS), array_keys($columns));
 		$select
 			->from($table->info(Zend_Db_Table::NAME), $columns);
-	}
-	
-	/**
-	 * Prepare @see Zend_Db_Select for filtering
-	 *
-	 * @param array $columns
-	 * @param Zend_Db_Select $select
-	 */
-	private function _prepareFilters(array $filters, Zend_Db_Select $select) {
-		$table   = $this->getTable();
-		$columns = $table->info(Zend_Db_Table::COLS);
-
-		foreach ($filters as $columnName => $filter) {
-			if (!in_array($columnName, $columns)) {
-				break;
-			}
-			$filter->filter($select);
-		}
 	}
 }

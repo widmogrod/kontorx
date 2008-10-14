@@ -4,12 +4,7 @@ require_once 'KontorX/DataGrid/Row/Interface.php';
 abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Interface {
 
 	/**
-	 * @var array
-	 */
-	private $_options = array();
-	
-	/**
-	 * Konstruktor
+	 * Constructor
 	 *
 	 * @param array $options
 	 */
@@ -21,32 +16,14 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 			$this->setOptions($options);
 		}
 	}
-
-	/**
-	 * Set options
-	 *
-	 * @param array $options
-	 */
-	public function setOptions(array $options) {
-		$this->_options = $options;
-	}
 	
 	/**
-	 * Return options
-	 *
-	 * @return array
-	 */
-	public function getOptions() {
-		return $this->_options;
-	}
-	
-	/**
-	 * To string
+	 * Return class name without prefix
 	 *
 	 * @return string
 	 */
-	public function __toString() {
-		return $this->render();
+	public function getName() {
+		return end(explode('_',get_class($this)));
 	}
 	
 	/**
@@ -78,6 +55,29 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 	}
 
 	/**
+	 * @var array
+	 */
+	private $_options = array();
+
+	/**
+	 * Set options
+	 *
+	 * @param array $options
+	 */
+	public function setOptions(array $options) {
+		$this->_options = $options;
+	}
+	
+	/**
+	 * Return options
+	 *
+	 * @return array
+	 */
+	public function getOptions() {
+		return $this->_options;
+	}
+
+	/**
 	 * @var string
 	 */
 	private $_columnName = null;
@@ -87,7 +87,7 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 	 * @return void
 	 */
 	public function setColumnName($name) {
-		$this->_columnName = null;
+		$this->_columnName = $name;
 	}
 
 	/**
@@ -97,5 +97,14 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 	 */
 	public function getColumnName() {
 		return $this->_columnName;
+	}
+
+	/**
+	 * To string
+	 *
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->render();
 	}
 }

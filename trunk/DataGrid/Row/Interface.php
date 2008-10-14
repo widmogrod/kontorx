@@ -7,20 +7,19 @@ interface KontorX_DataGrid_Row_Interface {
 	 * @return string
 	 */
 	public function render();
-	
+
 	/**
-	 * Set data to rendered
+	 * Return class name without prefix
+	 *
+	 * @return string
+	 */
+	public function getName();
+
+	/**
+	 * Set data if need to rendered
 	 *
 	 * @param mixed $data
 	 * @return void
 	 */
 	public function setData($data);
-
-	/**
-	 * Set column name
-	 * 
-	 * @param string $name
-	 * @return void
-	 */
-	public function setColumnName($name);
 }
