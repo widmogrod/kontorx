@@ -2,15 +2,38 @@
 interface KontorX_DataGrid_Filter_Interface {
 
 	/**
-	 * Enter description here...
+	 * Setup adapter filtering
 	 *
+	 * @param KontorX_DataGrid_Adapter_Interface $adapter
 	 */
-	public function filter();
+	public function filter(KontorX_DataGrid_Adapter_Interface $adapter);
 
 	/**
-	 * Render filter visualization i.e. "input text"
-	 * 
+	 * Return a context as a html/text string
+	 *
 	 * @return string
 	 */
 	public function render();
+	
+	/**
+	 * Return class name without prefix
+	 *
+	 * @return string
+	 */
+	public function getName();
+	
+	/**
+	 * Set data if need to rendered
+	 *
+	 * @param mixed $data
+	 * @return void
+	 */
+	public function setData($data);
+
+	/**
+	 * Set values
+	 *
+	 * @param array $values
+	 */
+	public function setValues(array $values);
 }

@@ -4,6 +4,29 @@ require_once 'KontorX/DataGrid/Adapter/Interface.php';
 abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Adapter_Interface {
 
 	/**
+	 * @var mixed
+	 */
+	private $_data = null;
+	
+	/**
+	 * Set raw data
+	 *
+	 * @param mixed $data
+	 */
+	public function setData($data) {
+		$this->_data = $data;
+	}
+	
+	/**
+	 * Return a raw data
+	 *
+	 * @return mixed
+	 */
+	public function getData() {
+		return $this->_data;
+	}
+	
+	/**
 	 * @var array
 	 */
 	private $_columns = array();
@@ -26,52 +49,6 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 		return empty($this->_columns) ? $columns : $this->_columns;
 	}
 	
-	/**
-	 * @var array
-	 */
-	private $_filters = array();
-	
-	/**
-	 * Set array of @see KontorX_DataGrid_Filter_Interface objects
-	 *
-	 * @param array $filters
-	 */
-	public function setFilters(array $filters) {
-		$this->_filters = $filters;
-	}
-
-	/**
-	 * Return filters array
-	 *
-	 * @return array
-	 */
-	public function getFilters(array $filters = null) {
-		return empty($this->_filters) ? $filters : $this->_filters;
-	}
-	
-	/**
-	 * @var array
-	 */
-	private $_rows = array();
-	
-	/**
-	 * Set array of @see KontorX_DataGrid_Row_Interface objects
-	 *
-	 * @param array $rows
-	 */
-	public function setRows(array $rows) {
-		$this->_rows = $rows;
-	}
-
-	/**
-	 * Return rows array
-	 *
-	 * @return array
-	 */
-	public function getRows(array $rows = null) {
-		return empty($this->_rows) ? $rows : $this->_rows;
-	}
-
 	/**
 	 * @var array
 	 */
@@ -103,5 +80,27 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 	 */
 	public function isPagination() {
 		return (count($this->_pagination) == 2);
+	}
+
+	private $_rows = array();
+	
+	/**
+	 * Get array set of @see KontorX_DataGrid_Row_Interface
+	 *
+	 * @return array
+	 */
+	public function getRows() {
+		if (empty($this->_rows)) {
+			$result = array();
+			foreach ($this->getColumns() as $columnName => $columnInstance) {
+				$row = $columnInstance->getRow();
+				if (null != $row) {
+					$result[$columnName] = $row;
+				}
+			}
+			$this->_rows = $result;
+		}
+
+		return $this->_rows;
 	}
 }
