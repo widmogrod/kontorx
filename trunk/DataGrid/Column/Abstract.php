@@ -18,8 +18,16 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
 			}
 			$this->setOptions($options);
 		}
+		
+		$this->init();
 	}
 
+	/**
+	 * Initialize class .. specialization purpose ..
+	 *
+	 */
+	public function init() {}
+	
 	/**
 	 * Return class name without prefix
 	 *
@@ -30,26 +38,26 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
 	}
 
 	/**
-	 * @var KontorX_DataGrid_Filter_Interface
+	 * @var arary
 	 */
-	private $_filter = null;
+	private $_filters = array();
 	
 	/**
-	 * Set filter instance @see KontorX_DataGrid_Filter_Interface
+	 * Add filter instance @see KontorX_DataGrid_Filter_Interface
 	 *
 	 * @param KontorX_DataGrid_Filter_Interface $filter
 	 */
-	public function setFilter(KontorX_DataGrid_Filter_Interface $filter) {
-		$this->_filter = $filter;
+	public function addFilter(KontorX_DataGrid_Filter_Interface $filter) {
+		$this->_filters[] = $filter;
 	}
 	
 	/**
-	 * Return filter instance @see KontorX_DataGrid_Filter_Interface
+	 * Return array of filter objects @see KontorX_DataGrid_Filter_Interface
 	 * 
-	 * @return KontorX_DataGrid_Filter_Interface
+	 * @return array
 	 */
-	public function getFilter() {
-		return $this->_filter;
+	public function getFilters() {
+		return $this->_filters;
 	}
 
 	/**

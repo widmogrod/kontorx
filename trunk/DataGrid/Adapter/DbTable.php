@@ -4,11 +4,6 @@ require_once 'KontorX/DataGrid/Adapter/Abstract.php';
 class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract {
 
 	/**
-	 * @var Zend_Db_Table_Abstract
-	 */
-	protected $_table = null;
-
-	/**
 	 * Konstruktor
 	 *
 	 * @param Zend_Db_Table_Abstract $table
@@ -16,6 +11,11 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 	public function __construct(Zend_Db_Table_Abstract $table) {
 		$this->_table = $table;
 	}
+	
+	/**
+	 * @var Zend_Db_Table_Abstract
+	 */
+	protected $_table = null;
 
 	/**
 	 * Zwraca @see Zend_Db_Table_Abstract
@@ -27,6 +27,23 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 	}
 
 	/**
+	 * @var Zend_Db_Select
+	 */
+	private $_select = null;
+	
+	/**
+	 * Return select statment mini. singletone
+	 *
+	 * @return Zend_Db_Select
+	 */
+	public function getSelect() {
+		if (null === $this->_select) {
+			$this->_select = $this->getTable()->select();
+		}
+		return $this->_select;
+	}
+	
+	/**
 	 * Wyławia szukane kolumny spełniające warunek ..
 	 *
 	 * @param array $columns
@@ -35,7 +52,7 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 	 */
 	public function fetchData() {
 		$table = $this->getTable();
-		$select = $table->select();
+		$select = $this->getSelect();
 
 		// przygotowanie zapytania {@see Zend_Db_Select}
 		if (null !== ($columns = $this->getColumns())) {

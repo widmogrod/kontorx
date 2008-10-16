@@ -8,14 +8,18 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 			throw new KontorX_DataGrid_Exception("Wrong filter adapter");
 		}
 		
-		$this->getValues();
+		$text = $this->getValue($this->getName());
 		$columnName = $this->getColumnName();
-		$dbTable = $adapter->getData();
-//		$dbTable->where()
+
+		if (strlen($text)) {
+			$adapter->getSelect()
+				->where("$columnName LIKE ?", "$text%");
+		}
 	}
 
 	public function render() {
-		$value = $this->getValues();
-		return '<input type="text" name="filter['.$this->getColumnName().']['.$this->getName().']['.$this->getColumnName().']" value="'.$value.'" />';
+		$name = $this->getName();
+		$value = $this->getValue($name);
+		return '<input type="text" name="filter['.$this->getColumnName().']['.$name.']" value="'.$value.'" />';
 	}
 }
