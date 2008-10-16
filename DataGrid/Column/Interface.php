@@ -26,14 +26,14 @@ interface KontorX_DataGrid_Column_Interface {
 	 *
 	 * @param KontorX_DataGrid_Filter_Interface $filter
 	 */
-	public function setFilter(KontorX_DataGrid_Filter_Interface $filter);
+	public function addFilter(KontorX_DataGrid_Filter_Interface $filter);
 	
 	/**
 	 * Return filter instance @see KontorX_DataGrid_Filter_Interface
 	 * 
 	 * @return KontorX_DataGrid_Filter_Interface
 	 */
-	public function getFilter();
+	public function getFilters();
 
 	/**
 	 * Set filter instance @see KontorX_DataGrid_Row_Interface

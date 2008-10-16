@@ -201,34 +201,21 @@ class KontorX_DataGrid {
 	}
 
 	/**
-	 * Find filter/column and pas to it values
+	 * Set each column property value
 	 *
 	 * @return void
 	 */
-	private function _noticeColumnAndFilterValues() {
-//		$values = $this->getValues();
-//		if (isset($values['columns'])) {
-//			foreach ((array) $values['columns'] as $columnName => $values) {
-//				if ($this->hasFilter($columnName)) {
-//					$filter = $this->getFilter($columnName);
-//					$filterName = $filter->getName();
-//					if (isset($values[$filterName])) {
-//						$filter->setValues((array) $values[$filterName]);
-//					}
-//				}
-//			}
-//		}
-//		if (isset($values['filters'])) {
-//			foreach ((array) $values['filters'] as $columnName => $values) {
-//				if ($this->hasColumn($columnName)) {
-//					$column = $this->getColumn($columnName);
-//					$columnName = $filter->getName();
-//					if (isset($values[$columnName])) {
-//						$column->setValues((array) $values[$columnName]);
-//					}
-//				}
-//			}
-//		}
+	private function _noticeValues() {
+		foreach ($this->getColumns() as $name => $column) {
+			if (isset($this->_values[$name])) {
+				$values = (array) $this->_values[$name];
+				$column->setValues($values);
+				// if column has filter - set values to filter!
+				foreach ($column->getFilters() as $filter) {
+					$filter->setValues($values);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -274,7 +261,7 @@ class KontorX_DataGrid {
 		// create filter
 		if (isset($columnOptions['filter'])) {
 			$filter = $this->_createFilter($columnName, (array) $columnOptions['filter']);
-			$columnInstance->setFilter($filter);
+			$columnInstance->addFilter($filter);
 		}
 		// create row
 		if (isset($columnOptions['row'])) {
@@ -427,7 +414,7 @@ class KontorX_DataGrid {
 	private function _getFilters() {
 		$result = array();
 		foreach ($this->getColumns() as $column) {
-			$result[] = $column->getFilter();
+			array_push($result, $column->getFilters());
 		}
 		return $result;
 	}
@@ -439,8 +426,7 @@ class KontorX_DataGrid {
 	 */
 	private function _noticeFilters(KontorX_DataGrid_Adapter_Interface $adapter) {
 		foreach ($this->getColumns() as $column) {
-			$filter = $column->getFilter();
-			if ($filter instanceof KontorX_DataGrid_Filter_Interface) {
+			foreach ($column->getFilters() as $filter) {
 				$filter->filter($adapter);
 			}
 		}
@@ -460,10 +446,11 @@ class KontorX_DataGrid {
 		if (null === $this->_vars) {
 			$adapter = $this->getAdapter();
 
-			$this->_orderColumns();
+			$this->_noticeValues();
 			$this->_noticeFilters($adapter);
-//			$this->_noticeColumnAndFilterValues();
 			
+			$this->_orderColumns();
+
 			$columns = $this->getColumns();
 			$adapter->setColumns($columns);
 
