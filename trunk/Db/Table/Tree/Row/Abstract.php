@@ -7,7 +7,7 @@ require_once 'Zend/Db/Table/Row/Abstract.php';
  * @category	KontorX
  * @package		KontorX_Db
  * @subpackage	Table
- * @version		0.2.8
+ * @version		0.3.1
  */
 abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abstract {
 	/**
@@ -51,14 +51,19 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 	public function __get($columnName) {
 		// specjalny atrybut zwracajacy glebokosc drzewa
 		if ($columnName == 'depth') {
-			$level = $this->_data[$this->_level];
-			// jezeli wartosc level jest == '' tzn. ze
-			// jest to wezel glowny
-			return $level == ''
-				? 0
-				: substr_count($level, $this->_separator) + 1;
+			return $this->getDepth();
 		}
 		return parent::__get($columnName);
+	}
+
+	/**
+	 * Return depth of row nest..
+	 * 
+	 * @return integer
+	 */
+	public function getDepth() {
+		$level = $this->_data[$this->_level];
+		return $level == '' ? 0 : substr_count($level, $this->_separator) + 1;
 	}
 	
 	/**
@@ -146,7 +151,7 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 		$rowset = $this->_table->find($descendans);
 		return $rowset;
 	}
-
+	
 	/**
 	 * Znajdz rodziców rodzica ;]
 	 *
@@ -174,15 +179,13 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 			? $this->select()
 			: $select;
 
-		// zapytanie wyszukujące dzieci dla rodzica
-		if (is_integer($depthLevel)) {
-			$levelArray	= explode($this->_separator, $level);
-			$levelParents = $this->_regexpDepthLevelParents($levelArray, $depthLevel);
-
-			$select->where("$this->_level REGEXP '^$levelParents$'");
-		} else {
-			$select->where("$this->_level LIKE ", "%$levelChildrens");
+		if (!is_integer($depthLevel)) {
+			$depthLevel = $this->getDepth();
 		}
+
+		$levelArray	  = explode($this->_separator, $level);
+		$levelParents = $this->_regexpDepthLevelParents($levelArray, $depthLevel);
+		$select->where("$this->_level REGEXP '^$levelParents$'");
 		
 		return $this->_table->fetchAll($select);
 	}
@@ -358,20 +361,34 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 		// stara wartosc zagniezdzenia
 		$levelOld = $this->{$this->_level};
 		// ustawianie zagniezdzenia
-		$this->{$this->_level} = $level;
-
+//		$this->{$this->_level} = $level;
+//
+//		// zabespieczenie gdy dzialamy na root
+//		$level = $levelOld == ''
+//			? $this->{current($this->_primary)}
+//			: $levelOld . $this->_separator . $this->{current($this->_primary)};
+		
 		// update dzieci rodzica gdy zostaje zmienione jego polozenie
 		$table = $this->getTable();
 		$db = $table->getAdapter();
-		$data = array($this->_level => $level);
-		
-		// zabespieczenie gdy dzialamy na root
-		$level = $levelOld == ''
-			? $this->{current($this->_primary)}
-			: $levelOld . $this->_separator . $this->{current($this->_primary)};
-		
-		$where = $db->quoteInto("$this->_level LIKE ?", $level . '%');
-		$db = $this->getTable()->update($data, $where);
+
+		$db->beginTransaction();
+		try {
+			// TODO przyd dużej ilość rekordów może zostać przepełniona pamięć!
+			// Zastąpić to zapytaniem SQL!
+			foreach ($this->findChildrens() as $children) {
+				$children->{$this->_level} = ($levelOld == '')
+					? $level . $this->_separator . $children->{$this->_level}
+					: str_replace($levelOld, $level, $children->{$this->_level});
+				$children->save();
+			}
+			$this->{$this->_level} = $level;
+
+			$db->commit();
+		} catch (Zend_Db_Exception $e) {
+			$db->rollBack();
+			throw $e;
+		}			
 
 		// zerowanie parent row ..
 		$this->_parentRow = null;

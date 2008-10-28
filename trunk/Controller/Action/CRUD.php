@@ -53,7 +53,7 @@ abstract class KontorX_Controller_Action_CRUD extends KontorX_Controller_Action_
     protected function _editGetFormDbTableIgnoreColumns() {
     	return $this->_addGetFormDbTableIgnoreColumns();
     }
-    
+
     /**
      * Zwraca obiekt konfiguracji @see Zend_Config
      *
@@ -66,9 +66,7 @@ abstract class KontorX_Controller_Action_CRUD extends KontorX_Controller_Action_
     	$controller = $request->getControllerName();
     	$module 	= $request->getModuleName();
 
-    	$controller = strtolower($controller);
-
-    	$fileName = "$controller.ini";
+    	$fileName = $this->_getConfigFormFilename($controller);
 
     	$loader = $this->_helper->loader;
     	if (!$loader->hasConfig($fileName, $module)) {
@@ -83,5 +81,18 @@ abstract class KontorX_Controller_Action_CRUD extends KontorX_Controller_Action_
     	}
 
     	return $config;
+    }
+    
+	/**
+	 * Return config name filename
+	 * 
+	 * @author gabriel
+	 * 
+	 * @param $controller
+	 * @return unknown_type
+	 */
+	protected function _getConfigFormFilename($controller) {
+    	$controller = strtolower($controller);
+    	return "$controller.ini";
     }
 }

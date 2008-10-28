@@ -217,6 +217,7 @@ class KontorX_Form_DbTable extends Zend_Form {
 				}
 				break;
 			case 'TEXT':
+			case 'MEDIUMTEXT':
 				$element = 'textarea';
 				break;
 			default:

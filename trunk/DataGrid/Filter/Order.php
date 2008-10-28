@@ -10,12 +10,16 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
 
 		$select = $adapter->getSelect();
 
+		$name = $this->getName();
+		$column = $this->getColumnName();
+
+		$values = $this->getValues()->filter;
+		$orderType = $values->$column->$name;
+		$orderType = ($orderType != 'asc') ? 'desc' : $orderType;
+
 		$columnName = $this->getColumnName();
 		
-		$order = $this->getValue($this->getName(), 'asc');
-		$order = ($order == 'asc') ? 'desc' : 'asc';
-
-		$select->order("$columnName $order");
+		$select->order("$columnName $orderType");
 	}
 
 	public function render() {

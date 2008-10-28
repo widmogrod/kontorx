@@ -18,15 +18,31 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
 			}
 			$this->setOptions($options);
 		}
-		
-		$this->init();
+		$this->_init();
 	}
 
 	/**
+	 * Return options key => value
+	 * @return string
+	 */
+	public function __get($name) {
+		return array_key_exists($name, $this->_options)
+			? $this->_options[$name] : null;
+	}
+	
+	/**
 	 * Initialize class .. specialization purpose ..
 	 *
+	 * @return void
 	 */
-	public function init() {}
+	protected function _init() {}
+	
+	/**
+	 * Setup values
+	 *
+	 * @return void
+	 */
+	protected function _setupValues() {}
 	
 	/**
 	 * Return class name without prefix
@@ -84,38 +100,29 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
 	}
 	
 	/**
-	 * @var array
+	 * @var Zend_Config
 	 */
-	private $_values = array();
+	private $_values = null;
 	
 	/**
 	 * Values
 	 *
 	 * @param array $values
 	 */
-	public function setValues(array $values) {
+	public function setValues(Zend_Config $values) {
 		$this->_values = $values;
+		// TODO To jest w tej chwili testowane
+		// a idea to zeby vartości filtrów zawsze były zaktualizowane!
+		$this->_setupValues();
 	}
 	
 	/**
 	 * Return values
 	 *
-	 * @return array
+	 * @return Zend_Config
 	 */
 	public function getValues() {
 		return $this->_values;
-	}
-	
-	/**
-	 * Return value
-	 *
-	 * @param string $name
-	 * @param mixed $default
-	 * @return mixed
-	 */
-	public function getValue($name, $default = null) {
-		return array_key_exists($name, $this->_values)
-			? $this->_values[$name] : $default;
 	}
 	
 	/**

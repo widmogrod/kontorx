@@ -1,4 +1,6 @@
 <?php
+require_once 'Zend/Config.php';
+
 /**
  * KontorX_DataGrid
  * 
@@ -174,9 +176,9 @@ class KontorX_DataGrid {
 	}
 
 	/**
-	 * @var array
+	 * @var Zend_Config
 	 */
-	private $_values = array();
+	private $_values = null;
 	
 	/**
 	 * Set array of values
@@ -185,16 +187,32 @@ class KontorX_DataGrid {
 	 *  filters => ..
 	 * )
 	 *
-	 * @param array $values
+	 * @param Zend_Config $values
 	 */
-	public function setValues(array $values) {
+	public function setValues($values) {
+		if (!$values instanceof Zend_Config) {
+			$values = new Zend_Config((array) $values, true);
+		}
+
+		if (!$values instanceof Zend_Config) {
+			require_once 'KontorX/DataGrid/Exception.php';
+			throw new KontorX_DataGrid_Exception("Values are not array or Zend_Config instance");
+		}
+
+		// sprawdzanie czy jest namespace!
+		if (!isset($values->filter)) {
+			$valuesBackup = $values;
+			$values = new Zend_Config(array(), true);
+			$values->filter = $valuesBackup;
+		}
+
 		$this->_values = $values;
 	}
 
 	/**
-	 * Return values
+	 * Return @see Zend_Config
 	 *
-	 * @return array
+	 * @return Zend_Config
 	 */
 	public function getValues() {
 		return $this->_values;
@@ -206,9 +224,9 @@ class KontorX_DataGrid {
 	 * @return void
 	 */
 	private function _noticeValues() {
-		foreach ($this->getColumns() as $name => $column) {
-			if (isset($this->_values[$name])) {
-				$values = (array) $this->_values[$name];
+		$values = $this->getValues();
+		if ($values instanceof Zend_Config) {
+			foreach ($this->getColumns() as $name => $column) {
 				$column->setValues($values);
 				// if column has filter - set values to filter!
 				foreach ($column->getFilters() as $filter) {
@@ -463,7 +481,8 @@ class KontorX_DataGrid {
 				'columns' => $columns,
 				'filters' => $this->_getFilters(),
 				'rowset'  => $adapter->fetchData(),
-				'paginator' => ($this->isPagination() ? $this->_createPaginator() : null)
+				'paginator' => ($this->isPagination() ? $this->_createPaginator() : null),
+				'valuesQuery' => urldecode(http_build_query($this->getValues()->toArray()))
 			);
 		}
 		return $this->_vars;

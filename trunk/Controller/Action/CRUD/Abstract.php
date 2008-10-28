@@ -301,7 +301,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      * 
      * @param Zend_Db_Table_Exception $e
      */
-    protected function _addOnException(Zend_Exception $e, Zend_Form $form) {
+    protected function _addOnException(Zend_Exception $e, Zend_Form $form, Zend_Db_Table_Row_Abstract $row = null) {
     	// logowanie wyjatku
 		$logger = Zend_Registry::get('logger');
 		$logger->log($e->getMessage() . "\n" . $e->getTraceAsString(), Zend_Log::ERR);

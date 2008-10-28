@@ -8,8 +8,14 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 			throw new KontorX_DataGrid_Exception("Wrong filter adapter");
 		}
 		
-		$text = $this->getValue($this->getName());
+		$select = $adapter->getSelect();
+
+		$name 		= $this->getName();
+		$column 	= $this->getColumnName();
 		$columnName = $this->getColumnName();
+
+		$values = $this->getValues()->filter;
+		$text = $values->$column->$name;
 
 		if (strlen($text)) {
 			$adapter->getSelect()
@@ -18,8 +24,12 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 	}
 
 	public function render() {
-		$name = $this->getName();
-		$value = $this->getValue($name);
-		return '<input type="text" name="filter['.$this->getColumnName().']['.$name.']" value="'.$value.'" />';
+		$name 		= $this->getName();
+		$column 	= $this->getColumnName();
+		
+		$values = $this->getValues()->filter;
+		$text = $values->$column->$name;
+
+		return '<input type="text" name="filter['.$this->getColumnName().']['.$name.']" value="'.$text.'" />';
 	}
 }
