@@ -33,7 +33,7 @@ interface KontorX_DataGrid_Filter_Interface {
 	/**
 	 * Set values
 	 *
-	 * @param array $values
+	 * @param Zend_Config $values
 	 */
-	public function setValues(array $values);
+	public function setValues(Zend_Config $values);
 }

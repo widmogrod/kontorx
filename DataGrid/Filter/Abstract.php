@@ -15,8 +15,17 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
 			}
 			$this->setOptions($options);
 		}
+		
+		$this->_init();
 	}
 
+	/**
+	 * Initialize
+	 * 
+	 * @return void
+	 */
+	protected function _init() {}
+	
 	/**
 	 * Return class name without prefix
 	 *
@@ -55,38 +64,26 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
 	}
 
 	/**
-	 * @var array
+	 * @var Zend_Config
 	 */
-	private $_values = array();
+	private $_values = null;
 	
 	/**
 	 * Set values
 	 *
 	 * @param array $values
 	 */
-	public function setValues(array $values) {
+	public function setValues(Zend_Config $values) {
 		$this->_values = $values;
 	}
 	
 	/**
 	 * Return values
 	 *
-	 * @return array
+	 * @return Zend_Config
 	 */
 	public function getValues() {
 		return $this->_values;
-	}
-
-	/**
-	 * Return value for key or default value as second parameter
-	 *
-	 * @param string $name
-	 * @param mixed $default
-	 * @return mixed
-	 */
-	public function getValue($name, $default = null) {
-		return array_key_exists($name, $this->_values)
-			? $this->_values[$name] : $default;
 	}
 	
 	/**

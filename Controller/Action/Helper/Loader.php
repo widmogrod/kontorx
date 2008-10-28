@@ -6,7 +6,7 @@ require_once 'Zend/Controller/Action/Helper/Abstract.php';
  * 
  * @category 	KontorX
  * @package 	KontorX_Controller_Action_Helper
- * @version 	0.1.4
+ * @version 	0.1.6
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
@@ -35,6 +35,10 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
 	 */
 	public function config($fileName = null, $module = null, $type = null) {
 		$fileName  = (null === $fileName) ? 'config.ini' : $fileName;
+		// prepere file type
+		$type = (null === $type)
+			? end(explode('.', $fileName)) // from extension
+			: $type;
 		$configKey = "$fileName:$type";
 
 		// zapobiegu ponownemu wczytywaniu konfiguacji
@@ -47,10 +51,19 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
 
 		// jakiego typu jest konfiguracja
 		switch ($type) {
-        	case self::CONFIG_PHP: $config = new Zend_Config(include $path); break;
+        	case self::CONFIG_PHP:
+        		require_once 'Zend/Config.php';
+        		$config = new Zend_Config(include $path);
+        		break;
         	default:
-        	case self::CONFIG_INI: $config = new Zend_Config_Ini($path); break;
-        	case self::CONFIG_XML: $config = new Zend_Config_Xml($path); break;
+        	case self::CONFIG_INI:
+        		require_once 'Zend/Config/Ini.php';
+        		$config = new Zend_Config_Ini($path);
+        		break;
+        	case self::CONFIG_XML:
+        		require_once 'Zend/Config/Xml.php';
+        		$config = new Zend_Config_Xml($path);
+        		break;
         }
 
         // zapis konfiguracji
