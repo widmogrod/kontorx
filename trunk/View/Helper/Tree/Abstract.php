@@ -33,7 +33,7 @@ abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstra
 		$result .= '</ul>';
 		return $result;
 	}
-
+	
 	/**
 	 * Renderowanie zagniezdzenia
 	 *
