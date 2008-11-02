@@ -172,13 +172,30 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		if (isset($templateConfig->title)) {
 			$headTitle = $view->headTitle();
 			$headTitle->setSeparator(' - ');
-			$headTitle->set($templateConfig->title);
+			$headTitle->append($templateConfig->title);
 		}
 		// meta
 		if (isset($templateConfig->meta)) {
+			// sprawdzanie czy są już ustawione meta dane
+			// TODO czy podwojne metadane przeszkadzają??
+			// bo wlasnie po to jest sprawdzanies
+			$meta = array();
 			$headMeta = $view->headMeta();
-			$headMeta->setName('keywords', $templateConfig->meta->name->keywords);
-			$headMeta->appendName('description', $templateConfig->meta->name->description);
+			foreach ($headMeta->getContainer() as $key) {
+				if ($key->name == 'keywords') {
+					$meta['keywords'] = true;
+				} else
+				if ($key->name == 'description') {
+					$meta['description'] = true;
+				}
+			}
+
+			if (!isset($meta['keywords'])) {
+				$headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
+			}
+			if (!isset($meta['description'])) {
+				$headMeta->appendName('description', $templateConfig->meta->name->description);
+			}
 		}
 		// script
 		if (isset($templateConfig->script)) {

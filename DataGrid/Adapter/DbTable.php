@@ -54,10 +54,7 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 		$table = $this->getTable();
 		$select = $this->getSelect();
 
-		// przygotowanie zapytania {@see Zend_Db_Select}
-		if (null !== ($columns = $this->getColumns())) {
-			$this->_prepareColumns($columns, $select);
-		}
+		// czy jest paginacja
 		if ($this->isPagination()) {
 			list($pageNumber, $itemCountPerPage) = $this->getPagination();
 			$select
@@ -65,37 +62,29 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 		}
 
 		$dataset = $table->fetchAll($select);
+		$columns = $this->getColumns();
 		$rows   = $this->getRows();
-		$result = array();
 
-		foreach ($dataset as $data) {
-			$data = $rawData = $data->toArray();
-			// czy są jakieś obiekty @see KontorX_DataGrid_Row_Interface
-			if (count($rows)) {
-				foreach ($rows as $rowName => $rowInstance) {
-					$cloneRowInstance = clone $rowInstance;
-					$cloneRowInstance->setData($rawData, $rowName);
-					$data[$rowName] = $cloneRowInstance;
+		$result = array();
+		foreach ($dataset as $i => $data) {
+			$rawData = $data->toArray();
+			// tworzymy tablice wielowymiarowa rekordow 
+			foreach ($columns as $columnName => $columnInstance) {
+				// jest dekorator rekordu @see KontorX_DataGrid_Row_Interface
+				if (count($rows)
+						&& isset($rows[$columnName])
+							&& $rows[$columnName] instanceof KontorX_DataGrid_Row_Interface) {
+					$cloneRowInstance = clone $rows[$columnName];
+					$cloneRowInstance->setData($rawData, $columnName);
+					$result[$i][$columnName] = $cloneRowInstance;
+				}
+				// surowy rekord!
+				else {
+					$result[$i][$columnName] = isset($rawData[$columnName])
+						? $rawData[$columnName] : null;
 				}
 			}
-			$result[] = $data;
 		}
-		
 		return $result;
-	}
-
-	/**
-	 * Prepare @see Zend_Db_Select for select columns
-	 *
-	 * @param array $columns
-	 * @param Zend_Db_Select $select
-	 */
-	private function _prepareColumns(array $columns, Zend_Db_Select $select) {
-		$table = $this->getTable();
-		// przygotowanie kolumn do wyciągnięcia
-		$columns = array_intersect(
-						$table->info(Zend_Db_Table::COLS), array_keys($columns));
-		$select
-			->from($table->info(Zend_Db_Table::NAME), $columns);
 	}
 }

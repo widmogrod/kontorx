@@ -12,6 +12,7 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
 		if (null != $options) {
 			if (isset($options['columnName'])) {
 				$this->setColumnName($options['columnName']);
+				unset($options['columnName']);
 			}
 			$this->setOptions($options);
 		}

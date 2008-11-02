@@ -12,9 +12,11 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
 		if (null != $options) {
 			if (isset($options['name'])) {
 				$this->setColumnMainName($options['name']);
+//				unset($options['name']);
 			}
 			if (isset($options['columnName'])) {
 				$this->setColumnName($options['columnName']);
+//				unset($options['columnName']);
 			}
 			$this->setOptions($options);
 		}

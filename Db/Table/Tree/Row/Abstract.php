@@ -377,9 +377,16 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 			// TODO przyd dużej ilość rekordów może zostać przepełniona pamięć!
 			// Zastąpić to zapytaniem SQL!
 			foreach ($this->findChildrens() as $children) {
-				$children->{$this->_level} = ($levelOld == '')
+				$childrenLevel = ($levelOld == '')
 					? $level . $this->_separator . $children->{$this->_level}
 					: str_replace($levelOld, $level, $children->{$this->_level});
+				// level nie moze zaczynac się od separatora!
+				$childrenLevel = ($childrenLevel{0} == $this->_separator)
+					? substr($childrenLevel, 1)
+					: $childrenLevel;
+
+				$children->{$this->_level} = $childrenLevel;
+
 				$children->save();
 			}
 			$this->{$this->_level} = $level;
