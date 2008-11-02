@@ -12,9 +12,19 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 		if (null != $options) {
 			if (isset($options['columnName'])) {
 				$this->setColumnName($options['columnName']);
+				unset($options['columnName']);
 			}
 			$this->setOptions($options);
 		}
+	}
+
+	/**
+	 * Return options key => value
+	 * @return string
+	 */
+	public function __get($name) {
+		return array_key_exists($name, $this->_options)
+			? $this->_options[$name] : null;
 	}
 	
 	/**

@@ -19,7 +19,7 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 
 		if (strlen($text)) {
 			$adapter->getSelect()
-				->where("$columnName LIKE ?", "$text%");
+				->where("$columnName LIKE ?", "%$text%");
 		}
 	}
 
