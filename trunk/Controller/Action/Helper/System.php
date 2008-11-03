@@ -7,6 +7,8 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 		$request = $action->getRequest();
 		$plugin  = $this->getPluginInstance();
 
+		$actionName = $request->getActionName();
+
 		// setup template
 		if (isset($action->skin)) {
 			if (is_array($action->skin)) {
@@ -14,7 +16,6 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 
 				// sprawdz czy nazwa akcji nie jest zastrzezona
 				// i czy istnieje jako oddzielna konfiguracja skórki dla akcji
-				$actionName = $request->getActionName();
 				if (!in_array($actionName, array('layout', 'dynamic', 'template'))
 						&& array_key_exists($actionName, $options)) {
 					$options = $action->skin[$actionName];
@@ -40,11 +41,46 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 				$this->getPluginInstance()->setTemplateName($action->skin);
 			}
 		}
+
+		// setup cache
+		if (isset($action->cache) &&
+				is_array($action->cache) &&
+					array_key_exists($actionName, $action->cache)) {
+			// cache options
+			$plugin->setCacheActionOptions($action->cache[$actionName], $request);
+		}		
     }
 
+    public function preDispatch() {
+    	$action  = $this->getActionController();
+    	$request = $action->getRequest();
+    	$plugin  = $this->getPluginInstance();
+
+    	// init cache for action!
+		$options = $plugin->getCacheActionOptions($request, true);
+		if (is_array($options)) {
+			$cache   = $plugin->getCacheInstance($options);
+			$cacheId = $plugin->getCacheActionId($request, $options);
+			// czy widok jest w cache?
+			if (!($view = $cache->load($cacheId))) {
+				$plugin->setCached(false);
+				$plugin->setCacheView(true);
+			} else {
+				$plugin->setCached(true);
+				$plugin->setCacheView(false);
+				// ustawiamy inforamcje żeby nie wykonywać akcji!
+				// bo po co jak jest w cache!
+				$request->setDispatched(false);
+
+				$this->getResponse()->appendBody($view);
+			}
+		}
+    }
+    
     public function postDispatch() {
     	$action = $this->getActionController();
     	$request = $action->getRequest();
+    	$plugin  = $this->getPluginInstance();
 
     	if (!$request->isDispatched()) {
     		return;
@@ -70,7 +106,7 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 		$scriptPath = "$path/ext/$module/scripts/";
 
 		$view->addScriptPath($scriptPath);
-				// narazie wielojezykowosc jest off!
+				// TODO narazie wielojezykowosc jest off!
 //				->addScriptPath("$pathI18n/scripts");
     }
     

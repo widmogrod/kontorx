@@ -15,26 +15,125 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @param Zend_Config $config
 	 */
 	public function __construct(Zend_Config $config) {
+		// ustawienie domyslenej konfiguracji!
 		$this->setConfig($config);
 	}
 
-	public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request) {
-		$this->_initHelper();
+	/**
+	 * @var array
+	 */
+	protected $_config = null;
+	
+	/**
+	 * @var Zend_Config
+	 */
+	protected $_configRaw = null;
+
+	/**
+	 * Domyślna konfiguracja systemu
+	 *
+	 * @var array
+	 */
+	protected $_defaultConfig = array(
+		'template' => array(
+			'name' 	=> 'default',
+			'layout'=> 'index',
+			'path'	=> './layout',
+			'config'=> array(
+				'filename' => 'config.ini',
+				'type' 	   => 'ini'
+			)
+		),
+		'language' => array(
+			'default' => 'pl'
+		),
+		'cache' => array(
+			'id' => 'params',
+			'frontendName' => 'Core',
+			'backendName' => 'File',
+			'frontendOptions' => array(
+				'lifetime' => 120,
+   				'automatic_serialization' => false
+			),
+			'backendOptions' => array(
+				'cache_dir' => './tmp/'
+			)
+		)
+	);
+	
+	/**
+	 * Ustawia konfigurację
+	 *
+	 * @param Zend_Config $config
+	 */
+	public function setConfig(Zend_Config $config) {
+		$this->_config = $config->toArray() + $this->_defaultConfig;
+		$this->_configRaw = $config;
+	}
+
+	/**
+	 * Zwraca konfigurację
+	 *
+	 * Parametr $raw false zwraca konfiguracje połączoną
+	 * z konfiguracją domyślną, tj. jeżeli jakaś wartość
+	 * nie została ustawiona przyjmuje wartość domyślną
+	 * Parametr $raw może również być typu Zend_Config|array
+	 * 
+	 * @param Zend_Config|array|bool $raw
+	 * @return Zend_Config|array
+	 */
+	public function getConfig($raw = false, $segment = null) {
+		if (false === $raw) {
+			$array = $this->_configRaw->toArray();
+		} else
+		if ($raw instanceof Zend_Config) {
+			$array = $raw->toArray();
+		} else
+		if (is_array($raw)){
+			$array = $raw;
+		} else {
+			return $this->_configRaw;
+		}
+
+		$result = array();
+		if (null !== $segment &&
+				array_key_exists($segment, $this->_config)) {
+			$result = $array + $this->_config[$segment];
+		} else {
+			$result = $array + $this->_config;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Zwraca domyślną konfigurację
+	 *
+	 * @return array
+	 */
+	public function getDefaultConfig() {
+		return $this->_defaultConfig;
 	}
 	
+	public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request) {
+		// inicjujemy pomocnik akcji!
+		$this->_initHelper();
+	}
+
 	/**
 	 * @Overwrite
 	 *
 	 * @param Zend_Controller_Request_Abstract $request
 	 */
 	public function postDispatch(Zend_Controller_Request_Abstract $request) {
-		if (!$request->isDispatched()) {
-			// tylko finalny loop
-			return;
-		}
+		// inicjujemy cache
+		$this->_initCache($request);
 
-		// inicjujemy layout
-		$this->_initLayout();
+		// tylko finalny loop
+		if ($request->isDispatched()) {
+			// inicjujemy layout
+			$this->_initLayout();
+		}
 	}
 
 	/**
@@ -45,7 +144,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
     protected function _initHelper(){
         $helperClass = $this->getHelperClass();
         require_once 'Zend/Controller/Action/HelperBroker.php';
-        if (!Zend_Controller_Action_HelperBroker::hasHelper('system')) {
+        if (!Zend_Controller_Action_HelperBroker::hasHelper('cache')) {
             require_once 'Zend/Loader.php';
             Zend_Loader::loadClass($helperClass);
             $this->_helperInstance = new $helperClass();
@@ -214,7 +313,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			}
 		}
 	}
-
+	
 	/**
 	 * @var string
 	 */
@@ -239,77 +338,6 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		return array($path, $pathI18n);
 	}
 	
-	/**
-	 * @var array
-	 */
-	protected $_config = null;
-	
-	/**
-	 * @var Zend_Config
-	 */
-	protected $_configRaw = null;
-
-	/**
-	 * Domyślna konfiguracja systemu
-	 *
-	 * @var array
-	 */
-	protected $_defaultConfig = array(
-		'template' => array(
-			'name' 	=> 'default',
-			'layout'=> 'index',
-			'path'	=> './layout',
-			'config'=> array(
-				'filename' => 'config.ini',
-				'type' 	   => 'ini'
-			)
-		),
-		'language' => array(
-			'default' => 'pl'
-		)
-	);
-	
-	/**
-	 * Ustawia konfigurację
-	 *
-	 * @param Zend_Config $config
-	 */
-	public function setConfig(Zend_Config $config) {
-		$this->_config 	  = null;
-		$this->_configRaw = $config;
-	}
-
-	/**
-	 * Zwraca konfigurację
-	 *
-	 * Parametr $raw false zwraca konfiguracje połączoną
-	 * z konfiguracją domyślną, tj. jeżeli jakaś wartość
-	 * nie została ustawiona przyjmuje wartość domyślną
-	 * 
-	 * @param bool $raw
-	 * @return Zend_Config
-	 */
-	public function getConfig($raw = false) {
-		if (false === $raw) {
-			if (null === $this->_config) {
-				$this->_config = array_merge(
-					$this->_defaultConfig,
-					$this->_configRaw->toArray());
-			}
-			return $this->_config;
-		}
-		return $this->_configRaw;
-	}
-
-	/**
-	 * Zwraca domyślną konfigurację
-	 *
-	 * @return array
-	 */
-	public function getDefaultConfig() {
-		return $this->_defaultConfig;
-	}
-
 	const APPLICATION_MODULES_DIRNAME = 'modules';
 	const APPLICATION_CONFIGURATION_DIRNAME = 'configuration';
 	
@@ -371,6 +399,197 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			return $this->_publicHtmlPath . '/' . $append;
 		}
 		return $this->_publicHtmlPath;
+	}
+
+	/**
+	 * @var string
+	 */
+	protected $_tempPath = null;
+
+	/**
+	 * Ustawia ścieżkę do katalogu temp
+	 *
+	 * @param string $path
+	 */
+	public function setTempPath($path) {
+		$this->_tempPath = (string) $path;
+	}
+
+	/**
+	 * Zwraca ścieżkę do katalogu temp
+	 *
+	 * @param string $append
+	 * @return string
+	 */
+	public function getTempPath($append = null) {
+		if (null !== $append) {
+			return $this->_tempPath . '/' . $append;
+		}
+		return $this->_tempPath;
+	}
+
+	private $_cacheInstance = array();
+
+	/**
+	 * @param $options
+	 * @return Zend_Cache_Core
+	 */
+	public function getCacheInstance(array $options) {
+		// marge options with default
+		$options = $this->getConfig($options, 'cache');
+
+		$key = sha1(serialize($options));
+		if (!array_key_exists($key, $this->_cacheInstance)) {
+			if (!class_exists('Zend_Cache',false)) {
+				require_once 'Zend/Cache.php';
+			}
+			$this->_cacheInstance[$key] = Zend_Cache::factory(
+				$options['frontendName'],
+				$options['backendName'],
+				$options['frontendOptions'],
+				$options['backendOptions']
+			);
+		}
+		return $this->_cacheInstance[$key];
+	}
+
+	/**
+	 * @param $request
+	 * @param $options
+	 * @return string
+	 */
+	public function getCacheActionId(Zend_Controller_Request_Abstract $request, array $options) {
+		// marge options with default
+		$options = $this->getConfig($options, 'cache');
+		$type = $options['id'];
+		if (is_string($type)) {
+			switch ($type) {
+				case 'params':
+					$cacheId = $request->getModuleName() .
+								$request->getControllerName() .
+								$request->getActionName() .
+								serialize($request->getParams());
+					break;
+			}
+		} else
+		if (is_array($type)) {
+			if (isset($type['param'])) {
+				$cacheId  = $this->_getKeyName($request);
+				$cacheId .= $request->getParam($type['param']);
+			}
+		}
+
+		return sha1($cacheId);
+	}
+
+	/**
+	 * @var bool
+	 */
+	private $_cached = false;
+	
+	/**
+	 * @param $flag
+	 * @return void
+	 */
+	public function setCached($flag = true) {
+		$this->_cached = (bool) $flag;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function isCached() {
+		return $this->_cached;
+	}
+
+	/**
+	 * @var bool
+	 */
+	private $_cacheView = false;
+	
+	/**
+	 * @param $flag
+	 * @return void
+	 */
+	public function setCacheView($flag = true) {
+		$this->_cacheView = (bool) $flag;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function cacheView() {
+		return $this->_cacheView;
+	}
+
+	/**
+	 * @var array
+	 */
+	private $_cacheActionOptions = array();
+	
+	/**
+	 * @param array $options
+	 * @param Zend_Controller_Request_Abstract $request
+	 * @return void
+	 */
+	public function setCacheActionOptions(array $options, Zend_Controller_Request_Abstract $request) {
+		$keyName = $this->_getKeyName($request);
+		$this->_cacheActionOptions[$keyName] = $options;
+	}
+	
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
+	 * @return array
+	 */
+	public function getCacheActionOptions(Zend_Controller_Request_Abstract $request, $margeDefault = false) {
+		$keyName = $this->_getKeyName($request);
+		$options = array_key_exists($keyName, $this->_cacheActionOptions)
+			? $this->_cacheActionOptions[$keyName]
+			: null;
+
+		if (null !== $options || $margeDefault) {
+			$options = $this->getConfig($options, 'cache');	
+		}
+
+		return $options;
+	}
+
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
+	 * @return string
+	 */
+	private function _getKeyName(Zend_Controller_Request_Abstract $request) {
+		return $request->getModuleName() .
+			$request->getControllerName() .
+			$request->getActionName();
+	}
+	
+	/**
+	 * @param $request
+	 * @return unknown_type
+	 */
+	private function _initCache(Zend_Controller_Request_Abstract $request) {
+		$options = $this->getCacheActionOptions($request);
+		// czy są ustawienia? prawie tozsame z tym czy ustawiono keszowanie!
+		if (null === $options) {
+			return;
+		}
+
+		// bindowanie domyslnych opcji dla `cache`
+		$options = $this->getConfig($options, 'cache');
+
+    	if ($this->isCached()) {
+    		// ustawienie flagi ze akcja wykonana!
+    		// bo powodujemy ominięcie egzekucji akcji w @see *Helper_System::preDispatch()
+    		$request->setDispatched(true);
+    	} else
+    	if ($this->cacheView()) {
+			$cache = $this->getCacheInstance($options);
+			// dodajemy widok do cache!
+			$view    = $this->getResponse()->getBody();
+			$cacheId = $this->getCacheActionId($request, $options);
+			$cache->save($view, $cacheId);
+    	}
 	}
 	
 	/**
