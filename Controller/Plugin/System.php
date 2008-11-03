@@ -144,7 +144,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
     protected function _initHelper(){
         $helperClass = $this->getHelperClass();
         require_once 'Zend/Controller/Action/HelperBroker.php';
-        if (!Zend_Controller_Action_HelperBroker::hasHelper('cache')) {
+        if (!Zend_Controller_Action_HelperBroker::hasHelper('system')) {
             require_once 'Zend/Loader.php';
             Zend_Loader::loadClass($helperClass);
             $this->_helperInstance = new $helperClass();
