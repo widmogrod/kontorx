@@ -271,7 +271,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		if (isset($templateConfig->title)) {
 			$headTitle = $view->headTitle();
 			$headTitle->setSeparator(' - ');
-			$headTitle->append($templateConfig->title);
+			$headTitle->prepend($templateConfig->title);
 		}
 		// meta
 		if (isset($templateConfig->meta)) {
