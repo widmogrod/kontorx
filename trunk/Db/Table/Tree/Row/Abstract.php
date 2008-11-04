@@ -32,6 +32,28 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 	protected $_parentRow = null;
 
 	/**
+     * Store table, primary key and data in serialized object
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return parent::__sleep() + array('_level','_separator');
+    }
+
+    /**
+     * Setup to do on wakeup.
+     * A de-serialized Row should not be assumed to have access to a live
+     * database connection, so set _connected = false.
+     *
+     * @return void
+     */
+    public function __wakeup()
+    {
+        parent::__wakeup();
+    }
+	
+	/**
 	 * @Overwrite
 	 */
 	public function init() {
