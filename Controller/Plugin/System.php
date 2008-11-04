@@ -461,25 +461,25 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	public function getCacheActionId(Zend_Controller_Request_Abstract $request, array $options) {
 		// marge options with default
 		$options = $this->getConfig($options, 'cache');
+		// base cacheIdName
+		$cacheId = $this->_getKeyName($request);
+
 		$type = $options['id'];
 		if (is_string($type)) {
 			switch ($type) {
 				case 'params':
-					$cacheId = $request->getModuleName() .
-								$request->getControllerName() .
-								$request->getActionName() .
-								serialize($request->getParams());
+					$cacheIdAppend = serialize($request->getParams());
 					break;
 			}
 		} else
 		if (is_array($type)) {
 			if (isset($type['param'])) {
-				$cacheId  = $this->_getKeyName($request);
-				$cacheId .= $request->getParam($type['param']);
+				$cacheIdAppend= $request->getParam($type['param']);
 			}
 		}
 
-		return sha1($cacheId);
+		$cacheIdAppend = sha1($cacheIdAppend);
+		return "{$cacheId}_{$cacheIdAppend}";
 	}
 
 	/**
@@ -547,6 +547,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			? $this->_cacheActionOptions[$keyName]
 			: null;
 
+		if (!isset($options['backendOptions']['cache_dir'])) {
+			$options['backendOptions']['cache_dir'] = $this->getTempPath('cache');
+		}
+
 		if (null !== $options || $margeDefault) {
 			$options = $this->getConfig($options, 'cache');	
 		}
@@ -559,8 +563,8 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @return string
 	 */
 	private function _getKeyName(Zend_Controller_Request_Abstract $request) {
-		return $request->getModuleName() .
-			$request->getControllerName() .
+		return $request->getModuleName() . '_' .
+			$request->getControllerName() . '_' .
 			$request->getActionName();
 	}
 	
