@@ -15,11 +15,11 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
 
 		$values = $this->getValues()->filter;
 		$orderType = $values->$column->$name;
-		$orderType = ($orderType != 'asc') ? 'desc' : $orderType;
-
-		$columnName = $this->getColumnName();
-		
-		$select->order("$columnName $orderType");
+		if (!empty($orderType)) {
+			$orderType = ($orderType != 'asc') ? 'desc' : $orderType;
+			$columnName = $this->getColumnName();
+			$select->order("$columnName $orderType");
+		}
 	}
 
 	public function render() {
