@@ -193,7 +193,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 		$form = new KontorX_Form_DbTable($model, $options, $ignoreColumns);
 
 		// To taki dodatek odemnie ;)
-		$form->addElement('submit','Dodaj',array('class' =>'action add','ignore' => true));
+		$form->addElement('submit','Dodaj',array('class' =>'action add','ignore' => true,'accesskey'=>'S'));
 		
 		return $form;
     }
@@ -387,7 +387,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 		$form = new KontorX_Form_DbTable($model, $options, $ignoreColumns);
 		
 		// To taki dodatek odemnie ;)
-		$form->addElement('submit','Edytuj',array('class' =>'action edit','ignore' => true));
+		$form->addElement('submit','Edytuj',array('class' =>'action edit','ignore' => true,'accesskey'=>'S'));
 		
 		return $form;
     }
