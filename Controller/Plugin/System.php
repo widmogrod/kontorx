@@ -560,6 +560,15 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 
 	/**
 	 * @param Zend_Controller_Request_Abstract $request
+	 * @return bool
+	 */
+	public function hasCacheActionOptions(Zend_Controller_Request_Abstract $request) {
+		$keyName = $this->_getKeyName($request);
+		return array_key_exists($keyName, $this->_cacheActionOptions);
+	}
+	
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
 	 * @return string
 	 */
 	private function _getKeyName(Zend_Controller_Request_Abstract $request) {
@@ -573,11 +582,11 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @return unknown_type
 	 */
 	private function _initCache(Zend_Controller_Request_Abstract $request) {
-		$options = $this->getCacheActionOptions($request);
-		// czy są ustawienia? prawie tozsame z tym czy ustawiono keszowanie!
-		if (null === $options) {
+		if (!$this->hasCacheActionOptions($request)) {
 			return;
 		}
+
+		$options = $this->getCacheActionOptions($request);
 
 		// bindowanie domyslnych opcji dla `cache`
 		$options = $this->getConfig($options, 'cache');
