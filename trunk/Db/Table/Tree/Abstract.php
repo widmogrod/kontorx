@@ -39,7 +39,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
 			require_once 'KontorX/Db/Table/Tree/Exception.php';
 			throw new KontorX_Db_Table_Tree_Exception('Field `$_level` name for nested records is not definded');
 		}
-		if (!in_array($this->_level, $this->_cols)) {
+		if (!in_array($this->_level, $this->_getCols())) {
             require_once 'KontorX/Db/Table/Tree/Exception.php';
             throw new KontorX_Db_Table_Tree_Exception("Specified column \"$this->_level\" is not in the row");
         }

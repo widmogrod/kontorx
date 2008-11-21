@@ -45,13 +45,20 @@ abstract class KontorX_Observable_Observer_SendMail implements KontorX_Observabl
 	 */
 	protected $_mail = null;
 
-	public function __construct($mailType, array $config, array $data = array(), Zend_View_Interface $view = null) {
+	public function __construct($mailType, $config, array $data = array(), Zend_View_Interface $view = null) {
 		if (!array_key_exists($mailType, $this->_mailFiles)) {
 			$error = "Mail type is unknown";
 			throw new KontorX_Observable_Exception($error);
 		}
 		$this->_mailType = $mailType;
 
+		if ($config instanceof Zend_Config) {
+			$config = $config->toArray();
+		} else
+		if (!is_array($config)) {
+			$config = array($config);
+		}
+		
 		if (!array_key_exists('from', $config)) {
 			$error = "Mail config do not have specified `from` key";
 			throw new KontorX_Observable_Exception($error);
