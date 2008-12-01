@@ -65,6 +65,7 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
 					$result .= "\n\t";
 				}
 			} else {
+				$value_1 = $this->_prepareValue($value_1);
 				$result .= "$key_1 = \"$value_1\"";
 				$result .= "\n\t";
 			}
@@ -87,9 +88,27 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
 				$result .= $this->_generateHelper_2($val, $currentBaseKey);
 			}
 		} else {
+			$value = $this->_prepareValue($value);
 			$result .= "$baseKey = \"$value\"";
 			$result .= "\n\t";
 		}
 		return $result;
 	}
+	
+	/**
+     * Prepare a value for INI
+     *
+     * @param  mixed $value
+     * @return string
+     */
+    protected function _prepareValue($value) {
+        if (is_integer($value) || is_float($value)) {
+            return $value;
+        } else
+        if (is_bool($value)) {
+            return ($value ? 'true' : 'false');
+        } else {
+            return '"' . addslashes($value) .  '"';
+        }
+    }
 }
