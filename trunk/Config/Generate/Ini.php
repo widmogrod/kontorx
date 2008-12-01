@@ -108,6 +108,10 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
         if (is_bool($value)) {
             return ($value ? 'true' : 'false');
         } else {
+        	// HACK jakich mało
+        	if (in_array(strtolower($value), array('true','false'))) {
+        		return strtolower($value);
+        	}
             return '"' . addslashes($value) .  '"';
         }
     }
