@@ -66,7 +66,7 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
 				}
 			} else {
 				$value_1 = $this->_prepareValue($value_1);
-				$result .= "$key_1 = $value_1";
+				$result .= $key_1 . " = " . $value_1;
 				$result .= "\n\t";
 			}
 		}
@@ -89,7 +89,7 @@ class KontorX_Config_Generate_Ini extends KontorX_Config_Generate_Abstract {
 			}
 		} else {
 			$value = $this->_prepareValue($value);
-			$result .= "$baseKey = $value";
+			$result .= $baseKey . " = " . $value;
 			$result .= "\n\t";
 		}
 		return $result;
