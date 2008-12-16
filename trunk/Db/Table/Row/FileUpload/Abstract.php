@@ -68,10 +68,10 @@ abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Ro
 	 * @param string $path
 	 */
 	public static function setImagePath($path) {
-		if (!is_dir($path)) {
-			require_once 'KontorX/Db/Table/Row/FileUpload/Exception.php';
-            throw new KontorX_Db_Table_Row_FileUpload_Exception("Upload path \"".self::$_uploadPath."\" do not exsists");
-		}
+//		if (!is_dir($path)) {
+//			require_once 'KontorX/Db/Table/Row/FileUpload/Exception.php';
+//            throw new KontorX_Db_Table_Row_FileUpload_Exception("Upload path \"".self::$_uploadPath."\" do not exsists");
+//		}
 
 		self::$_uploadPath = $path;
 	}
