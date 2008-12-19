@@ -76,6 +76,10 @@ abstract class KontorX_Db_Table_Row_FileUpload_Abstract extends Zend_Db_Table_Ro
 		self::$_uploadPath = $path;
 	}
 
+	public static function setUploadPath($path) {
+		self::setImagePath($path);
+	}
+	
 	public function addMessage($message) {
 		$this->_messages[] = (string) $message;
 	}
