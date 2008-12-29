@@ -97,10 +97,10 @@ class KontorX_File_Upload {
 	 *
 	 * @param string $filePath
 	 * @param string $generateUniqName
-	 * @param boolean $filterName
+	 * @param boolean $filred
 	 * @return boolean
 	 */
-	public function move($filePath, $generateUniqName = false, $filterName = true) {
+	public function move($filePath, $generateUniqName = false, $filred = true) {
 		if($generateUniqName === true) {
 			// Generujemy unikalną nazwę dla pliku
 			// Jeżeli $filePath wskazuje na istniejący plik,
@@ -110,16 +110,13 @@ class KontorX_File_Upload {
 			? basename($filePath)
 			: $this->_fileName;
 
-			if (true === $filterName) {
-				$a = explode('.', $fileName);
-				$extension = array_pop($a);
-				$name	   = implode('.', (array) $a);
-
+			if (true === $filred) {
 				require_once 'KontorX/Filter/Word/Rewrite.php';
-				$filter = new KontorX_Filter_Word_Rewrite();
-				$name = $filter->filter($name);
-
-				$fileName = "$name.$extension";
+				$f = new KontorX_Filter_Word_Rewrite();
+				
+				$extension = end(explode('.', $fileName));
+				$extension = $f->filter($extension);
+				$fileName = "$extension";
 			}
 
 			$this->_fileName = $this->_generateUniqFileName = md5($fileName . time() . microtime(true)) . '_' . $fileName;
