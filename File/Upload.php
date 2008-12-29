@@ -111,15 +111,15 @@ class KontorX_File_Upload {
 			: $this->_fileName;
 
 			if (true === $filterName) {
-//				$a = explode('.', $fileName);
-//				$extension = array_pop($a);
-//				$name	   = implode('.', (array) $a);
+				$a = explode('.', $fileName);
+				$extension = array_pop($a);
+				$name	   = implode('.', (array) $a);
 
 				require_once 'KontorX/Filter/Word/Rewrite.php';
 				$filter = new KontorX_Filter_Word_Rewrite();
-				$fileName = $filter->filter($name, '.');
+				$name = $filter->filter($name);
 
-//				$fileName = "$name.$extension";
+				$fileName = "$name.$extension";
 			}
 
 			$this->_fileName = $this->_generateUniqFileName = md5($fileName . time() . microtime(true)) . '_' . $fileName;
