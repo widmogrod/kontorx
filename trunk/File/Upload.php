@@ -1,7 +1,7 @@
 <?php
 /**
  * Umilenie uploadowania pliku na serwer ;]
- * 
+ *
  * @category 	KontorX
  * @package 	KontorX_File
  * @version 	0.1.6
@@ -104,16 +104,22 @@ class KontorX_File_Upload {
 		if($generateUniqName === true) {
 			// Generujemy unikalną nazwę dla pliku
 			// Jeżeli $filePath wskazuje na istniejący plik,
-			// pobiera jego nazwę wprzeciwnym wypadku pobiera nazwe pliku z
+			// pobiera jego nazwę wprzeciwnym wypadku pobiera nazwe pliku 
 			// przekazanej w konstroktorze tablicy $_FILES
 			$fileName = is_file($filePath)
-				? basename($filePath)
-				: $this->_fileName;
+			? basename($filePath)
+			: $this->_fileName;
 
 			if (true === $filterName) {
+//				$a = explode('.', $fileName);
+//				$extension = array_pop($a);
+//				$name	   = implode('.', (array) $a);
+
 				require_once 'KontorX/Filter/Word/Rewrite.php';
-				$f = new KontorX_Filter_Word_Rewrite();
-				$fileName = $f->filter($fileName);
+				$filter = new KontorX_Filter_Word_Rewrite();
+				$fileName = $filter->filter($name, '.');
+
+//				$fileName = "$name.$extension";
 			}
 
 			$this->_fileName = $this->_generateUniqFileName = md5($fileName . time() . microtime(true)) . '_' . $fileName;
@@ -140,8 +146,8 @@ class KontorX_File_Upload {
 	 */
 	public function getName($withdExtension = true) {
 		return (bool) $withdExtension
-			? $this->_fileName
-			: substr($this->_fileName, 0, strpos($this->_fileName, '.'));
+		? $this->_fileName
+		: substr($this->_fileName, 0, strpos($this->_fileName, '.'));
 	}
 
 	/**
@@ -152,7 +158,7 @@ class KontorX_File_Upload {
 	public function getFileTempName() {
 		return $this->_fileTempName;
 	}
-	
+
 	/**
 	 * Zwraca nazwe wygenerowanej unikalnej nazwy dla, uploadowanego pliku
 	 *
