@@ -118,7 +118,7 @@ abstract class KontorX_Image_Abstract {
 			$iNewHeight = round( $iWidth / $this->_iWidth * $this->_iHeight );
 		}
 
-		// nie przekroczono wartosci maksymalnej
+		// przekroczono wartosc maksymalną
 		if( $iHeight < $iNewHeight ){
 			$iNewHeight = $iHeight;
 			$iNewWidth = round( $iHeight / $this->_iHeight * $this->_iWidth );
