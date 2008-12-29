@@ -116,7 +116,7 @@ class KontorX_File_Upload {
 				
 				$extension = end(explode('.', $fileName));
 				$extension = $f->filter($extension);
-				$fileName = "$extension";
+				$fileName = ".$extension";
 			}
 
 			$this->_fileName = $this->_generateUniqFileName = md5($fileName . time() . microtime(true)) . '_' . $fileName;
