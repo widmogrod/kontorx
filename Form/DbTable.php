@@ -39,8 +39,14 @@ class KontorX_Form_DbTable extends Zend_Form {
 		}
 
 		$this->_setupFormFromTable($table, $options);
+		
+		$this->postInit();
 	}
 
+	public function postInit() {
+		
+	}
+	
 	/**
 	 * Ustaw klumny, które ignorujemy podczas tworzenia elementów @see Zend_Form_Element
 	 *

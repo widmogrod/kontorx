@@ -27,12 +27,14 @@ abstract class KontorX_Db_Table_Abstract extends Zend_Db_Table_Abstract {
     	$controller = $request->getControllerName();
     	$module	 	= $request->getModuleName();
 
+    	/**
+    	 * Jeżlie jest brak uprawnień do moderowania, pokaż pod względem ID
+    	 */
 		require_once 'user/models/User.php';
     	if (!User::hasCredential(User::PRIVILAGE_MODERATE, $controller, $module)) {
     		$userId = User::getAuth(User::AUTH_USERNAME_ID);
     		$select->where('user_id = ?', $userId);
     	}
-    	
     	return $select;
     }
 
