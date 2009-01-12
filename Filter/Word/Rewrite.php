@@ -13,10 +13,10 @@ class KontorX_Filter_Word_Rewrite implements Zend_Filter_Interface {
 	protected $_replace  = array('a','a','a','e','e','i','i','o','o','o','u','u','y','a','e','s','z','z','n','l','c','-','-');
 
 	public function filter($value, $regxpAllow = null) {
+		$value = (string) $value;
 		$value = strtolower($value);
 		$value = str_replace($this->_search, $this->_replace, $value);
 		$regxpAllow = preg_quote($regxpAllow, '#');
 		return preg_replace("#[^a-zA-Z0-9/$regxpAllow]+#i", '-', $value);
 	}
 }
-?>
