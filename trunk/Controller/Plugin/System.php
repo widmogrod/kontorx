@@ -51,7 +51,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		self::TEMPLATE => array(
 			'name' 	=> 'default',
 			'layout'=> 'index',
-			'path'	=> './layout',
+			'path'	=> './template',
 			'config'=> array(
 				'filename' => 'config.ini',
 				'type' 	   => 'ini'
@@ -96,12 +96,18 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			case self::TEMPLATE:
 			case self::LANGUAGE:
 			case self::CACHE:
-				$this->_config[$type] = $this->_createConfig($this->_defaultConfig[$type], $config);
+				if (!isset($this->_config[$type])) {
+					$this->_config[$type] = $this->_createConfig($this->_defaultConfig[$type], $config);
+//					Zend_Debug::dump($this->_config[$type],1);
+				} else {
+					$this->_config[$type] = $this->_createConfig($this->_config[$type], $config);
+//					Zend_Debug::dump($this->_config[$type],2);
+				}
 			break;
 
 			default:
 				$this->_config = $this->_createConfig($this->_defaultConfig, $config);
-				$this->_configRaw = $options;
+//				$this->_configRaw = $options;
 		}
 	}
 
@@ -140,32 +146,26 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @param Zend_Config|array|bool $raw
 	 * @return Zend_Config|array
 	 */
-	public function getConfig($raw = false, $type = null) {
-		if (false === $raw) {
-			$array = $this->_configRaw->toArray();
+	public function getConfig($config = null, $type = null) {
+		$merge = null;
+		if ($config instanceof Zend_Config) {
+			$merge = $raw->toArray();
 		} else
-		if ($raw instanceof Zend_Config) {
-			$array = $raw->toArray();
-		} else
-		if (is_array($raw)){
-			$array = $raw;
-		} else {
-			return $this->_configRaw;
+		if (is_array($config)) {
+			$merge = $config;
 		}
-
-		$result = array();
-		switch ($type) {
-			case self::TEMPLATE:
-			case self::LANGUAGE:
-			case self::CACHE:
-				if (array_key_exists($type, $this->_config)) {
-					$result = $array + $this->_config[$type];
-				}
-				break;
-			default:
-				$result = $array + $this->_config;
+		// pierwszy parametr w takim razie jest typem!
+		if (null === $type && is_string($config)) {
+			$type = $config;
 		}
+		$result = (in_array($type, $this->_configTypes))
+			? $this->_config[$type] : $this->_config ;
 
+		$result = (null === $merge)
+			? $result
+			: array_merge($result, $merge);
+
+//		Zend_Debug::dump($result);
 		return $result;
 	}
 
@@ -302,11 +302,15 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		$templatePaths = $view->getScriptPaths();
 
 		// ustawienia nazwy layoutu
-		$layoutName = $this->getLayoutName();
-		if($layoutName == '') {
-			$layoutName = $config[self::TEMPLATE]['layout'];
-		}
+		$layoutName = $this->hasLayoutName()
+			? $this->getLayoutName()
+			: $config[self::TEMPLATE]['layout'];
+
 		$layout->setLayout($layoutName);
+			
+		$layoutSection = $this->hasLayoutSectionName()
+			? $this->getLayoutSectionName()
+			: $layoutName;
 
 		// szukanie konfiguracji
 		$templateConfig 		= null;
@@ -315,7 +319,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		foreach ($templatePaths as $templatePath) {
 			$templateConfigPath = $templatePath . '/' . $templateConfigFilename;
 			if (is_readable($templateConfigPath)) {
-				$templateConfig = new Zend_Config_Ini($templateConfigPath, $layoutName, array('allowModifications' => true));
+				$templateConfig = new Zend_Config_Ini($templateConfigPath, $layoutSection, array('allowModifications' => true));
 				break;
 			}
 		}
@@ -325,9 +329,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 			return;
 		}
 
-		// ustawianie nowego pliku layoutu
+		// ustawianie nowego pliku layoutu gdy nie był wcześniej ustawiony "ręcznie"
+		// z poziomu kodu
 		// a co!? przecież mogę ;]
-		if (null !== $templateConfig->layout) {
+		if (!$this->isLockLayoutName() && null !== $templateConfig->layout) {
 			$layout->setLayout($templateConfig->layout);
 		}
 		// title
@@ -390,8 +395,8 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 */
 	public function getTemplatePaths($templateName) {
 		if (null === $this->_templatePath) {
-			$config 		= $this->getConfig();
-			$this->_templatePath = $config[self::TEMPLATE]['path'];
+			$config = $this->getConfig(false, self::TEMPLATE);
+			$this->_templatePath = $config['path'];
 		}
 
 		$path 	= $this->_templatePath . '/' . $templateName;
@@ -500,6 +505,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	public function getCacheInstance(array $options) {
 		// marge options with default
 		$options = $this->getConfig($options, self::CACHE);
+//		Zend_Debug::dump($options, 123);
 
 		$key = sha1(serialize($options));
 		if (!array_key_exists($key, $this->_cacheInstance)) {
@@ -719,7 +725,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	public function getTemplateName($forse = false) {
 		if (true === $forse && null === $this->_templateName) {
 			$config = $this->getConfig();
-			$this->_templateName = $config['template']['name'];
+			$this->_templateName = $config[self::TEMPLATE]['name'];
 		}
 		return $this->_templateName;
 	}
@@ -747,6 +753,65 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		return $this->_layoutName;
 	}
 
+	/**
+	 * Czy został ustawiony nazwa pliku szablonu (layput)
+	 * 
+	 * W domyśle nalerzy rozumieć, czy została ustawiona ręcznie
+	 * Ustawienie ręczne stanowi najwyższy priorytet!
+	 * 
+	 * @return bool
+	 */
+	public function hasLayoutName() {
+		return !empty($this->_layoutName);
+	}
+	
+	/**
+	 * @var bool
+	 */
+	protected $_lockLayoutName = false;
+	
+	/**
+	 * @return bool
+	 */
+	public function isLockLayoutName() {
+		return $this->_lockLayoutName;
+	}
+
+	/**
+	 * @param bool $flag
+	 * @return void
+	 */
+	public function lockLayoutName($flag = true) {
+		$this->_lockLayoutName = (bool) $flag;
+	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_layoutSectionName = null;
+	
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	public function setLayoutSectionName($name) {
+		$this->_layoutSectionName = (string) $name;
+	}
+	
+	/**
+	 * @return string|null
+	 */
+	public function getLayoutSectionName() {
+		return $this->_layoutSectionName;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function hasLayoutSectionName() {
+		return null !== $this->_layoutSectionName;
+	}
+	
 	/**
 	 * Sprawdza czy jest używany layout
 	 *
