@@ -35,6 +35,13 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 				if (isset($options['template'])) {
 					$plugin->setTemplateName($options['template']);
 				}
+
+				// dodatkowa konfiguracja
+				if (isset($options['config']) && is_array($options['config'])) {
+					$plugin->setConfig(
+						array('config' => $options['config']),
+						KontorX_Controller_Plugin_System::TEMPLATE);
+				}
 			} else
 			if (is_string($action->skin)){
 				// template name

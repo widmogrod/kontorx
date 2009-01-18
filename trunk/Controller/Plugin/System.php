@@ -9,6 +9,19 @@ require_once 'Zend/Controller/Plugin/Abstract.php';
  */
 class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 
+	const CACHE	   = 'CACHE';
+	const TEMPLATE = 'TEMPLATE';
+	const LANGUAGE = 'LANGUAGE';
+	
+	/**
+	 * @var array
+	 */
+	protected $_configTypes = array(
+		self::CACHE,
+		self::TEMPLATE,
+		self::LANGUAGE
+	);
+	
 	/**
 	 * Konstruktor
 	 *
@@ -35,7 +48,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @var array
 	 */
 	protected $_defaultConfig = array(
-		'template' => array(
+		self::TEMPLATE => array(
 			'name' 	=> 'default',
 			'layout'=> 'index',
 			'path'	=> './layout',
@@ -44,10 +57,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 				'type' 	   => 'ini'
 			)
 		),
-		'language' => array(
+		self::LANGUAGE => array(
 			'default' => 'pl'
 		),
-		'cache' => array(
+		self::CACHE => array(
 			'id' => 'params',
 			'frontendName' => 'Core',
 			'backendName' => 'File',
@@ -64,13 +77,58 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	/**
 	 * Ustawia konfigurację
 	 *
-	 * @param Zend_Config $config
+	 * @param Zend_Config|array $options
+	 * @param string $type
 	 */
-	public function setConfig(Zend_Config $config) {
-		$this->_config = $config->toArray() + $this->_defaultConfig;
-		$this->_configRaw = $config;
+	public function setConfig($options, $type = null) {
+		if ($options instanceof Zend_Config) {
+			$config = $options->toArray();
+		} else
+		if (is_array($options)){
+			$config = $options;
+		} else {
+			$message = "Config is not array or instance of Zend_Config";
+			require_once 'Zend/Controller/Exception.php';
+			throw new Zend_Controller_Exception($message);
+		}
+
+		switch ($type) {
+			case self::TEMPLATE:
+			case self::LANGUAGE:
+			case self::CACHE:
+				$this->_config[$type] = $this->_createConfig($this->_defaultConfig[$type], $config);
+			break;
+
+			default:
+				$this->_config = $this->_createConfig($this->_defaultConfig, $config);
+				$this->_configRaw = $options;
+		}
 	}
 
+	/**
+	 * Alternatywa array_merge
+	 * 
+	 * @param $defaultConfig array
+	 * @param $config array
+	 * @return array
+	 */
+	private function _createConfig(array $defaultConfig, array $config) {
+		$result = array();
+		foreach ($defaultConfig as $key => $array) {
+			if (array_key_exists($key, $config)) {
+				if (is_array($config[$key])) {
+					$result[$key] = $this->_createConfig($array, $config[$key]);
+				} else {
+					$result[$key] = $config[$key];
+				}
+				
+			} else {
+				$result[$key] = $array;
+			}
+		}
+		return $result;
+	}
+	
 	/**
 	 * Zwraca konfigurację
 	 *
@@ -82,7 +140,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 * @param Zend_Config|array|bool $raw
 	 * @return Zend_Config|array
 	 */
-	public function getConfig($raw = false, $segment = null) {
+	public function getConfig($raw = false, $type = null) {
 		if (false === $raw) {
 			$array = $this->_configRaw->toArray();
 		} else
@@ -96,11 +154,16 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		}
 
 		$result = array();
-		if (null !== $segment &&
-				array_key_exists($segment, $this->_config)) {
-			$result = $array + $this->_config[$segment];
-		} else {
-			$result = $array + $this->_config;
+		switch ($type) {
+			case self::TEMPLATE:
+			case self::LANGUAGE:
+			case self::CACHE:
+				if (array_key_exists($type, $this->_config)) {
+					$result = $array + $this->_config[$type];
+				}
+				break;
+			default:
+				$result = $array + $this->_config;
 		}
 
 		return $result;
@@ -220,11 +283,11 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		// ustawiamy nazwę skórki
 		$templateName = $this->getTemplateName();
 		if(null === $templateName) {
-			$templateName = $config['template']['name'];
+			$templateName = $config[self::TEMPLATE]['name'];
 		}
 
 		// katalog z szablonem default
-		list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault['template']['name']);
+		list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault[self::TEMPLATE]['name']);
 		// katalog z szablonem template
 		list($layoutPathTemplate, $layoutPathTemplateI18n) = $this->getTemplatePaths($templateName);
 		// ustawianie przeszukiwania katalogów
@@ -241,14 +304,14 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		// ustawienia nazwy layoutu
 		$layoutName = $this->getLayoutName();
 		if($layoutName == '') {
-			$layoutName = $config['template']['layout'];
+			$layoutName = $config[self::TEMPLATE]['layout'];
 		}
 		$layout->setLayout($layoutName);
 
 		// szukanie konfiguracji
 		$templateConfig 		= null;
-		$templateConfigType 	= $config['template']['config']['type'];
-		$templateConfigFilename = $config['template']['config']['filename'];
+		$templateConfigType 	= $config[self::TEMPLATE]['config']['type'];
+		$templateConfigFilename = $config[self::TEMPLATE]['config']['filename'];
 		foreach ($templatePaths as $templatePath) {
 			$templateConfigPath = $templatePath . '/' . $templateConfigFilename;
 			if (is_readable($templateConfigPath)) {
@@ -328,7 +391,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	public function getTemplatePaths($templateName) {
 		if (null === $this->_templatePath) {
 			$config 		= $this->getConfig();
-			$this->_templatePath = $config['template']['path'];
+			$this->_templatePath = $config[self::TEMPLATE]['path'];
 		}
 
 		$path 	= $this->_templatePath . '/' . $templateName;
@@ -436,7 +499,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 */
 	public function getCacheInstance(array $options) {
 		// marge options with default
-		$options = $this->getConfig($options, 'cache');
+		$options = $this->getConfig($options, self::CACHE);
 
 		$key = sha1(serialize($options));
 		if (!array_key_exists($key, $this->_cacheInstance)) {
@@ -460,7 +523,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	 */
 	public function getCacheActionId(Zend_Controller_Request_Abstract $request, array $options) {
 		// marge options with default
-		$options = $this->getConfig($options, 'cache');
+		$options = $this->getConfig($options, self::CACHE);
 		// base cacheIdName
 		$cacheId = $this->_getKeyName($request);
 
@@ -552,7 +615,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		}
 
 		if (null !== $options || $margeDefault) {
-			$options = $this->getConfig($options, 'cache');	
+			$options = $this->getConfig($options, self::CACHE);	
 		}
 
 		return $options;
@@ -589,7 +652,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 		$options = $this->getCacheActionOptions($request);
 
 		// bindowanie domyslnych opcji dla `cache`
-		$options = $this->getConfig($options, 'cache');
+		$options = $this->getConfig($options, self::CACHE);
 
     	if ($this->isCached()) {
     		// ustawienie flagi ze akcja wykonana!
