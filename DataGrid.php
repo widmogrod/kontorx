@@ -34,6 +34,10 @@ class KontorX_DataGrid {
 			require_once 'KontorX/DataGrid/Adapter/DbTable.php';
 			$adapter = new KontorX_DataGrid_Adapter_DbTable($data);
 		} else
+		if ($data instanceof Zend_Db_Select) {
+			require_once 'KontorX/DataGrid/Adapter/DbSelect.php';
+			$adapter = new KontorX_DataGrid_Adapter_DbSelect($data);
+		} else
 		if (is_array($data)) {
 			// TODO ..
 		} else {
