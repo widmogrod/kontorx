@@ -175,6 +175,16 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
     	return $this;
     }
 
+    public function __call($name, $params = array()) {
+    	$plugin = $this->getPluginInstance();
+    	if(method_exists($plugin, $name)) {
+    		return call_user_func_array(array($plugin,$name), $params);
+    	}
+    	
+    	require_once 'Zend/Controller/Exception.php';
+    	throw new Zend_Controller_Exception("Method '$name' not exsists");
+    }
+    
     /**
      * Dodaje do include path sciezkę do katalogu z modelem
      *
