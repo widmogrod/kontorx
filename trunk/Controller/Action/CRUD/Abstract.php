@@ -75,6 +75,21 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 	}
 
 	/**
+	 * @param Zend_Db_Table_Abstract $model
+	 * @return Zend_Db_Table_Rowset_Abstract
+	 */
+	protected function _findPrimaryKey(Zend_Db_Table_Abstract $model) {
+		$primaryKey = $model->info(Zend_Db_Table::PRIMARY);
+
+		$params = array();
+		foreach ($primaryKey as $column) {
+			$params[] = $this->_getParam($column); 
+		}
+		
+		return call_user_func_array(array($model,'find'), $params);
+	}
+	
+	/**
 	 * Przygotowanie paginacji
 	 *
 	 * @param Zend_Db_Table_Select $select
@@ -304,8 +319,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
     protected function _addOnException(Zend_Exception $e, Zend_Form $form, Zend_Db_Table_Row_Abstract $row = null) {
     	// logowanie wyjatku
 		$logger = Zend_Registry::get('logger');
-		$logger->log($e->getMessage() . "\n" . $e->getTraceAsString(), Zend_Log::ERR);
-		
+		$logger->log(get_class($e) . ' :: ' . $e->getMessage() . "\n" . $e->getTraceAsString(), Zend_Log::ERR);
+
 		// tworzenie komunikatu
 		$message = 'Rekord nie został dodany';
 
@@ -314,7 +329,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 		$this->view->form = $form->render();
 
 		// refirect
-//		$this->_helper->flashMessenger->addMessage($message);
+		$this->_helper->flashMessenger->addMessage($message);
 //		$this->_helper->redirector->goToAndExit('add');
     }
 
@@ -417,7 +432,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      */
     protected function _editFindRecord() {
     	$model = $this->_getModel();
-    	return $model->find($this->_getParam('id'))->current();
+    	return $this->_findPrimaryKey($model)->current();
     }
 
     /**
@@ -589,7 +604,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      */
     protected function _deleteFindRecord() {
     	$model = $this->_getModel();
-    	return $model->find($this->_getParam('id'))->current();
+    	return $this->_findPrimaryKey($model)->current();
     }
 
 	/**
@@ -890,7 +905,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      */
     protected function _modifyFindRecord() {
     	$model = $this->_getModel();
-    	return $model->find($this->_getParam('id'))->current();
+    	return $this->_findPrimaryKey($model)->current();
     }
 
     /**
