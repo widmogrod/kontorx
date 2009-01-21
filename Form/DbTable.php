@@ -38,6 +38,11 @@ class KontorX_Form_DbTable extends Zend_Form {
 			$options = array();
 		}
 
+		// ustawienie ignorwania klucza głównego
+		if (isset($options['ignorePK'])) {
+			$this->setIgnorePrimaryKey($options['ignorePK']);
+		}
+		
 		$this->_setupFormFromTable($table, $options);
 		
 		$this->postInit();
@@ -45,6 +50,29 @@ class KontorX_Form_DbTable extends Zend_Form {
 
 	public function postInit() {
 		
+	}
+
+	protected $_ignoredPrimaryKey = true;
+
+	/**
+	 * Ustawia flagę, czy kolumny wchodzące w skład klucza głównego
+	 * będą ignorowane podczas generowania formularza
+	 * 
+	 * @param bool $flag
+	 * @return void
+	 */
+	public function setIgnorePrimaryKey($flag = true) {
+		$this->_ignoredPrimaryKey = (bool) $flag;	
+	}
+
+	/**
+	 * Zwraca informację czy ignorujemy podczas generowania kolumny
+	 * wchodzący w skład klucza głównego
+	 * 
+	 * @return bool
+	 */
+	public function isIgnoredPrimaryKey() {
+		return $this->_ignoredPrimaryKey;
 	}
 	
 	/**
@@ -96,8 +124,10 @@ class KontorX_Form_DbTable extends Zend_Form {
 		$metadata = $table->info(Zend_Db_Table_Abstract::METADATA);
 
 		// dodajemy do ignorowania klucz glowny
-		$prmaryKay = $table->info(Zend_Db_Table_Abstract::PRIMARY);
-		$this->_addIgnoreColumns($table->info(Zend_Db_Table_Abstract::PRIMARY));
+		if ($this->isIgnoredPrimaryKey()) {
+			$prmaryKay = $table->info(Zend_Db_Table_Abstract::PRIMARY);
+			$this->_addIgnoreColumns($table->info(Zend_Db_Table_Abstract::PRIMARY));
+		}
 
 		foreach ($metadata as $column => $options) {
 			if ($this->_hasIgnoredColumn($column)) {
