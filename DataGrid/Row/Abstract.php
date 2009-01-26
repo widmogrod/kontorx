@@ -16,8 +16,18 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 			}
 			$this->setOptions($options);
 		}
+		
+		$this->init();
 	}
 
+	/**
+	 * Initialize
+	 * @return void
+	 */
+	public function init() {
+		
+	}
+	
 	/**
 	 * Return options key => value
 	 * @return string
@@ -115,6 +125,12 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->render();
+		try {
+			return $this->render();
+		} catch (Exception $e) {
+			trigger_error(get_class($e) . "::" . $e->getMessage(), E_USER_WARNING);
+		}
+		
+		return $this->getData($this->getColumnName());
 	}
 }
