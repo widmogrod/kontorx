@@ -19,7 +19,7 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 				if (!in_array($actionName, array('layout', 'dynamic', 'template'))
 						&& array_key_exists($actionName, $options)) {
 					$options = $action->skin[$actionName];
-				}
+				}				
 
 				// layout name
 				if (isset($options['layout'])) {
@@ -34,6 +34,11 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
 				// template name
 				if (isset($options['template'])) {
 					$plugin->setTemplateName($options['template']);
+				}
+				
+				// czy zablokować zmiane layout z poziomu konfiguracji szablonu
+				if (isset($options['lock'])) {
+					$plugin->lockLayoutName((bool) $options['lock']);
 				}
 
 				// dodatkowa konfiguracja

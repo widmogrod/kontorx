@@ -53,7 +53,7 @@ abstract class KontorX_Db_Table_Abstract extends Zend_Db_Table_Abstract {
      * @param integer $month
      * @param integer $day
      */
-    public function selectSetupForTimeRange(Zend_Db_Select $select, $year, $month = null, $day = null) {
+    public function selectSetupForTimeRange(Zend_Db_Select $select, $year = null, $month = null, $day = null) {
     	// year
     	if (is_numeric($year)) {
 			$select->where("YEAR($this->_columnForTimeRange) = ?", abs($year));
