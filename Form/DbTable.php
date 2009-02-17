@@ -28,7 +28,6 @@ class KontorX_Form_DbTable extends Zend_Form {
 	public function __construct(Zend_Db_Table_Abstract $table, $options = null, array $ignoreColumns = array()) {
 		parent::__construct();
 
-		// ustawiamy kolumny ignorowane
 		$this->_setIgnoreColumns($ignoreColumns);
 
 		if ($options instanceof Zend_Config) {
@@ -42,16 +41,25 @@ class KontorX_Form_DbTable extends Zend_Form {
 		if (isset($options['ignorePK'])) {
 			$this->setIgnorePrimaryKey($options['ignorePK']);
 		}
+		// ustawieni ignorowanych kolumn
+		if (isset($options['ignoreColumns'])) {
+			$ignoreColumns = $options['ignoreColumns'];
+			if (is_array($ignoreColumns)) {
+				$ignoreColumns = array_keys($ignoreColumns);
+			}
+			$this->_setIgnoreColumns((array) $ignoreColumns);
+		}
 		
 		$this->_setupFormFromTable($table, $options);
 		
 		$this->postInit();
 	}
 
-	public function postInit() {
-		
-	}
+	public function postInit() {}
 
+	/**
+	 * @var bool
+	 */
 	protected $_ignoredPrimaryKey = true;
 
 	/**
@@ -112,7 +120,7 @@ class KontorX_Form_DbTable extends Zend_Form {
 	protected function _hasIgnoredColumn($column) {
 		return in_array($column, $this->_ignoreColumns);
 	}
-	
+
 	/**
 	 * Tworzy na podstawie @see Zend_Db_Table_Abstract formularz
 	 *
@@ -177,6 +185,12 @@ class KontorX_Form_DbTable extends Zend_Form {
 			}
 			
 			$this->addElement($element, $elementName, $elementOptions);
+		}
+		
+		// dodawanie elementow formularza nie bedacych kolumnami tabeli
+		$elements = array_diff_key($formOptions['elements'],$metadata);
+		if (count($elements)) {
+			$this->addElements($elements);
 		}
 	}
 
