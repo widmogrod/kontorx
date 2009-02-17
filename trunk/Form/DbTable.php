@@ -188,9 +188,11 @@ class KontorX_Form_DbTable extends Zend_Form {
 		}
 		
 		// dodawanie elementow formularza nie bedacych kolumnami tabeli
-		$elements = array_diff_key($formOptions['elements'],$metadata);
-		if (count($elements)) {
-			$this->addElements($elements);
+		if (isset($formOptions['elements'])) {
+			$elements = array_diff_key((array) $formOptions['elements'], $metadata);
+			if (count($elements)) {
+				$this->addElements($elements);
+			}
 		}
 	}
 
