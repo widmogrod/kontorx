@@ -28,7 +28,7 @@ class KontorX_DataGrid_Row_Date extends KontorX_DataGrid_Row_Abstract {
 		$result  = $value;
 
 		if ($value == '') {
-			return '';
+			return "$value";
 		}
 		
 		$options = $this->getOptions();
