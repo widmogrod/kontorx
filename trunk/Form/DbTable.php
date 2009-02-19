@@ -149,23 +149,56 @@ class KontorX_Form_DbTable extends Zend_Form {
 			$referenceOptions = $this->_isForeignColumn($column, $referenceMap);
 			if ($referenceOptions !== false) {
 				// TODO Czy $referenceOptions['refColumns'] może być array?
-				$refColumns 		= (string) $referenceOptions['refColumns'];
+				$refColumns         = (string) $referenceOptions['refColumns'];
 				$refColumnsAsName   = (string) @$referenceOptions['refColumnsAsName'];
-				$refClassName		= (string) $referenceOptions['refTableClass'];
+				$refClassName       = (string) $referenceOptions['refTableClass'];
 				require_once 'Zend/Loader.php';
 				Zend_Loader::loadClass($refClassName);
-				$refClass 			= new $refClassName();
+				$refClass = new $refClassName();
 
 				$foreign = array(null => null); // pierwsze pole powinno byc zawsze puste!
-				foreach ($refClass->fetchAll() as $row) {
+
+                                $rowsetClass = $refClass->fetchAll();
+				foreach ($rowsetClass as $row) {
 					$key = $row->{$refColumns};
-					$value = null === $refColumnsAsName
+					$value = (null === $refColumnsAsName)
 						? $key
-						: (isset($row->{$refColumnsAsName}) ? $row->{$refColumnsAsName} : $key);
+						: (isset($row->{$refColumnsAsName})
+                                                    ? strip_tags($row->{$refColumnsAsName})
+                                                       : $key);
+
+                                        /**
+                                         * @todo Zrobić to lepiej!
+                                         */
+                                        if ($row instanceof KontorX_Db_Table_Tree_Row_Abstract) {
+                                            $value = str_repeat("-", $row->getDepth()) . " " . $value;
+                                        }
 					$foreign[$key] = $value;
 				}
-				$elementOptions['multiOptions'] = $foreign;
-				$element = 'select';
+
+//                                if ($rowsetClass instanceof KontorX_Db_Table_Tree_Rowset_Abstract) {
+//                                    $element = new KontorX_Form_Element_SelectTree($refColumns,array('options' => array(
+//                                        'rowset' => $rowsetClass,
+//                                        'valueCol' => $key,
+//                                        'labelCol' => $refColumnsAsName
+//                                    )));
+////                                    $elementOptions['prefixPath']['element'] = array(
+////                                        'prefix' => 'KontorX_Form_Element',
+////                                        'path' => 'KontorX/Form/Element'
+////                                    );
+////                                    prefixPath.element.prefix = "My_Element"
+////prefixPath.element.path = "My/Element/"
+////                                    .decorator. = "My_Decorator"
+////prefixPaths.decorator.path = "My/Decorator/"
+////                                    $elementOptions['multiOptions'] = array(
+////                                        'rowset' => $rowsetClass,
+////                                        'valueCol' => $key,
+////                                        'labelCol' => $refColumnsAsName
+////                                    );
+//                                } else {
+                                    $element = 'select';
+                                    $elementOptions['multiOptions'] = $foreign;
+//                                }
 			}
 
 			// aktualizowanie danych elementu
