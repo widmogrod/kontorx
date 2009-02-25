@@ -10,14 +10,14 @@ require_once 'KontorX/Db/Table/Abstract.php';
  * @version		0.1.6
  */
 class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
-	/**
-	 * @Overwrite
-	 */
-	protected $_rowClass = 'KontorX_Db_Table_Tree_Row';
+    /**
+     * @Overwrite
+     */
+    protected $_rowClass = 'KontorX_Db_Table_Tree_Row';
 
     /**
-	 * @Overwrite
-	 */
+     * @Overwrite
+     */
     protected $_rowsetClass = 'KontorX_Db_Table_Tree_Rowset';
     
     /**
@@ -27,42 +27,43 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
      */
     protected $_level = null;
 
-	/**
-	 * Seprarator poziomu zagnieżdżenia
-	 *
-	 * @var string
-	 */
-	protected $_separator = '/';
+    /**
+     * Seprarator poziomu zagnieżdżenia
+     *
+     * @var string
+     */
+    protected $_separator = '/';
 
-	public function init() {
-		if (null === $this->_level) {
-			require_once 'KontorX/Db/Table/Tree/Exception.php';
-			throw new KontorX_Db_Table_Tree_Exception('Field `$_level` name for nested records is not definded');
-		}
-		if (!in_array($this->_level, $this->_getCols())) {
+    public function init() {
+        if (null === $this->_level) {
+                require_once 'KontorX/Db/Table/Tree/Exception.php';
+                throw new KontorX_Db_Table_Tree_Exception('Field `$_level` name for nested records is not definded');
+        }
+        if (!in_array($this->_level, $this->_getCols())) {
             require_once 'KontorX/Db/Table/Tree/Exception.php';
             throw new KontorX_Db_Table_Tree_Exception("Specified column \"$this->_level\" is not in the row");
         }
+
         parent::init();
-	}
+    }
 
-	/**
-	 * Zwraca nazwe kolumny przechowujacej informacje o zagniezdzeniu
-	 *
-	 * @return string
-	 */
-	public function getLevel() {
-		return $this->_level;
-	}
+    /**
+     * Zwraca nazwe kolumny przechowujacej informacje o zagniezdzeniu
+     *
+     * @return string
+     */
+    public function getLevel() {
+            return $this->_level;
+    }
 
-	/**
-	 * Zwraca separator rozdzielający poziom, zagnieżdżenia
-	 *
-	 * @return string
-	 */
-	public function getSeparator() {
-		return $this->_separator;
-	}
+    /**
+     * Zwraca separator rozdzielający poziom, zagnieżdżenia
+     *
+     * @return string
+     */
+    public function getSeparator() {
+            return $this->_separator;
+    }
 
 //	/**
 //     * @Overwrite
@@ -75,7 +76,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
 //		return call_user_func_array(array(parent,'find'),func_get_args());
 //	}
 
-	/**
+    /**
      * @Overwrite
      * 
      * @param string|array|Zend_Db_Table_Select $where  OPTIONAL An SQL WHERE clause or Zend_Db_Table_Select object.
@@ -84,11 +85,11 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
      * @param int                               $offset OPTIONAL An SQL LIMIT offset.
      * @return KontorX_Db_Table_Tree_Rowset_Abstract The row results per the Zend_Db_Adapter fetch mode.
      */
-	public function fetchAll($where = null, $order = null, $count = null, $offset = null) {
-		return parent::fetchAll($where, $order, $count, $offset);
-	}
+    public function fetchAll($where = null, $order = null, $count = null, $offset = null) {
+            return parent::fetchAll($where, $order, $count, $offset);
+    }
 
-	/**
+    /**
      * @Overwrite
      * 
      * @param string|array|Zend_Db_Table_Select $where  OPTIONAL An SQL WHERE clause or Zend_Db_Table_Select object.
@@ -96,7 +97,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
      * @return KontorX_Db_Table_Tree_Row_Abstract The row results per the
      *     Zend_Db_Adapter fetch mode, or null if no row found.
      */
-	public function fetchRow($where = null, $order = null) {
-		return parent::fetchRow($where, $order);
-	}
+    public function fetchRow($where = null, $order = null) {
+            return parent::fetchRow($where, $order);
+    }
 }
