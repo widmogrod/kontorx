@@ -7,6 +7,14 @@
  */
 class KontorX_Filter_MagicQuotes implements Zend_Filter_Interface{
     public function filter($value) {
-        return get_magic_quotes_gpc() ? stripslashes($value) : $value;
+        if  (get_magic_quotes_gpc()) {
+            if (is_array($value)) {
+                $value = array_map('stripslashes', $value);
+            } else {
+                $value = $stripslashes($value);
+            }
+        }
+
+        return $value;
     }
 }
