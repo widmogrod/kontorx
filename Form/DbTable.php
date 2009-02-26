@@ -26,33 +26,38 @@ class KontorX_Form_DbTable extends Zend_Form {
 	 * @param array $ignoreColumns
 	 */
 	public function __construct(Zend_Db_Table_Abstract $table, $options = null, array $ignoreColumns = array()) {
-		parent::__construct();
+            $this->_setIgnoreColumns($ignoreColumns);
 
-		$this->_setIgnoreColumns($ignoreColumns);
+            if ($options instanceof Zend_Config) {
+                $options = $options->toArray();
+            } else
+            if (!is_array($options)){
+                $options = array();
+            }
 
-		if ($options instanceof Zend_Config) {
-			$options = $options->toArray();
-		} else
-		if (!is_array($options)){
-			$options = array();
-		}
+            // Wszyzstkie opcje <> 'elements'
+            $optionsForConstruct = (isset($options['elements']))
+                ? array_diff_key($options, array_flip(array('elements')))
+                : $options;
 
-		// ustawienie ignorwania klucza głównego
-		if (isset($options['ignorePK'])) {
-			$this->setIgnorePrimaryKey($options['ignorePK']);
-		}
-		// ustawieni ignorowanych kolumn
-		if (isset($options['ignoreColumns'])) {
-			$ignoreColumns = $options['ignoreColumns'];
-			if (is_array($ignoreColumns)) {
-				$ignoreColumns = array_keys($ignoreColumns);
-			}
-			$this->_setIgnoreColumns((array) $ignoreColumns);
-		}
-		
-		$this->_setupFormFromTable($table, $options);
-		
-		$this->postInit();
+            parent::__construct($optionsForConstruct);
+
+            // ustawienie ignorwania klucza głównego
+            if (isset($options['ignorePK'])) {
+                    $this->setIgnorePrimaryKey($options['ignorePK']);
+            }
+            // ustawieni ignorowanych kolumn
+            if (isset($options['ignoreColumns'])) {
+                    $ignoreColumns = $options['ignoreColumns'];
+                    if (is_array($ignoreColumns)) {
+                            $ignoreColumns = array_keys($ignoreColumns);
+                    }
+                    $this->_setIgnoreColumns((array) $ignoreColumns);
+            }
+
+            $this->_setupFormFromTable($table, $options);
+
+            $this->postInit();
 	}
 
 	public function postInit() {}
