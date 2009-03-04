@@ -1,369 +1,403 @@
 <?php
 abstract class KontorX_Image_Abstract {
-	const
-		image_quality = 85;		// domyslna jakosc grafiki
+    // domyslna jakosc grafiki
+    const IMAGE_QUALITY = 85;
 
-	private
-		// $_sPath = null,
-		// $_sName = null,
-		$_iType = null,			// typ pliku
-		$_sMime = null,			// mime pliku
-		$_iWidth = null,		// szerokosc pliku
-		$_iHeight = null,		// wysokosc pliku
-		$_rSource = null;		// uchwyt pliku
+    /**
+     * Typ pliku
+     * @var integer
+     */
+    protected $_type = null;
 
-	/**
-	 * konstruktor
-	 *
-	 * @param 	$sPath		string
-	 */
-	public function __construct( $sPath = null ){
-		if( !is_null( $sPath ))
-			$this->load( $sPath );
-	}
+    /**
+     * Typ mime pliku
+     * @var string
+     */
+    protected $_mine = null;
 
-	/**
-	 * zaladuj grafike
-	 *
-	 * @param 	$sPath		string
-	 */
-	public function load( $sPath ){
-		// sprawdz czy istnieje plik
-		if( !file_exists( $sPath )){
-			$sError = 'file `'.$sPath.'` does not exists';
-			throw new KontorX_Image_Exception( $sError );
-		}
+    /**
+     * Szerokosc pliku
+     * @var integer
+     */
+    protected $_width = null;
 
-		// pobierz informacje o grafice
-		$aImage = getimagesize( $sPath );
-		$this->_iWidth	= $aImage[0];
-		$this->_iHeight	= $aImage[1];
-		$this->_iType	= $aImage[2];
-		$this->_sMime	= $aImage['mime'];
+    /**
+     * Wysokosc pliku
+     * @var integer
+     */
+    protected $_height = null;
 
-		$this->_rSource = $this->_imageCreateFrom( $sPath );
-	}
+    /**
+     * Uchwyt pliku
+     * @var resource
+     */
+    protected $_image = null;
 
-	/**
-	 * zwroc typ pliku graficznego
-	 * 
-	 * @return 	integer
-	 */
-	public function getType(){
-		return $this->_iType;
-	}
+    /**
+     * @var string
+     */
+    protected $_pathname = null;
 
-	/**
-	 * zwroc mime pliku
-	 * 
-	 * @return 	string
-	 */
-	public function getMime(){
-		return $this->_sMime;
-	}
-	
-	/**
-	 * zmien rozmiar grafiki
-	 *
-	 * @param 	$iWidth		integer
-	 * @param 	$iHeight	integer
-	 * @return 	object
-	 */
-	public function resize( $iWidth, $iHeight ){
-		// sprawdz czy zaladowano grafike
-		if( !$this->_rSource ){
-			$sError = 'image has not been loaded';
-			throw new KontorX_Image_Exception( $sError );
-		}
+    /**
+     * @param string $pathname
+     */
+    public function __construct($pathname) {
+        $this->_pathname = $pathname;
+        $this->load($pathname);
+    }
 
-		// utworz nowy obrazek
-		if( !$rNewImage = $this->_imagecreate( $iWidth, $iHeight )){
-			$sError = 'image has not been created';
-			throw new KontorX_Image_Exception( $sError );
-		}
+    /**
+     * Wczytanie grafiki
+     * @param string $pathname
+     */
+    public function load($pathname) {
+        // sprawdz czy istnieje plik
+        if (!file_exists($pathname)) {
+            $message = "File '$pathname' does not exists";
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
 
-		// zmien rozmiar obrazka
-		$bResult = imageCopyResampled( $rNewImage, $this->_rSource, 0, 0, 0, 0, $iWidth, $iHeight, $this->_iWidth, $this->_iHeight );
+        // pobierz informacje o grafice
+        $data = getimagesize($pathname);
+        $this->_width	= $data[0];
+        $this->_height	= $data[1];
+        $this->_type	= $data[2];
+        $this->_mine	= $data['mime'];
 
-		if( !$bResult ){
-			$sError = 'image has not been resampled';
-			throw new KontorX_Image_Exception( $sError );
-		}
+        $this->_image = $this->_imageCreateFrom($pathname);
+    }
 
-		imagedestroy( $this->_rSource );
+    /**
+     * Zwraca typ pliku graficznego
+     * @return 	integer
+     */
+    public function getType() {
+        return $this->_type;
+    }
 
-		$this->_rSource = $rNewImage;
-		$this->_iWidth  = $iWidth;
-		$this->_iHeight = $iHeight;
+    /**
+     * Zwraca MIME pliku
+     * @return 	string
+     */
+    public function getMime() {
+        return $this->_mine;
+    }
 
-		return $this;
-	}
+    /**
+     * @param integer $width
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resize($width, $height) {
+        // sprawdz czy zaladowano grafike
+        if (!$this->_image) {
+            $message = 'Image not loaded';
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
 
-	/**
-	 * zmien rozmiar grafiki nie wikekszych niz wartosci maksymalnych
-	 *
-	 * @param 	$iWidth		integer
-	 * @param 	$iHeight	integer
-	 * @return 	object
-	 */
-	public function resizeToMax( $iWidth, $iHeight ){
-		// nie przekroczono wartosci maksymalnej
-		if( $iWidth > $this->_iWidth ){
-			$iNewWidth = $this->_iWidth;
-			$iNewHeight = $this->_iHeight;
-		}
-		// wartosc maksymalna zostala przekroczona
-		else {
-			$iNewWidth = $iWidth;
-			$iNewHeight = round( $iWidth / $this->_iWidth * $this->_iHeight );
-		}
+        // utworz nowy obrazek
+        if (($newImage = $this->_imagecreate($width, $height))) {
+            $message = 'Image not created';
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
 
-		// przekroczono wartosc maksymalną
-		if( $iHeight < $iNewHeight ){
-			$iNewHeight = $iHeight;
-			$iNewWidth = round( $iHeight / $this->_iHeight * $this->_iWidth );
-		}
+        // zmien rozmiar obrazka
+        $result = imageCopyResampled($rNewImage, $this->_image, 0, 0, 0, 0, $width, $height, $this->_width, $this->_height);
 
-		return $this->resize( $iNewWidth, $iNewHeight );
-	}
+        if(!$result) {
+            $message = 'Image not resampled';
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
 
-	/**
-	 * zmien rozmiar grafiki do szerokosci
-	 *
-	 * @param 	$iWidth		integer
-	 * @return 	bool
-	 */
-	public function resizeToWidth( $iWidth ){
-		$iHeight = round( $iWidth / $this->_iWidth * $this->_iHeight );
-		return $this->resize( $iWidth, $iHeight );
-	}
+        imagedestroy($this->_image);
 
-	/**
-	 * zmien rozmiar grafiki do wysokosci
-	 *
-	 * @param 	$iHeight	integer
-	 * @return 	object
-	 */
-	public function resizeToHeight( $iHeight ){
-		$iWidth = round( $iHeight / $this->_iHeight * $this->_iWidth );
-		return $this->resize( $iWidth, $iHeight );
-	}
+        $this->_image  = $rNewImage;
+        $this->_width  = $width;
+        $this->_height = $height;
 
-	/**
-	 * zmien rozmiar grafiki do maksymalnej szerokosci
-	 *
-	 * @param 	$iWidth		integer
-	 * @return 	bool
-	 */
-	public function resizeToMaxWidth( $iWidth ){
-		// nie przekroczono wartosci maksymalnej
-		if( $iWidth > $this->_iWidth ){
-			$iWidth = $this->_iWidth;
-			$iHeight = $this->_iHeight;
-		}
-		// wartosc maksymalna zostala przekroczona
-		else {
-			$iHeight = round( $iWidth / $this->_iWidth * $this->_iHeight );
-		}
+        return $this;
+    }
 
-		return $this->resize( $iWidth, $iHeight );
-	}
+    /**
+     * @param integer $width
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMax($width, $height) {
+        // nie przekroczono wartosci maksymalnej
+        if ($width > $this->_width) {
+            $iNewWidth = $this->_width;
+            $iNewHeight = $this->_height;
+        }
+        // wartosc maksymalna zostala przekroczona
+        else {
+            $iNewWidth = $width;
+            $iNewHeight = round($width / $this->_width * $this->_height);
+        }
 
-	/**
-	 * zmien rozmiar grafiki do maksymalnej wysokosci
-	 *
-	 * @param 	$iHeight	integer
-	 * @return 	bool
-	 */
-	public function resizeToMaxHeight( $iHeight ){
-		// nie przekroczono wartosci maksymalnej
-		if( $iHeight > $this->_iHeight ){
-			$iWidth = $this->_iWidth;
-			$iHeight = $this->_iHeight;
-		}
-		// wartosc maksymalna zostala przekroczona
-		else {
-			$iWidth = round( $iHeight / $this->_iHeight * $this->_iWidth );
-		}
+        // przekroczono wartosc maksymalną
+        if ($height < $iNewHeight) {
+            $iNewHeight = $height;
+            $iNewWidth = round($height / $this->_height * $this->_width);
+        }
 
-		return $this->resize( $iWidth, $iHeight );
-	}
+        return $this->resize($iNewWidth, $iNewHeight);
+    }
 
-	public function crop( $iX, $iY, $iWidth, $iHeight ){
-		// sprawdz czy zaladowano grafike
-		if( !$this->_rSource ){
-			$sError = 'image has not been loaded';
-			throw new KontorX_Image_Exception( $sError );
-		}
+    /**
+     * @param integer $width
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToWidth($width) {
+        $height = round($width / $this->_width * $this->_height);
+        return $this->resize($width, $height);
+    }
 
-		// utworz nowy obrazek
-		if( !$rNewImage = $this->_imagecreate( $iWidth, $iHeight )){
-			$sError = 'image has nit been created';
-			throw new KontorX_Image_Exception( $sError );
-		}
+    /**
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToHeight($height) {
+        $width = round($height / $this->_height * $this->_width);
+        return $this->resize($width, $height);
+    }
 
-		// zmien rozmiar obrazka
-		$bResult = imageCopy( $rNewImage, $this->_rSource, 0, 0, $iX, $iY, $iWidth, $iHeight );
+    /**
+     * @param integer $width
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMaxWidth($width) {
+        // nie przekroczono wartosci maksymalnej
+        if ($width > $this->_width) {
+            $width = $this->_width;
+            $height = $this->_height;
+        }
+        // wartosc maksymalna zostala przekroczona
+        else {
+            $height = round($width / $this->_width * $this->_height);
+        }
 
-		if( !$bResult ){
-			$sError = 'image has not been resampled';
-			throw new KontorX_Image_Exception( $sError );
-		}
+        return $this->resize($width, $height);
+    }
 
-		imagedestroy( $this->_rSource );
+    /**
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMaxHeight($height) {
+        // nie przekroczono wartosci maksymalnej
+        if ($height > $this->_height) {
+            $width = $this->_width;
+            $height = $this->_height;
+        }
+        // wartosc maksymalna zostala przekroczona
+        else {
+            $width = round($height / $this->_height * $this->_width);
+        }
 
-		$this->_rSource = $rNewImage;
-		$this->_iWidth  = $iWidth;
-		$this->_iHeight = $iHeight;
+        return $this->resize($width, $height);
+    }
 
-		return $this;
-	}
+    /**
+     * @param integer $offsetWidth
+     * @param integer $offsetHeight
+     * @param integer $width
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function crop($offsetWidth, $offsetHeight, $width, $height) {
+        // sprawdz czy zaladowano grafike
+        if(!$this->_image) {
+            $message = 'Image not loaded';
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
 
-	/**
-	 * Filtry na grafike
-	 */
+        // utworz nowy obrazek
+        if (($newImage = $this->_imagecreate($width, $height))) {
+            $message = 'Image not created';
+            throw new KontorX_Image_Exception($message);
+        }
 
-	public function grayscale(){
-		imagefilter( $this->_rSource, IMG_FILTER_GRAYSCALE );
-		return $this;
-	}
+        // zmien rozmiar obrazka
+        $result = imageCopy($rNewImage, $this->_image, 0, 0, $offsetWidth, $offsetHeight, $width, $height);
 
-	public function brightness( $iLevel ){
-		imagefilter( $this->_rSource, IMG_FILTER_BRIGHTNESS, $iLevel );
-		return $this;
-	}
+        if(!$result) {
+            $message = 'Image not resampled';
+            throw new KontorX_Image_Exception($message);
+        }
 
-	public function emboss(){
-		imagefilter( $this->_rSource, IMG_FILTER_EMBOSS );
-		return $this;
-	}
+        imagedestroy($this->_image);
 
-	public function negate(){
-		imagefilter( $this->_rSource, IMG_FILTER_NEGATE );
-		return $this;
-	}
+        $this->_image = $rNewImage;
+        $this->_width  = $width;
+        $this->_height = $height;
 
-	public function smooth(){
-		imagefilter( $this->_rSource, IMG_FILTER_SMOOTH, $iLevel );
-		return $this;
-	}
+        return $this;
+    }
 
-	public function colorize( $iRed = 0, $iGreen = 0, $iBlue = 0 ){
-		imagefilter( $this->_rSource, IMG_FILTER_COLORIZE, $iRed, $iGreen, $iBlue );
-		return $this;
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function grayscale() {
+        imagefilter($this->_image, IMG_FILTER_GRAYSCALE);
+        return $this;
+    }
 
-	public function edgeDetect(){
-		imagefilter( $this->_rSource, IMG_FILTER_EDGEDETECT );
-		return $this;
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function brightness($iLevel) {
+        imagefilter($this->_image, IMG_FILTER_BRIGHTNESS, $iLevel);
+        return $this;
+    }
 
-	/**
-	 * zapisz grafike do pliku
-	 *
-	 * @param 	$sFile		string
-	 * @param 	$iType		integer
-	 * @param 	$iQuality	integer
-	 * @return 	object
-	 */
-	public function save( $sFile, $iType = IMAGETYPE_JPEG, $iQuality = null ){
-		return $this->_image( $this->_rSource, $sFile, $iType, $iQuality );
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function emboss() {
+        imagefilter($this->_image, IMG_FILTER_EMBOSS);
+        return $this;
+    }
 
-	/**
-	 * wyswietl grafike
-	 *
-	 * @param 	$iType 		integer
-	 * @param 	$iQuality	integer
-	 */
-	public function display( $iType = IMAGETYPE_JPEG, $iQuality = self::image_quality, $bReturn = false ){
-		// wyslij naglowki
-		if((bool) !$bReturn ){
-			header( 'Content-type:' . image_type_to_mime_type( $iType ));
-			$this->_image( $this->_rSource, null, $iType, $iQuality );
-		} else {
-			ob_start();
-			$this->_image( $this->_rSource, null, $iType, $iQuality );
-			$sReturn = ob_get_contents();
-			ob_end_clean();
-			return $sReturn;
-		}
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function negate() {
+        imagefilter($this->_image, IMG_FILTER_NEGATE);
+        return $this;
+    }
 
-	/**
-	 * @param 	$sPath		string
-	 */
-	protected function _imageCreateFrom( $sPath ){
-		switch( $this->_iType ){
-			case IMAGETYPE_PNG: return imageCreateFromPng( $sPath );
-			case IMAGETYPE_GIF: return imageCreateFromGif( $sPath );
-			case IMAGETYPE_JPEG: return imageCreateFromJpeg( $sPath );
-		}
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function smooth() {
+        imagefilter($this->_image, IMG_FILTER_SMOOTH, $iLevel);
+        return $this;
+    }
 
-	/**
-	 * @param 	$iWidth		integer
-	 * @param 	$iHeight	integer
-	 * @return 	resource
-	 */
-	protected function _imagecreate( $iWidth, $iHeight ){
-		return function_exists('imagecreatetruecolor')
-			? imageCreateTrueColor( $iWidth, $iHeight )
-			: imageCreate( $iWidth, $iHeight );
-	}
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function colorize($iRed = 0, $iGreen = 0, $iBlue = 0) {
+        imagefilter($this->_image, IMG_FILTER_COLORIZE, $iRed, $iGreen, $iBlue);
+        return $this;
+    }
 
-	/**
-	 * @param  	$rSource 	string
-	 * @param 	$sFilename	string
-	 * @param 	$iQuality	integer
-	 * @return 	bool
-	 */
-	protected function _image( $rSource, $sFilename = null, $iType = IMAGETYPE_JPEG, $iQuality = self::image_quality ){
-		// wyslij grafike
-		switch( $iType ){
-			case IMAGETYPE_PNG:
-				return empty( $sFilename )
-					? imagePng( $rSource )
-					: imagePng( $rSource, $sFilename );
+    /**
+     * @return KontorX_Image_Abstract
+     */
+    public function edgeDetect() {
+        imagefilter($this->_image, IMG_FILTER_EDGEDETECT);
+        return $this;
+    }
 
-			case IMAGETYPE_GIF:
-				return empty( $sFilename )
-					? imageGif( $rSource )
-					: imageGif( $rSource, $sFilename );
+    /**
+     * zapisz grafike do pliku
+     *
+     * @param string $filename
+     * @param integer $type
+     * @param integer $quality
+     * @return KontorX_Image_Abstract
+     */
+    public function save($filename, $type = IMAGETYPE_JPEG, $quality = null) {
+        return $this->_image($this->_image, $filename, $type, $quality);
+    }
 
-			case IMAGETYPE_JPEG:
-				$iQuality = ( $iQuality > 0 && $iQuality < 100 ) ? $iQuality : self::image_quality ;
-				return empty( $sFilename )
-					? imageJpeg( $rSource, null, $iQuality )
-					: imageJpeg( $rSource, $sFilename, $iQuality );
+    /**
+     * @param integer $type
+     * @param integer $quality
+     * @param bool $capture
+     * @return void
+     */
+    public function display($type = IMAGETYPE_JPEG, $quality = self::IMAGE_QUALITY, $capture = false) {
+        // wyslij naglowki
+        if ($capture !== true) {
+            header('Content-type:' . image_type_to_mime_type($type));
+            $this->_image($this->_image, null, $type, $quality);
+        } else {
+            ob_start();
+            $this->_image($this->_image, null, $type, $quality);
+            $sReturn = ob_get_contents();
+            ob_end_clean();
+            return $sReturn;
+        }
+    }
 
-			default: return false;
-		}
-	}
+    /**
+     * @param string $pathname
+     * @return void
+     */
+    protected function _imageCreateFrom($pathname) {
+        switch($this->_type) {
+            case IMAGETYPE_PNG: return imageCreateFromPng($pathname);
+            case IMAGETYPE_GIF: return imageCreateFromGif($pathname);
+            case IMAGETYPE_JPEG: return imageCreateFromJpeg($pathname);
+        }
+    }
 
-	/**
-	 * zwraca numer typu pliku na podstawie nazwy mime
-	 *
-	 * @param 	$sMime		string
-	 * @return 	mixed
-	 */
-	static public function getImageTypeFromMimeType( $sMime ){
-		switch( strtolower( $sMime )){
-			case 'image/gif': 	return IMAGETYPE_GIF;
-			case 'image/jpeg': 	return IMAGETYPE_JPEG;
-			case 'image/png': 	return IMAGETYPE_PNG;
-			case 'image/psd': 	return IMAGETYPE_PSD;
-			case 'image/bmp': 	return IMAGETYPE_BMP;
-			case 'image/tiff': 	return IMAGETYPE_TIFF_II;
-			case 'image/jp2': 	return IMAGETYPE_JP2;
-			case 'image/iff': 	return IMAGETYPE_IFF;
-			case 'image/xbm': 	return IMAGETYPE_XBM;
-			case 'image/vnd.wap.wbmp': return IMAGETYPE_WBMP;
-			//case 'application/octet-stream': return IMAGETYPE_JPX;
-			case 'application/octet-stream': return IMAGETYPE_JPC;
-			case 'application/x-shockwave-flash': return IMAGETYPE_SWF;
-		}
+    /**
+     * @param integer $width
+     * @param integer $height
+     * @return resource
+     */
+    protected function _imagecreate($width, $height) {
+        return function_exists('imagecreatetruecolor')
+            ? imageCreateTrueColor($width, $height)
+            : imageCreate($width, $height);
+    }
 
-		return false;
-	}
+    /**
+     * @param string $source
+     * @param string $filename
+     * @param integer $quality
+     * @return bool
+     */
+    protected function _image($source, $filename = null, $type = IMAGETYPE_JPEG, $quality = self::IMAGE_QUALITY) {
+        // wyslij grafike
+        switch($type) {
+            case IMAGETYPE_PNG:
+                return empty($filename)
+                ? imagePng($source)
+                : imagePng($source, $filename);
+
+            case IMAGETYPE_GIF:
+                return empty($filename)
+                ? imageGif($source)
+                : imageGif($source, $filename);
+
+            case IMAGETYPE_JPEG:
+                $quality = ($quality > 0 && $quality < 100) ? $quality : self::IMAGE_QUALITY ;
+                return empty($filename)
+                ? imageJpeg($source, null, $quality)
+                : imageJpeg($source, $filename, $quality);
+        }
+    }
+
+    /**
+     * @param string $mime
+     * @return string
+     */
+    static public function getImageTypeFromMimeType($mime) {
+        switch(strtolower($mime)) {
+            case 'image/gif': 	return IMAGETYPE_GIF;
+            case 'image/jpeg': 	return IMAGETYPE_JPEG;
+            case 'image/png': 	return IMAGETYPE_PNG;
+            case 'image/psd': 	return IMAGETYPE_PSD;
+            case 'image/bmp': 	return IMAGETYPE_BMP;
+            case 'image/tiff': 	return IMAGETYPE_TIFF_II;
+            case 'image/jp2': 	return IMAGETYPE_JP2;
+            case 'image/iff': 	return IMAGETYPE_IFF;
+            case 'image/xbm': 	return IMAGETYPE_XBM;
+            case 'image/vnd.wap.wbmp': return IMAGETYPE_WBMP;
+            case 'application/octet-stream': return IMAGETYPE_JPC;
+            case 'application/x-shockwave-flash': return IMAGETYPE_SWF;
+        }
+
+        return null;
+    }
 }
