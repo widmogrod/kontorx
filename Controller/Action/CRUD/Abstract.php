@@ -82,8 +82,12 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         $primaryKey = $model->info(Zend_Db_Table::PRIMARY);
 
         $params = array();
-        foreach ($primaryKey as $column) {
-            $params[] = $this->_getParam($column);
+        if (count($primaryKey) > 1) {
+            foreach ($primaryKey as $column) {
+                $params[] = $this->_getParam($column);
+            }
+        } else {
+            $params = $this->_getParam(current($primaryKey));
         }
 
         return call_user_func_array(array($model,'find'), $params);
