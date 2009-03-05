@@ -5,8 +5,8 @@
  * @category 	KontorX
  * @package 	KontorX_File
  * @version 	0.1.6
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
+ * @license	GNU GPL
+ * @author 	Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_File_Upload {
 

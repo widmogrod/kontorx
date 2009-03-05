@@ -52,8 +52,8 @@ abstract class KontorX_Image_Abstract {
      */
     public function load($pathname) {
         // sprawdz czy istnieje plik
-        if (!file_exists($pathname)) {
-            $message = "File '$pathname' does not exists";
+        if (!file_exists($pathname) && is_readable($pathname)) {
+            $message = "File '$pathname' does not exists or is not readable";
             require_once 'KontorX/Image/Exception.php';
             throw new KontorX_Image_Exception($message);
         }
@@ -91,21 +91,21 @@ abstract class KontorX_Image_Abstract {
      */
     public function resize($width, $height) {
         // sprawdz czy zaladowano grafike
-        if (!$this->_image) {
+        if (!is_resource($this->_image)) {
             $message = 'Image not loaded';
             require_once 'KontorX/Image/Exception.php';
             throw new KontorX_Image_Exception($message);
         }
 
         // utworz nowy obrazek
-        if (($newImage = $this->_imagecreate($width, $height))) {
+        if (!is_resource($newImage = $this->_imagecreate($width, $height))) {
             $message = 'Image not created';
             require_once 'KontorX/Image/Exception.php';
             throw new KontorX_Image_Exception($message);
         }
 
         // zmien rozmiar obrazka
-        $result = imageCopyResampled($rNewImage, $this->_image, 0, 0, 0, 0, $width, $height, $this->_width, $this->_height);
+        $result = imageCopyResampled($newImage, $this->_image, 0, 0, 0, 0, $width, $height, $this->_width, $this->_height);
 
         if(!$result) {
             $message = 'Image not resampled';
@@ -115,7 +115,7 @@ abstract class KontorX_Image_Abstract {
 
         imagedestroy($this->_image);
 
-        $this->_image  = $rNewImage;
+        $this->_image  = $newImage;
         $this->_width  = $width;
         $this->_height = $height;
 
@@ -211,20 +211,20 @@ abstract class KontorX_Image_Abstract {
      */
     public function crop($offsetWidth, $offsetHeight, $width, $height) {
         // sprawdz czy zaladowano grafike
-        if(!$this->_image) {
+        if (!is_resource($this->_image)) {
             $message = 'Image not loaded';
             require_once 'KontorX/Image/Exception.php';
             throw new KontorX_Image_Exception($message);
         }
 
         // utworz nowy obrazek
-        if (($newImage = $this->_imagecreate($width, $height))) {
+        if (!is_resource($newImage = $this->_imagecreate($width, $height))) {
             $message = 'Image not created';
             throw new KontorX_Image_Exception($message);
         }
 
         // zmien rozmiar obrazka
-        $result = imageCopy($rNewImage, $this->_image, 0, 0, $offsetWidth, $offsetHeight, $width, $height);
+        $result = imageCopy($newImage, $this->_image, 0, 0, $offsetWidth, $offsetHeight, $width, $height);
 
         if(!$result) {
             $message = 'Image not resampled';
@@ -233,7 +233,7 @@ abstract class KontorX_Image_Abstract {
 
         imagedestroy($this->_image);
 
-        $this->_image = $rNewImage;
+        $this->_image = $newImage;
         $this->_width  = $width;
         $this->_height = $height;
 
@@ -297,22 +297,23 @@ abstract class KontorX_Image_Abstract {
     }
 
     /**
-     * zapisz grafike do pliku
-     *
      * @param string $filename
      * @param integer $type
      * @param integer $quality
-     * @return KontorX_Image_Abstract
+     * @return void
      */
-    public function save($filename, $type = IMAGETYPE_JPEG, $quality = null) {
-        return $this->_image($this->_image, $filename, $type, $quality);
+    public function save($filename = null, $type = IMAGETYPE_JPEG, $quality = null) {
+        if (null === $filename) {
+            $filename = $this->_pathname;
+        }
+        $this->_image($this->_image, $filename, $type, $quality);
     }
 
     /**
      * @param integer $type
      * @param integer $quality
      * @param bool $capture
-     * @return void
+     * @return mixed
      */
     public function display($type = IMAGETYPE_JPEG, $quality = self::IMAGE_QUALITY, $capture = false) {
         // wyslij naglowki
@@ -320,23 +321,40 @@ abstract class KontorX_Image_Abstract {
             header('Content-type:' . image_type_to_mime_type($type));
             $this->_image($this->_image, null, $type, $quality);
         } else {
-            ob_start();
-            $this->_image($this->_image, null, $type, $quality);
-            $sReturn = ob_get_contents();
-            ob_end_clean();
-            return $sReturn;
+            return $this->toString();
         }
     }
 
     /**
+     * @return string
+     */
+    public function toString() {
+        ob_start();
+        $this->_image($this->_image, null, $this->_type);
+        $sReturn = ob_get_clean();
+        return $sReturn;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString() {
+        return $this->toString();
+    }
+
+    /**
      * @param string $pathname
-     * @return void
+     * @return resource
      */
     protected function _imageCreateFrom($pathname) {
         switch($this->_type) {
             case IMAGETYPE_PNG: return imageCreateFromPng($pathname);
             case IMAGETYPE_GIF: return imageCreateFromGif($pathname);
             case IMAGETYPE_JPEG: return imageCreateFromJpeg($pathname);
+            default:
+                $message = "Image type '".image_type_to_mime_type($this->_type)."' is not suported";
+                require_once 'KontorX/Image/Exception.php';
+                throw new KontorX_Image_Exception($message);
         }
     }
 
@@ -357,25 +375,29 @@ abstract class KontorX_Image_Abstract {
      * @param integer $quality
      * @return bool
      */
-    protected function _image($source, $filename = null, $type = IMAGETYPE_JPEG, $quality = self::IMAGE_QUALITY) {
-        // wyslij grafike
+    protected function _image($source, $filename = null, $type = null, $quality = null) {
+        $result = null;
         switch($type) {
             case IMAGETYPE_PNG:
-                return empty($filename)
-                ? imagePng($source)
-                : imagePng($source, $filename);
-
+                $result = (null === $filename)
+                    ? imagePng($source)
+                    : imagePng($source, $filename);
+                break;
             case IMAGETYPE_GIF:
-                return empty($filename)
-                ? imageGif($source)
-                : imageGif($source, $filename);
-
+                $result = (null === $filename)
+                    ? imageGif($source)
+                    : imageGif($source, $filename);
+                break;
+            default:
             case IMAGETYPE_JPEG:
-                $quality = ($quality > 0 && $quality < 100) ? $quality : self::IMAGE_QUALITY ;
-                return empty($filename)
-                ? imageJpeg($source, null, $quality)
-                : imageJpeg($source, $filename, $quality);
+                if (!is_integer($quality)) {
+                    $quality = self::IMAGE_QUALITY;
+                }
+
+                $result = imageJpeg($source, $filename, $quality);
+                break;
         }
+        return $result;
     }
 
     /**
