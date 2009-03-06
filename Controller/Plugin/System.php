@@ -9,830 +9,839 @@ require_once 'Zend/Controller/Plugin/Abstract.php';
  */
 class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 
-	const CACHE	   = 'CACHE';
-	const TEMPLATE = 'TEMPLATE';
-	const LANGUAGE = 'LANGUAGE';
-	
-	/**
-	 * @var array
-	 */
-	protected $_configTypes = array(
-		self::CACHE,
-		self::TEMPLATE,
-		self::LANGUAGE
-	);
-	
-	/**
-	 * Konstruktor
-	 *
-	 * @param Zend_Config $config
-	 */
-	public function __construct(Zend_Config $config) {
-		// ustawienie domyslenej konfiguracji!
-		$this->setConfig($config);
-	}
+    const CACHE	   = 'CACHE';
+    const TEMPLATE = 'TEMPLATE';
+    const LANGUAGE = 'LANGUAGE';
 
-	/**
-	 * @var array
-	 */
-	protected $_config = null;
-	
-	/**
-	 * @var Zend_Config
-	 */
-	protected $_configRaw = null;
+        /**
+         * @var array
+         */
+    protected $_configTypes = array(
+        self::CACHE,
+        self::TEMPLATE,
+        self::LANGUAGE
+    );
 
-	/**
-	 * Domyślna konfiguracja systemu
-	 *
-	 * @var array
-	 */
-	protected $_defaultConfig = array(
-		self::TEMPLATE => array(
-			'name' 	=> 'default',
-			'layout'=> 'index',
-			'path'	=> './template',
-			'config'=> array(
-				'filename' => 'config.ini',
-				'type' 	   => 'ini'
-			)
-		),
-		self::LANGUAGE => array(
-			'default' => 'pl'
-		),
-		self::CACHE => array(
-			'id' => 'params',
-			'frontendName' => 'Core',
-			'backendName' => 'File',
-			'frontendOptions' => array(
-				'lifetime' => 120,
-   				'automatic_serialization' => false
-			),
-			'backendOptions' => array(
-				'cache_dir' => './tmp/'
-			)
-		)
-	);
-	
-	/**
-	 * Ustawia konfigurację
-	 *
-	 * @param Zend_Config|array $options
-	 * @param string $type
-	 */
-	public function setConfig($options, $type = null) {
-		if ($options instanceof Zend_Config) {
-			$config = $options->toArray();
-		} else
-		if (is_array($options)){
-			$config = $options;
-		} else {
-			$message = "Config is not array or instance of Zend_Config";
-			require_once 'Zend/Controller/Exception.php';
-			throw new Zend_Controller_Exception($message);
-		}
+        /**
+         * Konstruktor
+         *
+         * @param Zend_Config $config
+         */
+    public function __construct(Zend_Config $config) {
+        // ustawienie domyslenej konfiguracji!
+        $this->setConfig($config);
+    }
 
-		switch ($type) {
-			case self::TEMPLATE:
-			case self::LANGUAGE:
-			case self::CACHE:
-				if (!isset($this->_config[$type])) {
-					$this->_config[$type] = $this->_createConfig($this->_defaultConfig[$type], $config);
-//					Zend_Debug::dump($this->_config[$type],1);
-				} else {
-					$this->_config[$type] = $this->_createConfig($this->_config[$type], $config);
-//					Zend_Debug::dump($this->_config[$type],2);
-				}
-			break;
+        /**
+         * @var array
+         */
+    protected $_config = null;
 
-			default:
-				$this->_config = $this->_createConfig($this->_defaultConfig, $config);
-//				$this->_configRaw = $options;
-		}
-	}
+        /**
+         * @var Zend_Config
+         */
+    protected $_configRaw = null;
 
-	/**
-	 * Alternatywa array_merge
-	 * 
-	 * @param $defaultConfig array
-	 * @param $config array
-	 * @return array
-	 */
-	private function _createConfig(array $defaultConfig, array $config) {
-		$result = array();
-		foreach ($defaultConfig as $key => $array) {
-			if (array_key_exists($key, $config)) {
-				if (is_array($config[$key])) {
-					$result[$key] = $this->_createConfig($array, $config[$key]);
-				} else {
-					$result[$key] = $config[$key];
-				}
-				
-			} else {
-				$result[$key] = $array;
-			}
-		}
-		return $result;
-	}
-	
-	/**
-	 * Zwraca konfigurację
-	 *
-	 * Parametr $raw false zwraca konfiguracje połączoną
-	 * z konfiguracją domyślną, tj. jeżeli jakaś wartość
-	 * nie została ustawiona przyjmuje wartość domyślną
-	 * Parametr $raw może również być typu Zend_Config|array
-	 * 
-	 * @param Zend_Config|array|bool $raw
-	 * @return Zend_Config|array
-	 */
-	public function getConfig($config = null, $type = null) {
-		$merge = null;
-		if ($config instanceof Zend_Config) {
-			$merge = $raw->toArray();
-		} else
-		if (is_array($config)) {
-			$merge = $config;
-		}
-		// pierwszy parametr w takim razie jest typem!
-		if (null === $type && is_string($config)) {
-			$type = $config;
-		}
-		$result = (in_array($type, $this->_configTypes))
-			? $this->_config[$type] : $this->_config ;
+        /**
+         * Domyślna konfiguracja systemu
+         *
+         * @var array
+         */
+    protected $_defaultConfig = array(
+        self::TEMPLATE => array(
+                        'name' 	=> 'default',
+                        'layout'=> 'index',
+                        'path'	=> './template',
+                        'config'=> array(
+                                'filename' => 'config.ini',
+                                'type' 	   => 'ini'
+            )
+        ),
+        self::LANGUAGE => array(
+                        'default' => 'pl'
+        ),
+        self::CACHE => array(
+                        'id' => 'params',
+                        'frontendName' => 'Core',
+                        'backendName' => 'File',
+                        'frontendOptions' => array(
+                                'lifetime' => 120,
+                                'automatic_serialization' => false
+            ),
+                        'backendOptions' => array(
+                                'cache_dir' => './tmp/'
+            )
+        )
+    );
 
-		$result = (null === $merge)
-			? $result
-			: array_merge($result, $merge);
+        /**
+         * Ustawia konfigurację
+         *
+         * @param Zend_Config|array $options
+         * @param string $type
+         */
+    public function setConfig($options, $type = null) {
+        if ($options instanceof Zend_Config) {
+            $config = $options->toArray();
+        } else
+        if (is_array($options)) {
+            $config = $options;
+        } else {
+            $message = "Config is not array or instance of Zend_Config";
+            require_once 'Zend/Controller/Exception.php';
+            throw new Zend_Controller_Exception($message);
+        }
 
-//		Zend_Debug::dump($result);
-		return $result;
-	}
+        switch ($type) {
+            case self::TEMPLATE:
+                case self::LANGUAGE:
+                    case self::CACHE:
+                        if (!isset($this->_config[$type])) {
+                            $this->_config[$type] = $this->_createConfig($this->_defaultConfig[$type], $config);
+                            //					Zend_Debug::dump($this->_config[$type],1);
+                        } else {
+                            $this->_config[$type] = $this->_createConfig($this->_config[$type], $config);
+                            //					Zend_Debug::dump($this->_config[$type],2);
+                        }
+                        break;
 
-	/**
-	 * Zwraca domyślną konfigurację
-	 *
-	 * @return array
-	 */
-	public function getDefaultConfig() {
-		return $this->_defaultConfig;
-	}
-	
-	public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request) {
-		// inicjujemy pomocnik akcji!
-		$this->_initHelper();
-	}
+                        default:
+                            $this->_config = $this->_createConfig($this->_defaultConfig, $config);
+                            //				$this->_configRaw = $options;
+                        }
+                    }
 
-	/**
-	 * @Overwrite
-	 *
-	 * @param Zend_Controller_Request_Abstract $request
-	 */
-	public function postDispatch(Zend_Controller_Request_Abstract $request) {
-		// inicjujemy cache
-		$this->_initCache($request);
+        /**
+         * Alternatywa array_merge
+         *
+         * @param $defaultConfig array
+         * @param $config array
+         * @return array
+         */
+                    private function _createConfig(array $defaultConfig, array $config) {
+                        $result = array();
+                        foreach ($defaultConfig as $key => $array) {
+                            if (array_key_exists($key, $config)) {
+                                if (is_array($config[$key])) {
+                                    $result[$key] = $this->_createConfig($array, $config[$key]);
+                                } else {
+                                    $result[$key] = $config[$key];
+                                }
 
-		// tylko finalny loop
-		if ($request->isDispatched()) {
-			// inicjujemy layout
-			$this->_initLayout();
-		}
-	}
+                            } else {
+                                $result[$key] = $array;
+                            }
+                        }
+                        return $result;
+                    }
 
-	/**
+        /**
+         * Zwraca konfigurację
+         *
+         * Parametr $raw false zwraca konfiguracje połączoną
+         * z konfiguracją domyślną, tj. jeżeli jakaś wartość
+         * nie została ustawiona przyjmuje wartość domyślną
+         * Parametr $raw może również być typu Zend_Config|array
+         *
+         * @param Zend_Config|array|bool $raw
+         * @return Zend_Config|array
+         */
+                    public function getConfig($config = null, $type = null) {
+                        $merge = null;
+                        if ($config instanceof Zend_Config) {
+                            $merge = $raw->toArray();
+                        } else
+                        if (is_array($config)) {
+                            $merge = $config;
+                        }
+                        // pierwszy parametr w takim razie jest typem!
+                        if (null === $type && is_string($config)) {
+                            $type = $config;
+                        }
+                        $result = (in_array($type, $this->_configTypes))
+                        ? $this->_config[$type] : $this->_config ;
+
+                        $result = (null === $merge)
+                        ? $result
+                        : array_merge($result, $merge);
+
+                        //		Zend_Debug::dump($result);
+                        return $result;
+                    }
+
+        /**
+         * Zwraca domyślną konfigurację
+         *
+         * @return array
+         */
+                    public function getDefaultConfig() {
+                        return $this->_defaultConfig;
+                    }
+
+                    public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request) {
+                        // inicjujemy pomocnik akcji!
+                        $this->_initHelper();
+                    }
+
+        /**
+         * @Overwrite
+         *
+         * @param Zend_Controller_Request_Abstract $request
+         */
+                    public function postDispatch(Zend_Controller_Request_Abstract $request) {
+                        // inicjujemy cache
+                        $this->_initCache($request);
+
+                        // tylko finalny loop
+                        if ($request->isDispatched()) {
+                            // inicjujemy layout
+                            $this->_initLayout();
+                        }
+                    }
+
+        /**
      * Initialize action helper
-     * 
+     *
      * @return void
      */
-    protected function _initHelper(){
-        $helperClass = $this->getHelperClass();
-        require_once 'Zend/Controller/Action/HelperBroker.php';
-        if (!Zend_Controller_Action_HelperBroker::hasHelper('system')) {
-            require_once 'Zend/Loader.php';
-            Zend_Loader::loadClass($helperClass);
-            $this->_helperInstance = new $helperClass();
-            $this->_helperInstance->setPluginInstance($this);
-            Zend_Controller_Action_HelperBroker::getStack()->offsetSet(-20, $this->_helperInstance);
-        }
-    }
+                    protected function _initHelper() {
+                        $helperClass = $this->getHelperClass();
+                        require_once 'Zend/Controller/Action/HelperBroker.php';
+                        if (!Zend_Controller_Action_HelperBroker::hasHelper('system')) {
+                            require_once 'Zend/Loader.php';
+                            Zend_Loader::loadClass($helperClass);
+                            $this->_helperInstance = new $helperClass();
+                            $this->_helperInstance->setPluginInstance($this);
+                            Zend_Controller_Action_HelperBroker::getStack()->offsetSet(-20, $this->_helperInstance);
+                        }
+                    }
 
     /**
      * @var string
      */
-    protected $_helperClass = 'KontorX_Controller_Action_Helper_System';
-    
+                    protected $_helperClass = 'KontorX_Controller_Action_Helper_System';
+
     /**
      * @return string
      */
-    public function getHelperClass(){
-        return $this->_helperClass;
-    }
+                    public function getHelperClass() {
+                        return $this->_helperClass;
+                    }
 
     /**
      * @param  string $helperClass
      * @return KontorX_Controller_Action_Helper_System
      */
-    public function setHelperClass($helperClass){
-        $this->_helperClass = (string) $helperClass;
-        return $this;
-    }
+                    public function setHelperClass($helperClass) {
+                        $this->_helperClass = (string) $helperClass;
+                        return $this;
+                    }
 
     /**
      * @var KontorX_Controller_Action_Helper_System
      */
-    protected $_helperInstance = null;
+                    protected $_helperInstance = null;
 
     /**
      * @return KontorX_Controller_Action_Helper_System
      */
-    public function getHelperInstance() {
-    	return $this->_helperInstance;
-    }
+                    public function getHelperInstance() {
+                        return $this->_helperInstance;
+                    }
 
-	/**
-	 * Inicjowanie skórowania ;]
-	 *
-	 * @return void
-	 */
-	protected function _initLayout() {
-		require_once 'Zend/Layout.php';
-		$layout = Zend_Layout::getMvcInstance();
-		if (null === $layout) {
-			// TODO To jeszczeni nie działa!
-			// problem z filtrami będę chciał się w to zagłębić!
-//			$layout = Zend_Layout::startMvc();
-			require_once 'Zend/Controller/Exception.php';
-			throw new Zend_Controller_Exception("Zend_Layout is not initializet with MVC");
-		}
+        /**
+         * Inicjowanie skórowania ;]
+         *
+         * @return void
+         */
+                    protected function _initLayout() {
+                        require_once 'Zend/Layout.php';
+                        $layout = Zend_Layout::getMvcInstance();
+                        if (null === $layout) {
+                            // TODO To jeszczeni nie działa!
+                            // problem z filtrami będę chciał się w to zagłębić!
+                            //			$layout = Zend_Layout::startMvc();
+                            require_once 'Zend/Controller/Exception.php';
+                            throw new Zend_Controller_Exception("Zend_Layout is not initializet with MVC");
+                        }
 
-		// czy jest wyłączony layout
-		if (!$layout->isEnabled()) {
-			return;
-		}
+                        // czy jest wyłączony layout
+                        if (!$layout->isEnabled()) {
+                            return;
+                        }
 
-		// jezeli layout włączony, ale nie jest ustawiony template ..
-		if (!$this->isLayout()) {
-			// to wyłanczam layout!
-			$layout->disableLayout();
-			return;
-		}
-		
-		$config 		= $this->getConfig();
-		$configDefault  = $this->getDefaultConfig();
-		
-		// ustawiamy nazwę skórki
-		$templateName = $this->getTemplateName();
-		if(null === $templateName) {
-			$templateName = $config[self::TEMPLATE]['name'];
-		}
+                        // jezeli layout włączony, ale nie jest ustawiony template ..
+                        if (!$this->isLayout()) {
+                            // to wyłanczam layout!
+                            $layout->disableLayout();
+                            return;
+                        }
 
-		// katalog z szablonem default
-		list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault[self::TEMPLATE]['name']);
-		// katalog z szablonem template
-		list($layoutPathTemplate, $layoutPathTemplateI18n) = $this->getTemplatePaths($templateName);
-		// ustawianie przeszukiwania katalogów
-		// zasada LIFO stąd ta kolejność
-		// możliwości nadpisywania tworzenia niepełnego szablonu!
-		$view = $layout->getView()
-			->addScriptPath($layoutPathDefault)
-			->addScriptPath($layoutPathDefaultI18n)
-			->addScriptPath($layoutPathTemplate)
-			->addScriptPath($layoutPathTemplateI18n);
+                        $config 		= $this->getConfig();
+                        $configDefault  = $this->getDefaultConfig();
 
-		$templatePaths = $view->getScriptPaths();
+                        // ustawiamy nazwę skórki
+                        $templateName = $this->getTemplateName();
+                        if(null === $templateName) {
+                            $templateName = $config[self::TEMPLATE]['name'];
+                        }
 
-		// ustawienia nazwy layoutu
-		$layoutName = $this->hasLayoutName()
-			? $this->getLayoutName()
-			: $config[self::TEMPLATE]['layout'];
+                        // katalog z szablonem default
+                        list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault[self::TEMPLATE]['name']);
+                        // katalog z szablonem template
+                        list($layoutPathTemplate, $layoutPathTemplateI18n) = $this->getTemplatePaths($templateName);
+                        // ustawianie przeszukiwania katalogów
+                        // zasada LIFO stąd ta kolejność
+                        // możliwości nadpisywania tworzenia niepełnego szablonu!
+                        $view = $layout->getView()
+                        ->addScriptPath($layoutPathDefault)
+                        ->addScriptPath($layoutPathDefaultI18n)
+                        ->addScriptPath($layoutPathTemplate)
+                        ->addScriptPath($layoutPathTemplateI18n);
 
-		$layout->setLayout($layoutName);
-			
-		$layoutSection = $this->hasLayoutSectionName()
-			? $this->getLayoutSectionName()
-			: $layoutName;
+                        $templatePaths = $view->getScriptPaths();
 
-		// szukanie konfiguracji
-		$templateConfig 		= null;
-		$templateConfigType 	= $config[self::TEMPLATE]['config']['type'];
-		$templateConfigFilename = $config[self::TEMPLATE]['config']['filename'];
-		foreach ($templatePaths as $templatePath) {
-			$templateConfigPath = $templatePath . '/' . $templateConfigFilename;
-			if (is_readable($templateConfigPath)) {
-				$templateConfig = new Zend_Config_Ini($templateConfigPath, $layoutSection, array('allowModifications' => true));
-				break;
-			}
-		}
+                        // ustawienia nazwy layoutu
+                        $layoutName = $this->hasLayoutName()
+                        ? $this->getLayoutName()
+                        : $config[self::TEMPLATE]['layout'];
 
-		if (null === $templateConfig) {
-			// nie ma konfiguracji layoutu
-			return;
-		}
+                        $layout->setLayout($layoutName);
 
-		// ustawianie nowego pliku layoutu gdy nie był wcześniej ustawiony "ręcznie"
-		// z poziomu kodu
-		// a co!? przecież mogę ;]
-		if (!$this->isLockLayoutName() && null !== $templateConfig->layout) {
-			$layout->setLayout($templateConfig->layout);
-		}
-		// title
-		if (isset($templateConfig->title)) {
-			$headTitle = $view->headTitle();
-			$headTitle->setSeparator(' - ');
-			$headTitle->prepend($templateConfig->title);
-		}
-		// meta
-		if (isset($templateConfig->meta)) {
-			// sprawdzanie czy są już ustawione meta dane
-			// TODO czy podwojne metadane przeszkadzają??
-			// bo wlasnie po to jest sprawdzanies
-			$meta = array();
-			$headMeta = $view->headMeta();
-			foreach ($headMeta->getContainer() as $key) {
-				if ($key->name == 'keywords') {
-					$meta['keywords'] = true;
-				} else
-				if ($key->name == 'description') {
-					$meta['description'] = true;
-				}
-			}
+                        $layoutSection = $this->hasLayoutSectionName()
+                        ? $this->getLayoutSectionName()
+                        : $layoutName;
 
-			if (!isset($meta['keywords'])) {
-				$headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
-			}
-			if (!isset($meta['description'])) {
-				$headMeta->appendName('description', $templateConfig->meta->name->description);
-			}
-		}
-		// script
-		if (isset($templateConfig->script)) {
-			$headScript = $view->headScript();
-			foreach ($templateConfig->script->js as $file) {
-				// TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
-				$headScript->appendFile($file->src);
-			}
-		}
-		// link
-		$headLink = $view->headLink();
-		if (isset($templateConfig->links)) {
-			foreach ($templateConfig->links->css as $file) {
-				// TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
-				$headLink->appendStylesheet($file->href);
-			}
-		}
-	}
-	
-	/**
-	 * @var string
-	 */
-	protected $_templatePath = null;
-	
-	/**
-	 * Zwraca tablicę z katalogami z szablonu.
-	 *
-	 * @param string $templateName
-	 * @return array()
-	 */
-	public function getTemplatePaths($templateName) {
-		if (null === $this->_templatePath) {
-			$config = $this->getConfig(false, self::TEMPLATE);
-			$this->_templatePath = $config['path'];
-		}
+                        // szukanie konfiguracji
+                        $templateConfig 		= null;
+                        $templateConfigType 	= $config[self::TEMPLATE]['config']['type'];
+                        $templateConfigFilename = $config[self::TEMPLATE]['config']['filename'];
+                        foreach ($templatePaths as $templatePath) {
+                            $templateConfigPath = $templatePath . '/' . $templateConfigFilename;
+                            if (is_readable($templateConfigPath)) {
+                                $templateConfig = new Zend_Config_Ini($templateConfigPath, $layoutSection, array('allowModifications' => true));
+                                break;
+                            }
+                        }
 
-		$path 	= $this->_templatePath . '/' . $templateName;
-		$path 	= $this->getPublicHtmlPath($path);
-		$pathI18n	= $path . '/' . $this->getLanguage();
+                        if (null === $templateConfig) {
+                            // nie ma konfiguracji layoutu
+                            return;
+                        }
 
-		return array($path, $pathI18n);
-	}
-	
-	const APPLICATION_MODULES_DIRNAME = 'modules';
-	const APPLICATION_CONFIGURATION_DIRNAME = 'configuration';
-	
-	/**
-	 * @var string
-	 */
-	protected $_applicationPath = null;
+                        // ustawianie nowego pliku layoutu gdy nie był wcześniej ustawiony "ręcznie"
+                        // z poziomu kodu
+                        // a co!? przecież mogę ;]
+                        if (!$this->isLockLayoutName() && null !== $templateConfig->layout) {
+                            $layout->setLayout($templateConfig->layout);
+                        }
+                        // title
+                        if (isset($templateConfig->title)) {
+                            $headTitle = $view->headTitle();
+                            $headTitle->setSeparator(' - ');
+                            $headTitle->prepend($templateConfig->title);
+                        }
+                        // meta
+                        if (isset($templateConfig->meta)) {
+                            // sprawdzanie czy są już ustawione meta dane
+                            // TODO czy podwojne metadane przeszkadzają??
+                            // bo wlasnie po to jest sprawdzanies
+                            $meta = array();
+                            $headMeta = $view->headMeta();
+                            foreach ($headMeta->getContainer() as $key) {
+                                if ($key->name == 'keywords') {
+                                    $meta['keywords'] = true;
+                                } else
+                                if ($key->name == 'description') {
+                                    $meta['description'] = true;
+                                }
+                            }
 
-	/**
-	 * Ustawia ścieżkę do katalogu application
-	 *
-	 * @param string $path
-	 */
-	public function setApplicationPath($path) {
-		$this->applicationPath = (string) $path;
-	}
+                            if (!isset($meta['keywords'])) {
+                                $headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
+                            }
+                            if (!isset($meta['description'])) {
+                                $headMeta->appendName('description', $templateConfig->meta->name->description);
+                            }
+                        }
+                        // script
+                        if (isset($templateConfig->script)) {
+                            $headScript = $view->headScript();
+                            foreach ($templateConfig->script->js as $file) {
+                                // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
+                                $headScript->appendFile($file->src);
+                            }
+                        }
+                        // link
+                        $headLink = $view->headLink();
+                        if (isset($templateConfig->links)) {
+                            foreach ($templateConfig->links->css as $file) {
+                                // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
+                                $headLink->appendStylesheet($file->href);
+                            }
+                        }
+                    }
 
-	/**
-	 * Zwraca ścieżkę do katalogu application
-	 *
-	 * @param string $type
-	 * @return string
-	 */
-	public function getApplicationPath($type = null) {
-		$return = $this->applicationPath;
-		switch ($type) {
-			case self::APPLICATION_MODULES_DIRNAME:
-				$return .= '/modules/';
-				break;
-			case self::APPLICATION_CONFIGURATION_DIRNAME:
-				$return .= '/configuration/';
-				break;
-		}
-		return $return;
-	}
-	
-	/**
-	 * @var string
-	 */
-	protected $_publicHtmlPath = null;
+        /**
+         * @var string
+         */
+                    protected $_templatePath = null;
 
-	/**
-	 * Ustawia ścieżkę do katalogu publi_html
-	 *
-	 * @param string $path
-	 */
-	public function setPublicHtmlPath($path) {
-		$this->_publicHtmlPath = (string) $path;
-	}
+        /**
+         * Zwraca tablicę z katalogami z szablonu.
+         *
+         * @param string $templateName
+         * @return array()
+         */
+                    public function getTemplatePaths($templateName) {
+                        if (null === $this->_templatePath) {
+                            $config = $this->getConfig(false, self::TEMPLATE);
+                            $this->_templatePath = $config['path'];
+                        }
 
-	/**
-	 * Zwraca ścieżkę do katalogu publi_html
-	 *
-	 * @param string $append
-	 * @return string
-	 */
-	public function getPublicHtmlPath($append = null) {
-		if (null !== $append) {
-			return $this->_publicHtmlPath . '/' . $append;
-		}
-		return $this->_publicHtmlPath;
-	}
+                        $path 	= $this->_templatePath . '/' . $templateName;
+                        $path 	= $this->getPublicHtmlPath($path);
+                        $pathI18n	= $path . '/' . $this->getLanguage();
 
-	/**
-	 * @var string
-	 */
-	protected $_tempPath = null;
+                        return array($path, $pathI18n);
+                    }
 
-	/**
-	 * Ustawia ścieżkę do katalogu temp
-	 *
-	 * @param string $path
-	 */
-	public function setTempPath($path) {
-		$this->_tempPath = (string) $path;
-	}
+                    const APPLICATION_MODULES_DIRNAME = 'modules';
+                    const APPLICATION_CONFIGURATION_DIRNAME = 'configuration';
 
-	/**
-	 * Zwraca ścieżkę do katalogu temp
-	 *
-	 * @param string $append
-	 * @return string
-	 */
-	public function getTempPath($append = null) {
-		if (null !== $append) {
-			return $this->_tempPath . '/' . $append;
-		}
-		return $this->_tempPath;
-	}
+        /**
+         * @var string
+         */
+                    protected $_applicationPath = null;
 
-	private $_cacheInstance = array();
+        /**
+         * Ustawia ścieżkę do katalogu application
+         *
+         * @param string $path
+         */
+                    public function setApplicationPath($path) {
+                        $this->applicationPath = (string) $path;
+                    }
 
-	/**
-	 * @param $options
-	 * @return Zend_Cache_Core
-	 */
-	public function getCacheInstance(array $options) {
-		// marge options with default
-		$options = $this->getConfig($options, self::CACHE);
-//		Zend_Debug::dump($options, 123);
+        /**
+         * Zwraca ścieżkę do katalogu application
+         *
+         * @param string $type
+         * @return string
+         */
+                    public function getApplicationPath($type = null) {
+                        $return = $this->applicationPath;
+                        switch ($type) {
+                            case self::APPLICATION_MODULES_DIRNAME:
+                                $return .= '/modules/';
+                                break;
+                        case self::APPLICATION_CONFIGURATION_DIRNAME:
+                            $return .= '/configuration/';
+                            break;
+                }
+                return $return;
+            }
 
-		$key = sha1(serialize($options));
-		if (!array_key_exists($key, $this->_cacheInstance)) {
-			if (!class_exists('Zend_Cache',false)) {
-				require_once 'Zend/Cache.php';
-			}
-			$this->_cacheInstance[$key] = Zend_Cache::factory(
-				$options['frontendName'],
-				$options['backendName'],
-				$options['frontendOptions'],
-				$options['backendOptions']
-			);
-		}
-		return $this->_cacheInstance[$key];
-	}
+        /**
+         * @var string
+         */
+            protected $_publicHtmlPath = null;
 
-	/**
-	 * @param $request
-	 * @param $options
-	 * @return string
-	 */
-	public function getCacheActionId(Zend_Controller_Request_Abstract $request, array $options) {
-		// marge options with default
-		$options = $this->getConfig($options, self::CACHE);
-		// base cacheIdName
-		$cacheId = $this->_getKeyName($request);
+        /**
+         * Ustawia ścieżkę do katalogu publi_html
+         *
+         * @param string $path
+         */
+            public function setPublicHtmlPath($path) {
+                $this->_publicHtmlPath = (string) $path;
+            }
 
-		$type = $options['id'];
-		if (is_string($type)) {
-			switch ($type) {
-				case 'params':
-					$cacheIdAppend = serialize($request->getParams());
-					break;
-			}
-		} else
-		if (is_array($type)) {
-			if (isset($type['param'])) {
-				$cacheIdAppend= $request->getParam($type['param']);
-			}
-		}
+        /**
+         * Zwraca ścieżkę do katalogu publi_html
+         *
+         * @param string $append
+         * @return string
+         */
+            public function getPublicHtmlPath($append = null) {
+                if (null !== $append) {
+                    return $this->_publicHtmlPath . '/' . $append;
+                }
+                return $this->_publicHtmlPath;
+            }
 
-		$cacheIdAppend = sha1($cacheIdAppend);
-		return "{$cacheId}_{$cacheIdAppend}";
-	}
+        /**
+         * @var string
+         */
+            protected $_tempPath = null;
 
-	/**
-	 * @var bool
-	 */
-	private $_cached = false;
-	
-	/**
-	 * @param $flag
-	 * @return void
-	 */
-	public function setCached($flag = true) {
-		$this->_cached = (bool) $flag;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function isCached() {
-		return $this->_cached;
-	}
+        /**
+         * Ustawia ścieżkę do katalogu temp
+         *
+         * @param string $path
+         */
+            public function setTempPath($path) {
+                $this->_tempPath = (string) $path;
+            }
 
-	/**
-	 * @var bool
-	 */
-	private $_cacheView = false;
-	
-	/**
-	 * @param $flag
-	 * @return void
-	 */
-	public function setCacheView($flag = true) {
-		$this->_cacheView = (bool) $flag;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function cacheView() {
-		return $this->_cacheView;
-	}
+        /**
+         * Zwraca ścieżkę do katalogu temp
+         *
+         * @param string $append
+         * @return string
+         */
+            public function getTempPath($append = null) {
+                if (null !== $append) {
+                    return $this->_tempPath . '/' . $append;
+                }
+                return $this->_tempPath;
+            }
 
-	/**
-	 * @var array
-	 */
-	private $_cacheActionOptions = array();
-	
-	/**
-	 * @param array $options
-	 * @param Zend_Controller_Request_Abstract $request
-	 * @return void
-	 */
-	public function setCacheActionOptions(array $options, Zend_Controller_Request_Abstract $request) {
-		$keyName = $this->_getKeyName($request);
-		$this->_cacheActionOptions[$keyName] = $options;
-	}
-	
-	/**
-	 * @param Zend_Controller_Request_Abstract $request
-	 * @return array
-	 */
-	public function getCacheActionOptions(Zend_Controller_Request_Abstract $request, $margeDefault = false) {
-		$keyName = $this->_getKeyName($request);
-		$options = array_key_exists($keyName, $this->_cacheActionOptions)
-			? $this->_cacheActionOptions[$keyName]
-			: null;
+            private $_cacheInstance = array();
 
-		if (!isset($options['backendOptions']['cache_dir'])) {
-			$options['backendOptions']['cache_dir'] = $this->getTempPath('cache');
-		}
+        /**
+         * @param $options
+         * @return Zend_Cache_Core
+         */
+            public function getCacheInstance(array $options) {
+                // marge options with default
+                $options = $this->getConfig($options, self::CACHE);
+                //		Zend_Debug::dump($options, 123);
 
-		if (null !== $options || $margeDefault) {
-			$options = $this->getConfig($options, self::CACHE);	
-		}
+                $key = sha1(serialize($options));
+                if (!array_key_exists($key, $this->_cacheInstance)) {
+                    if (!class_exists('Zend_Cache',false)) {
+                        require_once 'Zend/Cache.php';
+                    }
+                    $this->_cacheInstance[$key] = Zend_Cache::factory(
+                        $options['frontendName'],
+                        $options['backendName'],
+                        $options['frontendOptions'],
+                        $options['backendOptions']
+                    );
+                }
+                return $this->_cacheInstance[$key];
+            }
 
-		return $options;
-	}
+        /**
+         * @param $request
+         * @param $options
+         * @return string
+         */
+            public function getCacheActionId(Zend_Controller_Request_Abstract $request, array $options) {
+                // marge options with default
+                $options = $this->getConfig($options, self::CACHE);
+                // base cacheIdName
+                $cacheId = $this->_getKeyName($request);
 
-	/**
-	 * @param Zend_Controller_Request_Abstract $request
-	 * @return bool
-	 */
-	public function hasCacheActionOptions(Zend_Controller_Request_Abstract $request) {
-		$keyName = $this->_getKeyName($request);
-		return array_key_exists($keyName, $this->_cacheActionOptions);
-	}
-	
-	/**
-	 * @param Zend_Controller_Request_Abstract $request
-	 * @return string
-	 */
-	private function _getKeyName(Zend_Controller_Request_Abstract $request) {
-		return $request->getModuleName() . '_' .
-			$request->getControllerName() . '_' .
-			$request->getActionName();
-	}
-	
-	/**
-	 * @param $request
-	 * @return unknown_type
-	 */
-	private function _initCache(Zend_Controller_Request_Abstract $request) {
-		if (!$this->hasCacheActionOptions($request)) {
-			return;
-		}
+                $type = $options['id'];
+                if (is_string($type)) {
+                    switch ($type) {
+                        case 'params':
+                            $cacheIdAppend = array();
+                            foreach ($request->getParams() as $key => $val) {
+                                if (!is_object($val)) {
+                                    if (is_array($val)) {
+                                        $val = serialize($val);
+                                    }
+                                    $cacheIdAppend[] = $key;
+                                }
+                            }
+                            $cacheIdAppend = implode(':', $cacheIdAppend);
+                            break;
+                    }
+                } else
+                if (is_array($type)) {
+                    if (isset($type['param'])) {
+                        $cacheIdAppend= $request->getParam($type['param']);
+                    }
+                }
 
-		$options = $this->getCacheActionOptions($request);
+                $cacheIdAppend = md5($cacheIdAppend);
+                return $cacheId.'_'.$cacheIdAppend;
+            }
 
-		// bindowanie domyslnych opcji dla `cache`
-		$options = $this->getConfig($options, self::CACHE);
+        /**
+         * @var bool
+         */
+            private $_cached = false;
 
-    	if ($this->isCached()) {
-    		// ustawienie flagi ze akcja wykonana!
-    		// bo powodujemy ominięcie egzekucji akcji w @see *Helper_System::preDispatch()
-    		$request->setDispatched(true);
-    	} else
-    	if ($this->cacheView()) {
-			$cache = $this->getCacheInstance($options);
-			// dodajemy widok do cache!
-			$view    = $this->getResponse()->getBody();
-			$cacheId = $this->getCacheActionId($request, $options);
-			$cache->save($view, $cacheId);
-    	}
-	}
-	
-	/**
-	 * @var string
-	 */
-	protected $_language = null;
+        /**
+         * @param $flag
+         * @return void
+         */
+            public function setCached($flag = true) {
+                $this->_cached = (bool) $flag;
+            }
 
-	/**
-	 * Ustawia język
-	 *
-	 * @param string $language
-	 */
-	public function setLanugage($language) {
-		$this->_language = (string) $language;
-	}
+        /**
+         * @return bool
+         */
+            public function isCached() {
+                return $this->_cached;
+            }
 
-	/**
-	 * Zwraca skrót umiędzynaradawianej watość Języka np. pl, en itd. lub null
-	 * @return string
-	 */
-	public  function getLanguage() {
-		if (null === $this->_language) {
-			$front 	 = $this->getFrontController();
-			$request = $front->getRequest();
-    		$this->_language = $request->getParam('language_url', $front->getParam('i18n'));
-		}
+        /**
+         * @var bool
+         */
+            private $_cacheView = false;
 
-		return $this->_language;
-	}
+        /**
+         * @param $flag
+         * @return void
+         */
+            public function setCacheView($flag = true) {
+                $this->_cacheView = (bool) $flag;
+            }
 
-	/**
-	 * @var string
-	 */
-	protected $_templateName = null;
+        /**
+         * @return bool
+         */
+            public function cacheView() {
+                return $this->_cacheView;
+            }
 
-	/**
-	 * Ustawia nazwę skórki
-	 *
-	 * @param string $name
-	 */
-	public function setTemplateName($name) {
-		$this->_templateName = (string) $name;
-	}
+        /**
+         * @var array
+         */
+            private $_cacheActionOptions = array();
 
-	/**
-	 * Zwraca nazwę skórki
-	 *
-	 * @param bool $forse
-	 * @return string
-	 */
-	public function getTemplateName($forse = false) {
-		if (true === $forse && null === $this->_templateName) {
-			$config = $this->getConfig();
-			$this->_templateName = $config[self::TEMPLATE]['name'];
-		}
-		return $this->_templateName;
-	}
+        /**
+         * @param array $options
+         * @param Zend_Controller_Request_Abstract $request
+         * @return void
+         */
+            public function setCacheActionOptions(array $options, Zend_Controller_Request_Abstract $request) {
+                $keyName = $this->_getKeyName($request);
+                $this->_cacheActionOptions[$keyName] = $options;
+            }
 
-	/**
-	 * @var string
-	 */
-	protected $_layoutName = null;
-	
-	/**
-	 * Ustawia nazwę szablonu
-	 *
-	 * @param string $name
-	 */
-	public function setLayoutName($name) {
-		$this->_layoutName = (string) $name;
-	}
+        /**
+         * @param Zend_Controller_Request_Abstract $request
+         * @return array
+         */
+            public function getCacheActionOptions(Zend_Controller_Request_Abstract $request, $margeDefault = false) {
+                $keyName = $this->_getKeyName($request);
+                $options = array_key_exists($keyName, $this->_cacheActionOptions)
+                ? $this->_cacheActionOptions[$keyName]
+                : null;
 
-	/**
-	 * Zwraca nazwę layotu
-	 *
-	 * @return string
-	 */
-	public function getLayoutName() {
-		return $this->_layoutName;
-	}
+                if (!isset($options['backendOptions']['cache_dir'])) {
+                    $options['backendOptions']['cache_dir'] = $this->getTempPath('cache');
+                }
 
-	/**
-	 * Czy został ustawiony nazwa pliku szablonu (layput)
-	 * 
-	 * W domyśle nalerzy rozumieć, czy została ustawiona ręcznie
-	 * Ustawienie ręczne stanowi najwyższy priorytet!
-	 * 
-	 * @return bool
-	 */
-	public function hasLayoutName() {
-		return !empty($this->_layoutName);
-	}
-	
-	/**
-	 * @var bool
-	 */
-	protected $_lockLayoutName = false;
-	
-	/**
-	 * @return bool
-	 */
-	public function isLockLayoutName() {
-		return $this->_lockLayoutName;
-	}
+                if (null !== $options || $margeDefault) {
+                    $options = $this->getConfig($options, self::CACHE);
+                }
 
-	/**
-	 * @param bool $flag
-	 * @return void
-	 */
-	public function lockLayoutName($flag = true) {
-		$this->_lockLayoutName = (bool) $flag;
-	}
-	
-	/**
-	 * @var string
-	 */
-	protected $_layoutSectionName = null;
-	
-	/**
-	 * @param string $name
-	 * @return void
-	 */
-	public function setLayoutSectionName($name) {
-		$this->_layoutSectionName = (string) $name;
-	}
-	
-	/**
-	 * @return string|null
-	 */
-	public function getLayoutSectionName() {
-		return $this->_layoutSectionName;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function hasLayoutSectionName() {
-		return null !== $this->_layoutSectionName;
-	}
-	
-	/**
-	 * Sprawdza czy jest używany layout
-	 *
-	 * @return bool
-	 */
-	public function isLayout() {
-		return (null !== $this->_layoutName || null !== $this->_templateName); 
-	}
-	
-	/**
-	 * @var Zend_Controller_Front
-	 */
-	protected $_frontController;
+                return $options;
+            }
+
+        /**
+         * @param Zend_Controller_Request_Abstract $request
+         * @return bool
+         */
+            public function hasCacheActionOptions(Zend_Controller_Request_Abstract $request) {
+                $keyName = $this->_getKeyName($request);
+                return array_key_exists($keyName, $this->_cacheActionOptions);
+            }
+
+        /**
+         * @param Zend_Controller_Request_Abstract $request
+         * @return string
+         */
+            private function _getKeyName(Zend_Controller_Request_Abstract $request) {
+                return $request->getModuleName() . '_' .
+                $request->getControllerName() . '_' .
+                $request->getActionName();
+            }
+
+        /**
+         * @param $request
+         * @return unknown_type
+         */
+            private function _initCache(Zend_Controller_Request_Abstract $request) {
+                if (!$this->hasCacheActionOptions($request)) {
+                    return;
+                }
+
+                $options = $this->getCacheActionOptions($request);
+
+                // bindowanie domyslnych opcji dla `cache`
+                $options = $this->getConfig($options, self::CACHE);
+
+                if ($this->isCached()) {
+                    // ustawienie flagi ze akcja wykonana!
+                    // bo powodujemy ominięcie egzekucji akcji w @see *Helper_System::preDispatch()
+                    $request->setDispatched(true);
+                } else
+                if ($this->cacheView()) {
+                    $cache = $this->getCacheInstance($options);
+                    // dodajemy widok do cache!
+                    $view    = $this->getResponse()->getBody();
+                    $cacheId = $this->getCacheActionId($request, $options);
+                    $cache->save($view, $cacheId);
+                }
+            }
+
+        /**
+         * @var string
+         */
+            protected $_language = null;
+
+        /**
+         * Ustawia język
+         *
+         * @param string $language
+         */
+            public function setLanugage($language) {
+                $this->_language = (string) $language;
+            }
+
+        /**
+         * Zwraca skrót umiędzynaradawianej watość Języka np. pl, en itd. lub null
+         * @return string
+         */
+            public  function getLanguage() {
+                if (null === $this->_language) {
+                    $front 	 = $this->getFrontController();
+                    $request = $front->getRequest();
+                    $this->_language = $request->getParam('language_url', $front->getParam('i18n'));
+                }
+
+                return $this->_language;
+            }
+
+        /**
+         * @var string
+         */
+            protected $_templateName = null;
+
+        /**
+         * Ustawia nazwę skórki
+         *
+         * @param string $name
+         */
+            public function setTemplateName($name) {
+                $this->_templateName = (string) $name;
+            }
+
+        /**
+         * Zwraca nazwę skórki
+         *
+         * @param bool $forse
+         * @return string
+         */
+            public function getTemplateName($forse = false) {
+                if (true === $forse && null === $this->_templateName) {
+                    $config = $this->getConfig();
+                    $this->_templateName = $config[self::TEMPLATE]['name'];
+                }
+                return $this->_templateName;
+            }
+
+        /**
+         * @var string
+         */
+            protected $_layoutName = null;
+
+        /**
+         * Ustawia nazwę szablonu
+         *
+         * @param string $name
+         */
+            public function setLayoutName($name) {
+                $this->_layoutName = (string) $name;
+            }
+
+        /**
+         * Zwraca nazwę layotu
+         *
+         * @return string
+         */
+            public function getLayoutName() {
+                return $this->_layoutName;
+            }
+
+        /**
+         * Czy został ustawiony nazwa pliku szablonu (layput)
+         *
+         * W domyśle nalerzy rozumieć, czy została ustawiona ręcznie
+         * Ustawienie ręczne stanowi najwyższy priorytet!
+         *
+         * @return bool
+         */
+            public function hasLayoutName() {
+                return !empty($this->_layoutName);
+            }
+
+        /**
+         * @var bool
+         */
+            protected $_lockLayoutName = false;
+
+        /**
+         * @return bool
+         */
+            public function isLockLayoutName() {
+                return $this->_lockLayoutName;
+            }
+
+        /**
+         * @param bool $flag
+         * @return void
+         */
+            public function lockLayoutName($flag = true) {
+                $this->_lockLayoutName = (bool) $flag;
+            }
+
+        /**
+         * @var string
+         */
+            protected $_layoutSectionName = null;
+
+        /**
+         * @param string $name
+         * @return void
+         */
+            public function setLayoutSectionName($name) {
+                $this->_layoutSectionName = (string) $name;
+            }
+
+        /**
+         * @return string|null
+         */
+            public function getLayoutSectionName() {
+                return $this->_layoutSectionName;
+            }
+
+        /**
+         * @return bool
+         */
+            public function hasLayoutSectionName() {
+                return null !== $this->_layoutSectionName;
+            }
+
+        /**
+         * Sprawdza czy jest używany layout
+         *
+         * @return bool
+         */
+            public function isLayout() {
+                return (null !== $this->_layoutName || null !== $this->_templateName);
+            }
+
+        /**
+         * @var Zend_Controller_Front
+         */
+            protected $_frontController;
 
     /**
      * @return Zend_Controller_Front
      */
-    public function getFrontController() {
-        if (null === $this->_frontController) {
-            $this->_frontController = Zend_Controller_Front::getInstance();
+            public function getFrontController() {
+                if (null === $this->_frontController) {
+                    $this->_frontController = Zend_Controller_Front::getInstance();
+                }
+                return $this->_frontController;
+            }
         }
-        return $this->_frontController;
-    }
-}
