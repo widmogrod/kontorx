@@ -1,136 +1,157 @@
 <?php
 require_once 'KontorX/DataGrid/Row/Interface.php';
-
 abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Interface {
 
-	/**
-	 * Constructor
-	 *
-	 * @param array $options
-	 */
-	public function __construct(array $options = null) {
-		if (null != $options) {
-			if (isset($options['columnName'])) {
-				$this->setColumnName($options['columnName']);
-				unset($options['columnName']);
-			}
-			$this->setOptions($options);
-		}
-		
-		$this->init();
-	}
+    /**
+     * @param array $options
+     */
+    public function __construct(array $options = null) {
+        if (null != $options) {
+            if (isset($options['columnName'])) {
+                $this->setColumnName($options['columnName']);
+                unset($options['columnName']);
+            }
+            $this->setOptions($options);
+        }
+    }
 
-	/**
-	 * Initialize
-	 * @return void
-	 */
-	public function init() {
-		
-	}
-	
-	/**
-	 * Return options key => value
-	 * @return string
-	 */
-	public function __get($name) {
-		return array_key_exists($name, $this->_options)
-			? $this->_options[$name] : null;
-	}
-	
-	/**
-	 * Return class name without prefix
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return end(explode('_',get_class($this)));
-	}
-	
-	/**
-	 * @var mixed
-	 */
-	private $_data = null;
-	
-	/**
-	 * Set data to rendered
-	 *
-	 * @param mixed $data
-	 * @return void
-	 */
-	public function setData($data) {
-		$this->_data = $data;
-	}
+    /**
+     * @var string
+     */
+    private $_columnName = null;
 
-	/**
-	 * Return data
-	 *
-	 * @return mixed
-	 */
-	public function getData($key = null) {
-		if (null !== $key) {
-			return (array_key_exists($key, $this->_data))
-				? $this->_data[$key] : null;
-		}
-		return $this->_data;
-	}
+    /**
+     * Set column displayed name
+     * @return void
+     */
+    public function setColumnName($name) {
+        $this->_columnName = $name;
+    }
 
-	/**
-	 * @var array
-	 */
-	private $_options = array();
+    /**
+     * Get column displayed name
+     * @return string
+     */
+    public function getColumnName() {
+        return $this->_columnName;
+    }
 
-	/**
-	 * Set options
-	 *
-	 * @param array $options
-	 */
-	public function setOptions(array $options) {
-		$this->_options = $options;
-	}
-	
-	/**
-	 * Return options
-	 *
-	 * @return array
-	 */
-	public function getOptions() {
-		return $this->_options;
-	}
+    /**
+     * Return class name without prefix
+     * @return string
+     */
+    public function getClassName() {
+        return end(explode('_',get_class($this)));
+    }
 
-	/**
-	 * @var string
-	 */
-	private $_columnName = null;
+    /**
+     * @var array
+     */
+    private $_protectedMethods = array('ColumnName','Data');
 
-	/**
-	 * Set column name
-	 * @return void
-	 */
-	public function setColumnName($name) {
-		$this->_columnName = $name;
-	}
+    /**
+     * @param array $options
+     * @return void
+     */
+    public function setOptions(array $options) {
+        $attribs = array();
+        foreach ($options as $name => $value) {
+            $ucname = ucfirst($name);
+            if (!in_array($ucname, $this->_protectedMethods)) {
+                $method = 'set'.ucfirst($ucname);
+                if (method_exists($this, $method)) {
+                    $this->$method($value);
+                } else {
+                    $attribs[$name] = $value;
+                }
+            }
+        }
+        $this->addAttribs($attribs);
+    }
 
-	/**
-	 * Get column name
-	 *
-	 * @return string
-	 */
-	public function getColumnName() {
-		return $this->_columnName;
-	}
+    /**
+     * @var array
+     */
+    protected $_data = array();
 
-	/**
-	 * To string
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		try {
-			return $this->render();
-		} catch (Exception $e) {
-			trigger_error(get_class($e) . "::" . $e->getMessage(), E_USER_WARNING);
-		}
-		
-		return $this->getData($this->getColumnName());
-	}
+    /**
+     * @param array $attribs
+     * @return void
+     */
+    public function setData($data) {
+        $this->_data = $data;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function getData($name = null) {
+        if (null === $name) {
+            return $this->_data;
+        }
+        return array_key_exists($name, $this->_data)
+            ? $this->_data[$name] : null;
+    }
+
+    /**
+     * @var array
+     */
+    protected $_attribs = array();
+
+    /**
+     * @param array $attribs
+     * @return void
+     */
+    public function setAttribs(array $attribs) {
+        $this->_attribs = $attribs;
+    }
+
+    /**
+     * @param array $attribs
+     * @return void
+     */
+    public function addAttribs(array $attribs) {
+        $this->_attribs += $attribs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttribs() {
+        return $this->_attribs;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function getAttrib($name) {
+        return array_key_exists($name, $this->_attribs)
+            ? $this->_attribs[$name] : null;
+    }
+
+    /**
+     * Return attrib key => value
+     * @return string
+     */
+    public function __get($name) {
+        return $this->getAttrib($name);
+    }
+
+    /**
+     * To string
+     *
+     * @return string
+     */
+    public function __toString() {
+        try {
+            return $this->render();
+        } catch (Exception $e) {
+            trigger_error(get_class($e) . "::" . $e->getMessage(), E_USER_ERROR);
+        }
+
+        $result = $this->getData($this->getColumnName());
+        return "$result";
+    }
 }

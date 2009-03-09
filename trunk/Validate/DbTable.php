@@ -6,14 +6,18 @@ require_once 'Zend/Validate/Abstract.php';
  *
  * @category 	File
  * @package 	KontorX_Validate
- * @version 	0.1.2
+ * @version 	0.2.2
  * @license	GNU GPL
  * @author 	Gabriel `widmogror` Habryn, widmogrod@gmail.com
+ *
+ * @todo Dodac 'message'
  */
 class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
 //    const NOT_IN_DB = 'notInDb';
     const RECORD_EXSISTS_IN_TABLE = 'recordExsistsInTable';
 
+    const GET = 'GET';
+    const POST = 'POST';
     const REQUEST = 'REQUEST';
 
     /**
@@ -27,14 +31,16 @@ class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
      * @param mixced $table
      * @param string $where
      * @param bool $uniqValue
+     * @param mixced $attribs
      */
-    public function __construct($table = null, $where = null, $uniqValue = null) {
+    public function __construct($table = null, $where = null, $uniqValue = null, $attribs = null) {
         if (is_array($table) && null === $where && null === $uniqValue) {
             $this->setOptions($table);
         } else {
             $this->setTable($table);
             $this->setWhere($where);
             $this->setUniqValue($uniqValue);
+            $this->setAttribs($attribs);
         }
     }
 
@@ -114,11 +120,21 @@ class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
      * @return void
      */
     public function setAttribs($attribs) {
-        if (is_string($attribs)) {
-            switch (strtoupper($attribs)) {
+        if (!is_array($attribs)) {
+            switch ($attribs) {
                 default:
+                case self::GET: $attribs = $_GET; break;
+                case self::POST: $attribs = $_POST; break;
                 case self::REQUEST:
-                    $attribs = Zend_Controller_Front::getInstance()->getRequest()->getParams();
+                    if (class_exists('Zend_Controller_Front', false)) {
+                        $attribs = Zend_Controller_Front::getInstance()
+                        ->getRequest()
+                        ->getParams();
+                    } else {
+                        require_once 'Zend/Controller/Request/Http.php';
+                        $request = new Zend_Controller_Request_Http();
+                        $attribs = $request->getParams();
+                    }
                     break;
             }
         }
@@ -130,7 +146,7 @@ class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
      */
     public function getAttribs() {
         if (null === $this->_attribs) {
-            $this->setAttribs(self::REQUEST);
+            $this->setAttribs(null);
         }
         return $this->_attribs;
     }

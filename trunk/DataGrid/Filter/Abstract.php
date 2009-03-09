@@ -1,143 +1,213 @@
 <?php
 require_once 'KontorX/DataGrid/Row/Interface.php';
-
 abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filter_Interface {
 
-	/**
-	 * Konstruktor
-	 *
-	 * @param array $options
-	 */
-	public function __construct(array $options = null) {
-		if (null != $options) {
-			if (isset($options['columnName'])) {
-				$this->setColumnName($options['columnName']);
-				unset($options['columnName']);
-			}
-			$this->setOptions($options);
-		}
-		
-		$this->_init();
-	}
+    /**
+     * @param array $options
+     */
+    public function __construct(array $options = null) {
+        if (null != $options) {
+            if (isset($options['columnName'])) {
+                $this->setColumnName($options['columnName']);
+                unset($options['columnName']);
+            }
+            $this->setOptions($options);
+        }
 
-	/**
-	 * Initialize
-	 * 
-	 * @return void
-	 */
-	protected function _init() {}
-	
-	/**
-	 * Return class name without prefix
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return end(explode('_',get_class($this)));
-	}
-	
-	/**
-	 * @var mixed
-	 */
-	private $_data = null;
-	
-	/**
-	 * Set data to rendered
-	 *
-	 * @param mixed $data
-	 * @return void
-	 */
-	public function setData($data) {
-		$this->_data = $data;
-	}
+        $this->_init();
+    }
 
-	/**
-	 * Return data
-	 *
-	 * @return mixed
-	 */
-	public function getData($key = null) {
-		if (null !== $key) {
-			return (array_key_exists($key, $this->_data))
-				? $this->_data[$key] : null;
-		}
-		return $this->_data;
-	}
+    /**
+     * Initialize
+     *
+     * @return void
+     */
+    protected function _init() {}
 
-	/**
-	 * @var Zend_Config
-	 */
-	private $_values = null;
-	
-	/**
-	 * Set values
-	 *
-	 * @param array $values
-	 */
-	public function setValues(Zend_Config $values) {
-		$this->_values = $values;
-	}
-	
-	/**
-	 * Return values
-	 *
-	 * @return Zend_Config
-	 */
-	public function getValues() {
-		return $this->_values;
-	}
-	
-	/**
-	 * @var string
-	 */
-	private $_columnName = null;
+    /**
+     * @var Zend_Config
+     */
+    private $_values = null;
 
-	/**
-	 * Set column name
-	 * @return void
-	 */
-	public function setColumnName($name) {
-		$this->_columnName = $name;
-	}
+    /**
+     * Values
+     * @param array $values
+     */
+    public function setValues(Zend_Config $values) {
+        $this->_values = $values;
+    }
 
-	/**
-	 * Get column name
-	 *
-	 * @return string
-	 */
-	public function getColumnName() {
-		return $this->_columnName;
-	}
-	
-	/**
-	 * @var array
-	 */
-	private $_options = array();
-	
-	/**
-	 * Set options
-	 *
-	 * @param array $options
-	 */
-	public function setOptions(array $options) {
-		$this->_options = $options;
-	}
-	
-	/**
-	 * Return options
-	 *
-	 * @return array
-	 */
-	public function getOptions() {
-		return $this->_options;
-	}
-	
-	/**
-	 * To string
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		return $this->render();
-	}
+    /**
+     * Return values
+     * @return Zend_Config
+     */
+    public function getValues() {
+        return $this->_values;
+    }
+
+    /**
+     * Set filter value
+     * @param mixed $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setValue($key, $value = null) {
+        if (null === $value) {
+            $value = $key;
+            $key = $this->getClassName();
+        }
+
+        $column = $this->getColumnName();
+        $values = $this->_values->filter;
+        if (!isset($values->$column)) {
+            $values->$column = new Zend_Config(array($key => $value),true);
+        }
+        $values->$column->$key = $value;
+    }
+
+    /**
+     * Get filter value
+     * @param string $key
+     * @return mixed
+     */
+    public function getValue($key = null) {
+        if (null === $key) {
+            $key = $this->getClassName();
+        }
+        $values = $this->_values->filter;
+        $column = $this->getColumnName();
+        if (isset($values->$column)) {
+            return $values->$column->$key;
+        }
+        return null;
+    }
+
+    /**
+     * @var string
+     */
+    private $_name = null;
+
+    /**
+     * Ustawia nazwę kolumny
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->_name = (string) $name;
+    }
+
+    /**
+     * Zwraca pełnowymiarową nazwę kolumny
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+
+    /**
+     * @var string
+     */
+    private $_columnName = null;
+
+    /**
+     * Set column displayed name
+     * @return void
+     */
+    public function setColumnName($name) {
+        $this->_columnName = $name;
+    }
+
+    /**
+     * Get column displayed name
+     * @return string
+     */
+    public function getColumnName() {
+        return $this->_columnName;
+    }
+
+    /**
+     * Return class name without prefix
+     * @return string
+     */
+    public function getClassName() {
+        return end(explode('_',get_class($this)));
+    }
+
+    /**
+     * @var array
+     */
+    private $_protectedMethods = array('Values','Value','ColumnName');
+
+    /**
+     * @param array $options
+     * @return void
+     */
+    public function setOptions(array $options) {
+        $attribs = array();
+        foreach ($options as $name => $value) {
+            $ucname = ucfirst($name);
+            if (!in_array($ucname, $this->_protectedMethods)) {
+                $method = 'set'.ucfirst($ucname);
+                if (method_exists($this, $method)) {
+                    $this->$method($value);
+                } else {
+                    $attribs[$name] = $value;
+                }
+            }
+        }
+        $this->addAttribs($attribs);
+    }
+
+    /**
+     * @var array
+     */
+    protected $_attribs = array();
+
+    /**
+     * @param array $attribs
+     * @return void
+     */
+    public function setAttribs(array $attribs) {
+        $this->_attribs = $attribs;
+    }
+
+    /**
+     * @param array $attribs
+     * @return void
+     */
+    public function addAttribs(array $attribs) {
+        $this->_attribs += $attribs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttribs() {
+        return $this->_attribs;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function getAttrib($name) {
+        return array_key_exists($name, $this->_attribs)
+            ? $this->_attribs[$name] : null;
+    }
+
+    /**
+     * Return attrib key => value
+     * @return string
+     */
+    public function __get($name) {
+        return $this->getAttrib($name);
+    }
+
+    /**
+     * To string
+     *
+     * @return string
+     */
+    public function __toString() {
+        return $this->render();
+    }
 }

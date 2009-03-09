@@ -1,55 +1,42 @@
 <?php
 require_once 'KontorX/DataGrid/Column/Abstract.php';
 class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_Abstract {
-	protected function _init() {
-		require_once 'KontorX/DataGrid/Filter/Order.php';
-		$filter = new KontorX_DataGrid_Filter_Order($this->getOptions());
+    protected function _init() {
+        require_once 'KontorX/DataGrid/Filter/Order.php';
+        $filter = new KontorX_DataGrid_Filter_Order($this->getAttribs());
 
-		$this->addFilter($filter);
-	}
+        $this->addFilter($filter);
+    }
 
-	protected function _setupValues() {
-		$name = $this->getName();
-		$column = $this->getColumnName();
+    public function render() {
+        // switching type of order..
+        $orderCurrent = strtolower($this->getValue());
+        switch ($orderCurrent) {
+            default:
+            case 'null':
+                $orderNext    = 'asc';
+                $orderCurrent = 'null';
+                break;
+            case 'asc':
+                $orderNext = 'desc';
+                break;
+            case 'desc':
+                $orderNext = 'null';
+                break;
+        }
 
-		$values = $this->getValues()->filter;
-		if (!isset($values->$column)) {
-			$values->$column = new Zend_Config(array(), true);
-		}
-	}
+        // klonowanie wzrtosci i zmiana atrybotow
+        // umozliwia ich aktywacje po kliknieciu linku!
+        $backup = $this->getValues();
+        $this->setValue($orderNext);
+        $values = clone $this->getValues();
+        $this->setValues($backup);
 
-	public function render() {
-		$name = $this->getName();
-		$column = $this->getColumnName();
+        $href = $this->getAttrib('href');
+        $href = rtrim($href, '?') . '?';
+        $href .= http_build_query($values->toArray());
 
-		// cloning allow to change column values for only this column! 
-		$values = clone $this->getValues();
-		// switching type of order..
-		$orderTypeCurrent = $values->filter->$column->$name;
-		switch ($orderTypeCurrent) {
-			case null:
-			case 'null':
-				$orderTypeNext    = 'asc';
-				$orderTypeCurrent = 'null';
-				break;
-			case 'asc':
-				$orderTypeNext = 'desc';
-				break;
-			case 'desc':
-				$orderTypeNext = 'null';
-				break;
-		}
-		$values->filter->$column->$name = $orderTypeNext;
-
-		$options = $this->getOptions();
-		// prepare and build href
-		$href = @$options['href'];
-		if (substr($href, -1, 1) != '?') {
-			$href .= '?';
-		}
-		$href .= http_build_query($values->toArray());
-
-		$column = $this->getColumnMainName();
-		return "<a class=\"column column_order\" href=\"$href\">$column <span class=\"order order-$orderTypeCurrent\">$orderTypeCurrent</span></a>";
-	}
+        $format = '<a class="column column_order" href="%s">%s <span class="order order-%s">%s</span></a>';
+        return sprintf($format, $href, $this->getName(), $orderCurrent, $orderCurrent);
+    }
 }

@@ -17,6 +17,6 @@ class KontorX_Filter_Word_Rewrite implements Zend_Filter_Interface {
 		$value = strtolower($value);
 		$value = str_replace($this->_search, $this->_replace, $value);
 		$regxpAllow = preg_quote($regxpAllow, '#');
-		return preg_replace("#[^a-zA-Z0-9/$regxpAllow]+#i", '-', $value);
+		return preg_replace("#[^a-z0-9/$regxpAllow]+#i", '-', $value);
 	}
 }
