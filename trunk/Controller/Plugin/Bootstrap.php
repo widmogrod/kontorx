@@ -2,6 +2,22 @@
 require_once 'Zend/Controller/Plugin/Abstract.php';
 class KontorX_Controller_Plugin_Bootstrap extends Zend_Controller_Plugin_Abstract {
 
+    public function __construct(Zend_Config $config = null) {
+        if (null !== $config) {
+            $this->setConfig($config);
+        }
+    }
+
+    private $_config = null;
+
+    public function setConfig(Zend_Config $config) {
+        $this->_config = $config;
+    }
+
+    public function getConfig() {
+        return $this->_config;
+    }
+
 //    public function routeStartup(Zend_Controller_Request_Abstract $request)
 //    {}
 //
