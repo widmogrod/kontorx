@@ -85,9 +85,10 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
                 $request->setDispatched(false);
                 $this->getResponse()->appendBody($cacheData['body']);
 
-//                if (isset($cacheData['Zend_View'])
-//                    && $cacheData['Zend_View'] instanceof Zend_View_Interface) {
-//                    $this->view = $cacheData['Zend_View'];
+//                if (isset($cacheData['Zend_View_Helper'])) {
+//                    $helper = (array) $cacheData['Zend_View_Helper'];
+//                    if (isset($helper[''])) {
+//                    }
 //                }
             }
         }

@@ -94,4 +94,44 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 
         return $this->_rows;
     }
+
+    const CACHE_PREFIX = 'KontorX_DataGrid_Adapter_';
+
+    /**
+     * @var Zend_Cache_Core
+     */
+    protected static $_cache = null;
+
+    /**
+     * @param Zend_Cache_Core $cache
+     */
+    public static function setCache(Zend_Cache_Core $cache) {
+        self::$_cache = $cache;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getCacheId() {
+        return self::CACHE_PREFIX . '_' . spl_object_hash($this);
+    }
+
+    /**
+     * @var bool
+     */
+    private $_cacheEnabled = null;
+
+    /**
+     * @param bool $flag
+     */
+    public function setCacheEnable($flag = true) {
+        $this->_cacheEnabled = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _cacheEnabled() {
+        return (self::$_cache === null || $this->_cacheEnabled === false) ? false : true;
+    }
 }
