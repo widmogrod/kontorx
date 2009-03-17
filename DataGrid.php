@@ -38,12 +38,16 @@ class KontorX_DataGrid {
         if ($data instanceof Zend_Db_Select) {
             require_once 'KontorX/DataGrid/Adapter/DbSelect.php';
             $adapter = new KontorX_DataGrid_Adapter_DbSelect($data);
+        } else
+        if (is_array($data)) {
+            require_once 'KontorX/DataGrid/Adapter/Array.php';
+            $adapter = new KontorX_DataGrid_Adapter_Array($data);
         } else {
             require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Data type is not suported");
         }
 
-        $adapter->setData($data);
+        // $adapter->setData($data);
         $instance = new self($adapter);
 
         if (is_array($options)) {
@@ -523,7 +527,7 @@ class KontorX_DataGrid {
             $columns = $this->getColumns();
             $adapter->setColumns($columns);
 
-            if ($this->isPagination()) {
+            if ($this->_isPagination()) {
                 list($pageNumber, $itemCountPerPage) = $this->getPagination();
                 $adapter->setPagination($pageNumber, $itemCountPerPage);
             }
@@ -532,7 +536,7 @@ class KontorX_DataGrid {
                 'columns' => $columns,
                 'filters' => $this->_getFilters(),
                 'rowset'  => $adapter->fetchData(),
-                'paginator' => ($this->isPagination() ? $this->_createPaginator() : null),
+                'paginator' => ($this->_isPagination() ? $this->_createPaginator() : null),
                 'valuesQuery' => urldecode(http_build_query($this->getValues()->toArray()))
             );
         }
@@ -638,7 +642,7 @@ class KontorX_DataGrid {
      * Retrun true if pagination is enabled and pagination options are set!
      * @return bool
      */
-    public function isPagination() {
+    private function _isPagination() {
         return $this->_enabledPagination && (count($this->_pagination) == 2);
     }
 

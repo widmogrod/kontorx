@@ -1,64 +1,42 @@
 <?php
 require_once 'KontorX/DataGrid/Adapter/Abstract.php';
-
-class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract {
+class KontorX_DataGrid_Adapter_Array extends KontorX_DataGrid_Adapter_Abstract {
 
     /**
      * Konstruktor
      *
-     * @param Zend_Db_Table_Abstract $table
+     * @param array $array
      */
-    public function __construct(Zend_Db_Table_Abstract $table) {
-        $this->_table = $table;
+    public function __construct(array $array) {
+        $this->_array = $array;
     }
 
     /**
-     * @var Zend_Db_Table_Abstract
+     * @var array
      */
-    protected $_table = null;
+    protected $_array = null;
 
     /**
-     * Zwraca @see Zend_Db_Table_Abstract
+     * Zwraca array
      *
-     * @return Zend_Db_Table_Abstract
+     * @return array
      */
-    public function getTable() {
-        return $this->_table;
-    }
-
-    /**
-     * @var Zend_Db_Select
-     */
-    private $_select = null;
-
-    /**
-     * Return select statment mini. singletone
-     *
-     * @return Zend_Db_Select
-     */
-    public function getSelect() {
-        if (null === $this->_select) {
-            $this->_select = $this->getTable()->select();
-        }
-        return $this->_select;
+    public function getArray() {
+        return $this->_array;
     }
 
     /**
      * Wyławia szukane kolumny spełniające warunek ..
-     *
-     * @param array $columns
-     * @param array $filters
      * @return array
      */
     public function fetchData() {
-        $table = $this->getTable();
-        $select = $this->getSelect();
+        $array = $this->getArray();
 
         // czy jest paginacja
         if ($this->isPagination()) {
             list($pageNumber, $itemCountPerPage) = $this->getPagination();
-            $select
-            ->limitPage($pageNumber, $itemCountPerPage);
+            // @TODO Test
+            $array = array_slice($array, $itemCountPerPage*($pageNumber-1), $itemCountPerPage);
         }
 
         // cache on
@@ -72,15 +50,12 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
         $rows   = $this->getRows();
 
         $result = array();
-
-        $dataset = $table->fetchAll($select);
-        foreach ($dataset as $i => $data) {
-            $rawData = $data->toArray();
+        $i = 0;
+        while (($rawData = array_shift($array))) {
             // tworzymy tablice wielowymiarowa rekordow
             foreach ($columns as $columnName => $columnInstance) {
                 // jest dekorator rekordu @see KontorX_DataGrid_Row_Interface
-                if (count($rows)
-                    && isset($rows[$columnName])
+                if (isset($rows[$columnName])
                     && $rows[$columnName] instanceof KontorX_DataGrid_Row_Interface) {
                     $cloneRowInstance = clone $rows[$columnName];
                     $cloneRowInstance->setData($rawData, $columnName);
@@ -92,6 +67,7 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
                     ? $rawData[$columnName] : null;
                 }
             }
+            $i++;
         }
 
         // cache save

@@ -38,23 +38,30 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
         // czy jest paginacja
         if ($this->isPagination()) {
             list($pageNumber, $itemCountPerPage) = $this->getPagination();
-            $select
-            ->limitPage($pageNumber, $itemCountPerPage);
+            $select->limitPage($pageNumber, $itemCountPerPage);
         }
 
-        $stmt = $select->query();
+        // cache on
+        if ($this->_cacheEnabled()) {
+            if (false !== ($result = self::$_cache->load($this->_getCacheId()))) {
+                return $result;
+            }
+        }
 
         $columns = $this->getColumns();
         $rows   = $this->getRows();
 
-        $result = array();
         $i = 0;
+        $result = array();
+
+        $stmt = $select->query();
         while (($rawData = $stmt->fetch(Zend_Db::FETCH_ASSOC))) {
             // tworzymy tablice wielowymiarowa rekordow
             foreach ($columns as $columnName => $columnInstance) {
                 // jest dekorator rekordu @see KontorX_DataGrid_Row_Interface
                 if (isset($rows[$columnName])
-                    && $rows[$columnName] instanceof KontorX_DataGrid_Row_Interface) {
+                    && $rows[$columnName] instanceof KontorX_DataGrid_Row_Interface)
+                {
                     $cloneRowInstance = clone $rows[$columnName];
                     $cloneRowInstance->setData($rawData, $columnName);
                     $result[$i][$columnName] = $cloneRowInstance;
@@ -66,6 +73,11 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
                 }
             }
             $i++;
+        }
+
+        // cache save
+        if ($this->_cacheEnabled()) {
+            self::$_cache->save($result, $this->_getCacheId());
         }
 
         return $result;
