@@ -113,7 +113,7 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
      * @return string
      */
     protected function _getCacheId() {
-        return self::CACHE_PREFIX . '_' . spl_object_hash($this);
+        return self::CACHE_PREFIX . spl_object_hash($this);
     }
 
     /**

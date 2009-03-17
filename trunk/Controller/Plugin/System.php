@@ -13,6 +13,8 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
     const TEMPLATE = 'TEMPLATE';
     const LANGUAGE = 'LANGUAGE';
 
+    const CACHE_PREFIX = 'KontorX_Controller_Plugin_System';
+
     /**
      * @var array
      */
@@ -525,33 +527,23 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         // marge options with default
         $options = $this->getConfig($options, self::CACHE);
         // base cacheIdName
-        $cacheId = $this->_getKeyName($request);
+        $key = $this->_getKeyName($request);
 
         $type = $options['id'];
         if (is_string($type)) {
             switch ($type) {
                 case 'params':
-                    $cacheIdAppend = array();
-                    foreach ($request->getParams() as $key => $val) {
-                        if (!is_object($val)) {
-                            if (is_array($val)) {
-                                $val = serialize($val);
-                            }
-                            $cacheIdAppend[] = $key;
-                        }
-                    }
-                    $cacheIdAppend = implode(':', $cacheIdAppend);
+                    $append = spl_object_hash($request);
                     break;
             }
         } else
         if (is_array($type)) {
             if (isset($type['param'])) {
-                $cacheIdAppend= $request->getParam($type['param']);
+                $append = md5($request->getParam($type['param']));
             }
         }
 
-        $cacheIdAppend = md5($cacheIdAppend);
-        return $cacheId.'_'.$cacheIdAppend;
+        return self::CACHE_PREFIX . $key . '_' . $append;
     }
 
     /**
