@@ -2,8 +2,6 @@
 require_once 'KontorX/Search/Semantic/Query/Abstract.php';
 class KontorX_Search_Semantic_Query_InArray extends KontorX_Search_Semantic_Query_Abstract {
 	
-	const SEPARATOR = ' ';
-
 	/**
 	 * @var array
 	 */
@@ -22,18 +20,18 @@ class KontorX_Search_Semantic_Query_InArray extends KontorX_Search_Semantic_Quer
 
 		$words = explode(self::SEPARATOR, $content);
 		while ($word = array_shift($words)) {
-			if (array_key_exists($word, $this->_array)) {
+			if (in_array($word, $this->_array)) {
 				// ustawieni tresci
 				$this->_setContent(self::CONTENT, $word);
 				$this->_setContent(self::CONTENT_LEFT, implode(self::SEPARATOR, $wordsLeft));
 				$this->_setContent(self::CONTENT_RIGHT, implode(self::SEPARATOR, $words));
 
-				return $this->_array[$word];
+				return $word;
 			} else {
 				$wordsLeft[] = $word;
 			}
 		}
-		
+
 		return null;
 	}
 }

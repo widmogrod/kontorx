@@ -1,6 +1,8 @@
 <?php
 require_once 'KontorX/Search/Semantic/Query/Interface.php';
 abstract class KontorX_Search_Semantic_Query_Abstract implements KontorX_Search_Semantic_Query_Interface {
+	const SEPARATOR = ' ';
+
 	const CONTENT = 'CONTENT';
 	const CONTENT_LEFT = 'CONTENT_LEFT';
 	const CONTENT_RIGHT = 'CONTENT_RIGHT';
