@@ -19,7 +19,7 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 	/**
 	 * @var KontorX_Search_Semantic_Query_InArray
 	 */
-	private $_queryInArrayWeeks = null; 
+	private $_queryInArrayWeeks = null;
 	
 	/**
 	 * @return KontorX_Search_Semantic_Query_InArray
@@ -36,9 +36,9 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 
 	function testQueryInArray() {
 		$content = 'Dzisiaj jest poniedziałek';
-		$correct = array(array('poniedziałek'));
+		$correct = array(array('weeks' => 'poniedziałek'));
 		
-		$this->_semantic->addQuery($this->_getQueryInArrayWeeks());
+		$this->_semantic->addQuery($this->_getQueryInArrayWeeks(), 'weeks');
 
 		$data = $this->_semantic->query($content);
 

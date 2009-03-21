@@ -66,13 +66,14 @@ class KontorX_Search_Semantic_Query_ChainTest extends UnitTestCase {
 //    }
 	
 	public function testChainElementsDateAndInArray1() {
-		$correct = array('poniedziałek',11);
+		$correct = array('week'=>'poniedziałek','date'=>11);
 		$content = "poniedziałek 11";
 		
-		$this->_query->addQuery($this->_getQueryInArrayWeeks());
-		$this->_query->addQuery($this->_getQueryDate());
+		$this->_query->addQuery($this->_getQueryInArrayWeeks(), 'week');
+		$this->_query->addQuery($this->_getQueryDate(), 'date');
 
 		$data = $this->_query->query($content);
+		$this->dump($data);
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $content);
 		$this->assertEqual($data, $correct, $message);
@@ -81,8 +82,8 @@ class KontorX_Search_Semantic_Query_ChainTest extends UnitTestCase {
 	public function testChainElementsDateAndInArray2() {
 		$content = "może 11";
 		
-		$this->_query->addQuery($this->_getQueryInArrayWeeks());
-		$this->_query->addQuery($this->_getQueryDate());
+		$this->_query->addQuery($this->_getQueryInArrayWeeks(), 'week');
+		$this->_query->addQuery($this->_getQueryDate(), 'date');
 
 		$data = $this->_query->query($content);
 		

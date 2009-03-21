@@ -23,10 +23,28 @@ class KontorX_Search_Semantic {
    
     /**
      * @param KontorX_Search_Semantic_Query_Interface $query
-     * @return void
+     * @param string $name
+     * @return KontorX_Search_Semantic
      */
-    public function addQuery(KontorX_Search_Semantic_Query_Interface $query) {
-    	$this->_query[] = $query;
+    public function addQuery(KontorX_Search_Semantic_Query_Interface $query, $name) {
+    	if (array_key_exists($name, $this->_query)) {
+    		require_once 'KontorX/Search/Semantic/Exception.php';
+			throw new KontorX_Search_Semantic_Exception(sprintf("Query element by name '%s' exsists. Remove query element", $name));
+    	}
+
+    	$this->_query[$name] = $query;
+    	return $this;
+    }
+    
+    /**
+     * @param string $name
+     * @return KontorX_Search_Semantic
+     */
+    public function removeQuery($name) {
+    	if (array_key_exists($name, $this->_query)) {
+    		unset($this->_query[$name]);
+    	}
+    	return $this;
     }
     
     /**
@@ -34,6 +52,16 @@ class KontorX_Search_Semantic {
      * @return array
      */
     public function query($content) {
+    	if (empty($this->_query)) {
+			require_once 'KontorX/Search/Semantic/Exception.php';
+			throw new KontorX_Search_Semantic_Exception("No query elements");
+		}
+		
+    	if (empty($content)) {
+			require_once 'KontorX/Search/Semantic/Exception.php';
+			throw new KontorX_Search_Semantic_Exception("attribute 'content' can not be empty");
+		}
+
     	$content = (string) $content;
     	if (false !== strstr($content, self::LOGIC_SEPARATOR)) {
     		$logicContent = explode(self::LOGIC_SEPARATOR, $content);

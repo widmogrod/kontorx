@@ -2,18 +2,35 @@
 require_once 'KontorX/Search/Semantic/Query/Abstract.php';
 class KontorX_Search_Semantic_Query_Chain extends KontorX_Search_Semantic_Query_Abstract {
 	/**
-	 * @var array 
-	 */
-	private $_chain = array();
+     * @var array 
+     */
+    private $_chain = array();
+   
+    /**
+     * @param KontorX_Search_Semantic_chain_Interface $query
+     * @param string $name
+     * @return KontorX_Search_Semantic
+     */
+    public function addQuery(KontorX_Search_Semantic_Query_Interface $query, $name) {
+    	if (array_key_exists($name, $this->_chain)) {
+    		require_once 'KontorX/Search/Semantic/Exception.php';
+			throw new KontorX_Search_Semantic_Exception(sprintf("Query element by name '%s' exsists. Remove query element", $name));
+    	}
 
-	
-	/**
-	 * @param KontorX_Search_Semantic_Query_Interface $query
-	 * @return void
-	 */
-	public function addQuery(KontorX_Search_Semantic_Query_Interface $query) {
-		$this->_chain[] = $query;
-	}
+    	$this->_chain[$name] = $query;
+    	return $this;
+    }
+    
+    /**
+     * @param string $name
+     * @return KontorX_Search_Semantic
+     */
+    public function removeQuery($name) {
+    	if (array_key_exists($name, $this->_chain)) {
+    		unset($this->_chain[$name]);
+    	}
+    	return $this;
+    }
 
 	public function query($content) {
 		if (empty($this->_chain)) {
@@ -24,13 +41,13 @@ class KontorX_Search_Semantic_Query_Chain extends KontorX_Search_Semantic_Query_
 		$result = array();
 
 		// typ 0 - ze względu na wystapienie
-		foreach ($this->_chain as $query) {
-			$data = $query->query($content);
+		foreach ($this->_chain as $queryName => $queryInstance) {
+			$data = $queryInstance->query($content);
 			if (null !== $data) {
 				// zbieranie danych
-				$result[] = $data;
+				$result[$queryName] = $data;
 				// łańcuch ma być zgodny z treścią w prawo
-				$content = $query->getContentRight();
+				$content = $queryInstance->getContentRight();
 			} else {
 				// TODO Dodać brakeOnFailure - (w domyśle true)
 				return null;
