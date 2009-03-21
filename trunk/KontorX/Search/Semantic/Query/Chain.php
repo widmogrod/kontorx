@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/Search/Semantic/Query/Interface.php';
-class KontorX_Search_Semantic_Query_Chain implements KontorX_Search_Semantic_Query_Interface {
+require_once 'KontorX/Search/Semantic/Query/Abstract.php';
+class KontorX_Search_Semantic_Query_Chain extends KontorX_Search_Semantic_Query_Abstract {
 	/**
 	 * @var array 
 	 */
@@ -16,11 +16,17 @@ class KontorX_Search_Semantic_Query_Chain implements KontorX_Search_Semantic_Que
 	}
 
 	public function query($content) {
+		if (empty($this->_chain)) {
+			require_once 'KontorX/Search/Semantic/Exception.php';
+			throw new KontorX_Search_Semantic_Exception("No elements in chain");
+		}
+
 		$result = array();
 
 		// typ 0 - ze względu na wystapienie
 		foreach ($this->_chain as $query) {
-			if (null !== ($data = $query->query($content))) {
+			$data = $query->query($content);
+			if (null !== $data) {
 				// zbieranie danych
 				$result[] = $data;
 				// łańcuch ma być zgodny z treścią w prawo
@@ -32,6 +38,10 @@ class KontorX_Search_Semantic_Query_Chain implements KontorX_Search_Semantic_Que
 		}
 		
 		// TODO typ 1 - ze wzgledu na położenie
+		
+		if (empty($result)) {
+			return null;
+		}
 		
 		return $result;
 	}
