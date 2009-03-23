@@ -136,9 +136,9 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 		$this->assertEqual($data, $correct, $message);
     }
     
-	public function testLogic2() {
+public function testLogic2() {
 		$correct = array();
-		$context = "ulica Opolska 13, godzina 22, dzień niedziela";
+		$context = "ulica Opolska 13, godzina 22, dzien niedziela";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 		
 		if (!class_exists('KontorX_Search_Semantic_Interpreter_InArray', false)) {
@@ -165,18 +165,72 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 		$hourLogicOr->addInterpreter($hourLogicAnd,'godzina1');
 		$hourLogicOr->addInterpreter($this->_getInterpreterDate(),'godzina1');
 		$this->_semantic->addInterpreter($hourLogicOr,'godzinaOr');
-//
-//		// dzień
-//		$dayKeyword = new KontorX_Search_Semantic_Interpreter_InArray(array(
-//			'dzień'
-//		));
-//		$dayLogicAnd = $this->_getLogicAnd();
-//		$dayLogicAnd->addInterpreter($dayKeyword,'keyword');
-//		$dayLogicAnd->addInterpreter($this->_getInterpreterDate(),'name');
-//		$dayLogicOr = $this->_getLogicOr();
-//		$dayLogicOr->addInterpreter($dayLogicAnd,'dzień1');
-//		$dayLogicOr->addInterpreter($this->_getInterpreterDate(),'dzień2');
-//		$this->_semantic->addInterpreter($dayLogicOr,'dzieńOr');
+
+		// dzień
+		$dayKeyword = new KontorX_Search_Semantic_Interpreter_InArray(array(
+			'dzien'
+		));
+		$dayLogicAnd = $this->_getLogicAnd();
+		$dayLogicAnd->addInterpreter($dayKeyword,'keyword');
+		$dayLogicAnd->addInterpreter($this->_getInterpreterInArrayWeeks(),'name');
+		$dayLogicOr = $this->_getLogicOr();
+		$dayLogicOr->addInterpreter($dayLogicAnd,'dzień1');
+		$dayLogicOr->addInterpreter($this->_getInterpreterInArrayWeeks(),'dzień2');
+		$this->_semantic->addInterpreter($dayLogicOr,'dzieńOr');
+
+		$this->_semantic->interpret($contextInstance);
+		$data = $contextInstance->getOutput();
+		$this->dump($data);
+
+		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
+		$this->assertEqual($data, $correct, $message);
+    }
+    
+	/**
+	 * @todo Wprowadzić może xor by 'Opolska 13' bie była widziana jako tekst
+	 * @return void
+	 */
+	public function testLogic3() {
+		$correct = array();
+		$context = "Opolska 13, niedziela";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+		
+		if (!class_exists('KontorX_Search_Semantic_Interpreter_InArray', false)) {
+			require_once 'KontorX/Search/Semantic/Interpreter/InArray.php';
+		}
+
+		// ulica
+		$streetKeyword = new KontorX_Search_Semantic_Interpreter_InArray(array(
+			'ul.','ulica','al.','aleja'
+		));
+		$streetLogicAnd = $this->_getLogicAnd();
+		$streetLogicAnd->addInterpreter($streetKeyword, 'keyword');
+		$streetLogicAnd->addInterpreter($this->_getInterpreterContextToSeparator(),'name');
+		$this->_semantic->addInterpreter($streetLogicAnd,'ulicaAnd');
+		
+		// godzina
+		$hourKeyword = new KontorX_Search_Semantic_Interpreter_InArray(array(
+			'godzina'
+		));
+		$hourLogicAnd = $this->_getLogicAnd();
+		$hourLogicAnd->addInterpreter($hourKeyword,'keyword');
+		$hourLogicAnd->addInterpreter($this->_getInterpreterDate(),'hour');
+		$hourLogicOr = $this->_getLogicOr();
+		$hourLogicOr->addInterpreter($hourLogicAnd,'godzina1');
+		$hourLogicOr->addInterpreter($this->_getInterpreterDate(),'godzina1');
+		$this->_semantic->addInterpreter($hourLogicOr,'godzinaOr');
+
+		// dzień
+		$dayKeyword = new KontorX_Search_Semantic_Interpreter_InArray(array(
+			'dzien'
+		));
+		$dayLogicAnd = $this->_getLogicAnd();
+		$dayLogicAnd->addInterpreter($dayKeyword,'keyword');
+		$dayLogicAnd->addInterpreter($this->_getInterpreterInArrayWeeks(),'name');
+		$dayLogicOr = $this->_getLogicOr();
+		$dayLogicOr->addInterpreter($dayLogicAnd,'dzień1');
+		$dayLogicOr->addInterpreter($this->_getInterpreterInArrayWeeks(),'dzień2');
+		$this->_semantic->addInterpreter($dayLogicOr,'dzieńOr');
 
 		$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();

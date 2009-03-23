@@ -40,6 +40,8 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 			if ($this->_separator == $word) {
 				// połącz słowa
 				$output = implode(KontorX_Search_Semantic_Context::WORD_SEPARATOR, $storedContext);
+				// TODO Dodać remove
+				// $context->remove();
 				$context->setOutput($output);
 				return true;
 			}

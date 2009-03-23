@@ -27,6 +27,7 @@ class KontorX_Search_Semantic_Interpreter_InArray extends KontorX_Search_Semanti
 		while ($context->valid()) {
 			$word = $context->current();
 			if (in_array($word, $this->_array)) {
+				$context->remove();
 				$context->setOutput($word);
 				return true;
 			}

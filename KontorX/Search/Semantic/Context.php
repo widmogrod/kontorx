@@ -26,12 +26,19 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	 * @param string $input
 	 * @return void
 	 */
-	public function __construct($input) {
-		$this->setInput($input);
+	public function __construct($input = null) {
+		if (null !== $input) {
+			$this->setInput($input);
+		}
 	}
 
 	public function getInput() {
-		return $this->_input;
+//		if ($this->valid()) {
+//			$return = array_slice($this->_words, $this->_position);
+//		} else {
+			$return = $this->_words;
+//		}
+		return implode(self::WORD_SEPARATOR, $return);
 	}
 	
 	public function setInput($input) {
@@ -58,12 +65,8 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 		$this->_output[(string)$name] = $data;
 	}
 	
-	public function getOutput($name = null) {
-		return (null !== $name)
-			? (array_key_exists((string)$name, $this->_output)
-				? $this->_output[(string)$name]
-				: null)
-			: $this->_output;
+	public function getOutput() {
+		return $this->_output;
 	}
 	
 	public function clearOutput() {
@@ -75,7 +78,7 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 	
 	public function __toString() {
-		return $this->_input;
+		return $this->getInput();
 	}
 
 	public function current() {
@@ -93,8 +96,6 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 
  	public function rewind() {
- 		var_dump("REWIND");
- 		var_dump($rewind);
  		$this->_position = 0;
  	}
 
@@ -107,5 +108,14 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 			$this->_count = count($this->_words);
 		}
 		return $this->_count;
+	}
+	
+	public function remove() {
+		if ($this->valid()) {
+			unset($this->_words[$this->_position]);
+//			$this->_position = 0;
+			$this->_words = array_values($this->_words);
+			$this->_count = null;
+		}
 	}
 }
