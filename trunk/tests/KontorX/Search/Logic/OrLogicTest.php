@@ -51,14 +51,17 @@ class KontorX_Search_Semantic_Logic_OrLogicTest extends UnitTestCase {
 	public function testAndForDateAndInArrayWeek() {
 		$date = '11-03-2009';
 		$correct = array('hour' => $date);
+		$correctResult = true;
 		$context = "Dzisiaj jest poniedziałek $date";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 
 		$this->_logic->addInterpreter($this->_getInterpreterDate(),'hour');
 		$this->_logic->addInterpreter($this->_getInterpreterInArrayWeeks(),'week');
-		$this->_logic->interpret($contextInstance);
-		$data = $contextInstance->getOutput();
-		
+
+		$result = $this->_logic->interpret($contextInstance);
+		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'true'");
+
+		$data = $contextInstance->getOutput();		
 		$this->dump($data);
 		
 		$message = sprintf('Znalezione wyrażenie w tekscie "%s" jest różna od oczekiwanego', $context);
@@ -68,17 +71,40 @@ class KontorX_Search_Semantic_Logic_OrLogicTest extends UnitTestCase {
 	public function testAndForInArrayWeekAndDate() {
 		$date = '11-03-2009';
 		$correct = array('week' => 'poniedziałek');
+		$correctResult = true;
 		$context = "Dzisiaj jest poniedziałek $date";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 
 		$this->_logic->addInterpreter($this->_getInterpreterInArrayWeeks(),'week');
 		$this->_logic->addInterpreter($this->_getInterpreterDate(),'hour');
-		$this->_logic->interpret($contextInstance);
-		$data = $contextInstance->getOutput();
 		
+		$result = $this->_logic->interpret($contextInstance);
+		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'true'");
+		
+		
+		$data = $contextInstance->getOutput();
 		$this->dump($data);
 		
 		$message = sprintf('Znalezione wyrażenie w tekscie "%s" jest różna od oczekiwanego', $context);
+		$this->assertEqual($data, $correct, $message);
+    }
+    
+	public function testFalse() {
+		$correct = array();
+		$correctResult = false;
+		$context = "Ala ma kota";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+
+		$this->_logic->addInterpreter($this->_getInterpreterInArrayWeeks(),'week');
+		$this->_logic->addInterpreter($this->_getInterpreterDate(),'hour');
+		
+		$result = $this->_logic->interpret($contextInstance);
+		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'false'");
+		
+		$data = $contextInstance->getOutput();
+		$this->dump($data);
+		
+		$message = sprintf('Tekst "%s" nie powinien być interpretowalny', $context);
 		$this->assertEqual($data, $correct, $message);
     }
 }

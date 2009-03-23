@@ -6,11 +6,6 @@
  */
 class KontorX_Search_Semantic {
 	
-	/**
-	 * Separator oddzielnej logiki w zdaniu
-	 */
-	const LOGIC_SEPARATOR = ',';
-
     /**
      * @var array 
      */
@@ -48,25 +43,18 @@ class KontorX_Search_Semantic {
     		require_once 'KontorX/Search/Semantic/Exception.php';
 			throw new KontorX_Search_Semantic_Exception("attribute 'context' is no instance of 'KontorX_Search_Semantic_Context_Interface'");
     	}
-    	
+
     	if (empty($this->_interpreter)) {
 			require_once 'KontorX/Search/Semantic/Exception.php';
-			throw new KontorX_Search_Semantic_Exception("No query elements");
+			throw new KontorX_Search_Semantic_Exception("No interpreters elements");
 		}
 
-    	/*$content = (string) $content;
-    	if (false !== strstr($content, self::LOGIC_SEPARATOR)) {
-    		$logicContent = explode(self::LOGIC_SEPARATOR, $content);
-    		$logicContent = array_map('trim', $logicContent);
-    		$logicContent = array_filter($logicContent);
-    	} else {
-    		$logicContent = array($content);
-    	}*/
-
+		$interpreterContext = clone $context;
     	foreach ($this->_interpreter as $interpreterName => $interpreterInstance) {
-    		$logicContext = clone $context; 
-    		if (true === $interpreterInstance->interpret($logicContext)) {
-    			$context->addOutput($interpreterName, $logicContext->getOutput());
+    		if (true === $interpreterInstance->interpret($interpreterContext)) {
+    			$context->addOutput($interpreterName, $interpreterContext->getOutput());
+    			var_dump($interpreterContext->key());
+    			$interpreterContext->clearOutput();
     		}
     	}
     }

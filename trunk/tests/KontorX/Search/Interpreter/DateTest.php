@@ -74,6 +74,23 @@ class KontorX_Search_Semantic_Interpreter_DateTest extends UnitTestCase {
 		$this->assertEqual($data, $time, $message);
     }
     
+	public function testTimeHHInContentFalse() {
+		$time = '37';
+		$correct = array();
+		$resultCorrect = false;
+		$context = "Jest godzina $time po południu";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+
+		$result = $this->_interpreter->interpret($contextInstance);
+		$data = $contextInstance->getOutput();
+		$this->dump($data);
+		
+		$this->assertIdentical($result, $resultCorrect, "Wynik identyfikacji jest różny od 'false'");
+		
+		$message = sprintf('Znaleziona godzina "%s" w tekscie "%s" jest różna od oczekiwanej "%s"', $data, $context, $correct);
+		$this->assertEqual($data, $correct, $message);
+    }
+    
 	public function testNoTimeInContent() {
 		$time = 'o brak';
 		$correct = array();
