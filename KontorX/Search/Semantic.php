@@ -5,11 +5,6 @@
  * @author gabriel
  */
 class KontorX_Search_Semantic {
-	 
-	/**
-	 * Separator oddzielnych słów
-	 */
-	const WORDS_SEPARATOR = ' ';
 	
 	/**
 	 * Separator oddzielnej logiki w zdaniu
@@ -19,74 +14,60 @@ class KontorX_Search_Semantic {
     /**
      * @var array 
      */
-    private $_query = array();
+    private $_interpreter = array();
    
     /**
-     * @param KontorX_Search_Semantic_Query_Interface $query
+     * @param KontorX_Search_Semantic_Query_Interface $interpreter
      * @param string $name
      * @return KontorX_Search_Semantic
      */
-    public function addQuery(KontorX_Search_Semantic_Query_Interface $query, $name) {
-    	if (array_key_exists($name, $this->_query)) {
+    public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name) {
+    	$this->_interpreter[(string)$name] = $interpreter;
+    	return $this;
+    }
+    
+    /**
+     * @param string $name
+     * @return KontorX_Search_Semantic
+     */
+    public function removeInterpreter($name) {
+    	if (array_key_exists($name, $this->_interpreter)) {
+    		unset($this->_interpreter[$name]);
+    	}
+    	return $this;
+    }
+    
+    /**
+     * @param KontorX_Search_Semantic_Context_Interface|string $context
+     * @return void
+     */
+    public function interpret($context) {
+    	if (is_string($context)) {
+    		$context = new KontorX_Search_Semantic_Context_Interface($context);
+    	} elseif (!$context instanceof KontorX_Search_Semantic_Context_Interface) {
     		require_once 'KontorX/Search/Semantic/Exception.php';
-			throw new KontorX_Search_Semantic_Exception(sprintf("Query element by name '%s' exsists. Remove query element", $name));
+			throw new KontorX_Search_Semantic_Exception("attribute 'context' is no instance of 'KontorX_Search_Semantic_Context_Interface'");
     	}
-
-    	$this->_query[$name] = $query;
-    	return $this;
-    }
-    
-    /**
-     * @param string $name
-     * @return KontorX_Search_Semantic
-     */
-    public function removeQuery($name) {
-    	if (array_key_exists($name, $this->_query)) {
-    		unset($this->_query[$name]);
-    	}
-    	return $this;
-    }
-    
-    /**
-     * @param string $content
-     * @return array
-     */
-    public function query($content) {
-    	if (empty($this->_query)) {
+    	
+    	if (empty($this->_interpreter)) {
 			require_once 'KontorX/Search/Semantic/Exception.php';
 			throw new KontorX_Search_Semantic_Exception("No query elements");
 		}
-		
-    	if (empty($content)) {
-			require_once 'KontorX/Search/Semantic/Exception.php';
-			throw new KontorX_Search_Semantic_Exception("attribute 'content' can not be empty");
-		}
 
-    	$content = (string) $content;
+    	/*$content = (string) $content;
     	if (false !== strstr($content, self::LOGIC_SEPARATOR)) {
     		$logicContent = explode(self::LOGIC_SEPARATOR, $content);
     		$logicContent = array_map('trim', $logicContent);
     		$logicContent = array_filter($logicContent);
     	} else {
     		$logicContent = array($content);
+    	}*/
+
+    	foreach ($this->_interpreter as $interpreterName => $interpreterInstance) {
+    		$logicContext = clone $context; 
+    		if (true === $interpreterInstance->interpret($logicContext)) {
+    			$context->addOutput($interpreterName, $logicContext->getOutput());
+    		}
     	}
-
-    	$result = array();
-    	// każda wydzielona zawartość logiczna jest oddzielnie analizowana
-    	foreach ($logicContent as $i => $content) {
-	    	foreach ($this->_query as $queryName => $queryInstance) {
-	    		$data = $queryInstance->query($content);
-	    		// czy zapytanie znalazło to czego szuka ;]?
-	    		if (null !== $data) {
-	    			if (!isset($result[$i])) {
-	    				$result[$i] = array();
-	    			}
-
-	    			$result[$i][$queryName] = $data;
-	    		}
-	    	}
-    	}
-
-    	return $result;
     }
 }
