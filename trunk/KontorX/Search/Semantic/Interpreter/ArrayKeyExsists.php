@@ -26,6 +26,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyExsists extends KontorX_Search
 		while ($context->valid()) {
 			$word = $context->current();
 			if (array_key_exists($word, $this->_array)) {
+				$context->remove();
 				$context->setOutput($this->_array[$word]);
 				return true;
 			}

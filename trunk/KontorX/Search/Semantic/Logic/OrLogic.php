@@ -17,6 +17,9 @@ class KontorX_Search_Semantic_Logic_OrLogic extends KontorX_Search_Semantic_Logi
 		foreach ($this->_interpreter as $interpreterName => $interpreterInstance) {
 			// Interpreter rozpoznał kontekst
 			if (true === $interpreterInstance->interpret($logicContext)) {
+				// przekazanie głównemu kontektowi, zmodyfikowanego (aktualnego) input'a
+				$context->setInput($logicContext->getInput());
+				// przekazanie głównemu kontekstowi, output'a dla interpretatora
 				$context->addOutput($interpreterName, $logicContext->getOutput());
 				return true;
 			}

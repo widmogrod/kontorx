@@ -29,17 +29,15 @@ class KontorX_Search_Semantic_Logic_AndLogic extends KontorX_Search_Semantic_Log
 					 */
 					return false;
 				}
-				
-				/**
-				 * Przesuń kursor o 1 pozycję, by następny interpreter
-				 * zaczynał od następnego słowa.
-				 */ 
-				$logicContext->next();
+
 				$finalContext->addOutput($interpreterName, $logicContext->getOutput());
 			} else {
 				return false;
 			}
 		}
+		// przekazanie głównemu kontektowi, zmodyfikowanego (aktualnego) input'a
+		$context->setInput($logicContext->getInput());
+		// przekazanie głównemu kontekstowi, output'a
 		$context->setOutput($finalContext->getOutput());
 		return true;
 	}

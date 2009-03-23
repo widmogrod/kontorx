@@ -5,6 +5,11 @@
  */
 interface KontorX_Search_Semantic_Context_Interface extends  Iterator, Countable {
 	/**
+	 * @return void
+	 */
+	public function remove();
+	
+	/**
 	 * @return string
 	 */
 	public function getInput();
@@ -27,12 +32,11 @@ interface KontorX_Search_Semantic_Context_Interface extends  Iterator, Countable
 	 * @return void
 	 */
 	public function addOutput($name, $data);
-	
+
 	/**
-	 * @param string $name
 	 * @return array|null
 	 */
-	public function getOutput($name = null);
+	public function getOutput();
 	
 	/**
 	 * @return void

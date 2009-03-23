@@ -51,10 +51,13 @@ class KontorX_Search_Semantic {
 
 		$interpreterContext = clone $context;
     	foreach ($this->_interpreter as $interpreterName => $interpreterInstance) {
-    		if (true === $interpreterInstance->interpret($interpreterContext)) {
+    		$interpreterContext->clearOutput();
+    		$interpreterContext->rewind();
+    		
+    		$r = $interpreterInstance->interpret($interpreterContext);
+    		if (true === $r) {
+    			// przekazanie głównemu kontekstowi, output'a dla interpretatora
     			$context->addOutput($interpreterName, $interpreterContext->getOutput());
-    			var_dump($interpreterContext->key());
-    			$interpreterContext->clearOutput();
     		}
     	}
     }
