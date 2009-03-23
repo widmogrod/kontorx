@@ -33,4 +33,9 @@ interface KontorX_Search_Semantic_Context_Interface extends  Iterator, Countable
 	 * @return array|null
 	 */
 	public function getOutput($name = null);
+	
+	/**
+	 * @return void
+	 */
+	public function clearOutput();
 }

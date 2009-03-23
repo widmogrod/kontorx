@@ -36,6 +36,12 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	
 	public function setInput($input) {
 		$this->_input = (string) $input;
+		$this->_input = str_replace(
+			// karzdy przecinek jako osoby znak
+			array(','  , '  '),
+			array(' , ', ' '),
+			$this->_input
+		);
 		$this->_words = explode(self::WORD_SEPARATOR, $this->_input);
 	}
 	
@@ -60,8 +66,12 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 			: $this->_output;
 	}
 	
-	public function __clone() {
+	public function clearOutput() {
 		$this->_output = array();
+	}
+	
+	public function __clone() {
+		$this->clearOutput();
 	}
 	
 	public function __toString() {
@@ -77,10 +87,14 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 
 	public function next() {
-		++$this->_position;
+		if ($this->_position <= $this->count()) {
+			++$this->_position;
+		}
 	}
 
  	public function rewind() {
+ 		var_dump("REWIND");
+ 		var_dump($rewind);
  		$this->_position = 0;
  	}
 
