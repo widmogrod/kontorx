@@ -2,6 +2,7 @@
 /**
  * KontorX_Search_Semantic
  *
+ * @todo Dodać 'konstruktor' z @see Zend_Config
  * @author gabriel
  */
 class KontorX_Search_Semantic {
