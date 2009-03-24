@@ -25,8 +25,14 @@ class KontorX_Search_Semantic_Logic_OrLogic extends KontorX_Search_Semantic_Logi
 			}
 			// Nie rozpoznanie kontekstu, przez interpreter
 			else {
-				// Kontekst, będzie interpretowany od początku! 
-				$logicContext->rewind();
+				/**
+				 * Kontekst, będzie interpretowany od początku!
+				 * XXX Pointer nie będzie w miejscu otrzymanym na starcie początkowym..
+				 */  
+				//$logicContext->rewind();
+				
+				// Teraz interpreter dostaje ten sam kontekst!
+				$logicContext = clone $context;
 			}
 		}
 		return false;

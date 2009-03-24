@@ -4,29 +4,36 @@ require_once '../../../setupTest.php';
 /**
  * @see KontorX_Search_Semantic_Query_Date 
  */
-require_once 'KontorX/Search/Semantic/Interpreter/ArrayKeyExsists.php';
+require_once 'KontorX/Search/Semantic/Interpreter/ArrayKeyValueExsists.php';
 
 /**
  * @see KontorX_Search_Semantic_Context 
  */
 require_once 'KontorX/Search/Semantic/Context.php';
 
-class KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest extends UnitTestCase {
+class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsistsTest extends UnitTestCase {
 	
 	/**
-	 * @var KontorX_Search_Semantic_Interpreter_ArrayKeyExsists
+	 * @var KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists
 	 */
 	protected $_interpreter = null;
 	
 	public function setUp() {
-		$this->_interpreter = new KontorX_Search_Semantic_Interpreter_ArrayKeyExsists(array(
-			'poniedziałek' => 1,
-			'wtorek' => 2,
-			'środa' => 3,
-			'czwartek' => 4,
-			'piątek' => 5,
-			'sobota' => 6,
-			'niedziela' => 7
+		$this->_interpreter = new KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists(array(
+    		array('key' => 'poniedziałek',
+    			  'value' => 1),
+    		array('key' => 'wtorek',
+    			  'value' => 2),
+    		array('key' => 'środa',
+    			  'value' => 3),
+    		array('key' => 'czwartek',
+    			  'value' => 4),
+    		array('key' => 'piątek',
+    			  'value' => 5),
+    		array('key' => 'sobota',
+    			  'value' => 6),
+    		array('key' => 'niedziela',
+    			  'value' => 7)
 		));
 	}
 	
@@ -34,7 +41,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest extends UnitTestCa
 		$this->_interpreter = null;
 	}
 
-	public function testArrayKeyExsistsTrue() {
+	public function testArrayKeyValueExsistsTrue() {
 		$day = 'poniedziałek';
 		$correct = 1;
 		$correctResult = true;
@@ -50,7 +57,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest extends UnitTestCa
 		$this->assertEqual($data, $correct, $message);
     }
     
-	public function testArrayKeyExsistsFalse() {
+	public function testArrayKeyValueExsistsFalse() {
 		$day = 'pon';
 		$correct = array();
 		$correctResult = false;
@@ -66,7 +73,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest extends UnitTestCa
 		$this->assertEqual($data, $correct, $message);
     }
     
-	public function testArrayKeyExsistsMultiCorrectTrue() {
+	public function testArrayKeyValueExsistsMultiCorrectTrue() {
 		$day = 'poniedziałek wtorek środa';
 		$correct = 1;
 		$correctResult = true;
@@ -84,5 +91,5 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest extends UnitTestCa
     }
 }
 
-$r = new KontorX_Search_Semantic_Interpreter_ArrayKeyExsistsTest();
+$r = new KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsistsTest();
 $r->run(new TextReporter());

@@ -242,13 +242,14 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
     
     public function testConfig() {
     	$correct = array();
-		$context = "ulica Opolska 13, godzina 22, dzien niedziela";
+		$context = "ulica Opolska 13, godzina 22, dzien niedziela, dzielnica krowodrza";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 
     	require_once 'Zend/Config/Xml.php';
     	$c = new Zend_Config_Xml(dirname(__FILE__) . '/config.xml');
 
     	$this->_semantic->setConfig($c);
+//    	$this->dump($c->toArray());
 
     	$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();

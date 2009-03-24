@@ -33,23 +33,17 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 
 	public function getInput() {
-//		if ($this->valid()) {
-//			$return = array_slice($this->_words, $this->_position);
-//		} else {
-			$return = $this->_words;
-//		}
-		return implode(self::WORD_SEPARATOR, $return);
+		return ($this->count() > 0)
+			? implode(self::WORD_SEPARATOR, $this->_words)
+			: array(); 
 	}
 	
 	public function setInput($input) {
 		$this->_input = (string) $input;
-		$this->_input = str_replace(
-			// karzdy przecinek jako osoby znak
-			array(','  , '  '),
-			array(' , ', ' '),
-			$this->_input
-		);
-		$this->_words = explode(self::WORD_SEPARATOR, $this->_input);
+		// karzdy przecinek jako osoby znak
+		$this->_input = str_replace(',', ' , ', $this->_input);
+		// tablica pozbawiona postych elementow
+		$this->_words = array_diff(explode(self::WORD_SEPARATOR, $this->_input), array());
 	}
 	
 	/**
@@ -82,7 +76,9 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 
 	public function current() {
-		return $this->_words[$this->_position];
+		return isset($this->_words[$this->_position])
+			? $this->_words[$this->_position]
+			: null;
 	}
 
 	public function key() {
@@ -97,6 +93,8 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 
  	public function rewind() {
  		$this->_position = 0;
+ 		// Resetuję klucze, bo np. po remove są puste luki!
+ 		$this->_words = (array) array_values($this->_words);
  	}
 
 	public function valid () {
@@ -113,9 +111,10 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	public function remove() {
 		if ($this->valid()) {
 			unset($this->_words[$this->_position]);
-//			$this->_position = 0;
-			$this->_words = array_values($this->_words);
-			$this->_count = null;
+			// Resetuję klucze
+//			$this->_words = (array) array_values($this->_words);
+			// Resetuję count
+			--$this->_count;
 		}
 	}
 }

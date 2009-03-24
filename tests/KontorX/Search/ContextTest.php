@@ -72,7 +72,54 @@ class KontorX_Search_Semantic_ContextTest extends UnitTestCase {
 		$result = $this->_context->getInput();
 
 		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
-    }	
+    }
+
+	public function testOutputRemoveAndNext1() {
+		$correctCurrent1 = "Dzisiaj";
+		$correctCurrent2 = null;
+		$correctCurrent3 = "jest";
+		$correct = "jest poniedziałek";
+		$context = "Dzisiaj jest poniedziałek";
+		
+		$this->_context->setInput($context);
+		$current1 = $this->_context->current(); // Dzisiaj
+		$this->assertEqual($current1, $correctCurrent1, sprintf("Next '%s' różny od '%s'", $current1, $correctCurrent1));
+
+		$this->_context->remove(); 				// remove Dzisiaj
+		$current2 = $this->_context->current(); // null
+		$this->assertEqual($current2, $correctCurrent2, sprintf("Next '%s' różny od '%s'", $current2, $correctCurrent2));
+
+		$this->_context->next();				// move pointer to: jest
+		$current3 = $this->_context->current(); // jest
+		$this->assertEqual($current3, $correctCurrent3, sprintf("Next '%s' różny od '%s'", $current3, $correctCurrent3));
+
+		$result = $this->_context->getInput();
+		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
+    }
+    
+	public function testOutputRemoveAndNext2() {
+		$correctCurrent1 = "Dzisiaj";
+		$correctCurrent2 = null;
+		$correctCurrent3 = null;
+		$correct = array();
+		$context = "Dzisiaj";
+		
+		$this->_context->setInput($context);
+		$current1 = $this->_context->current(); // Dzisiaj
+		$this->assertEqual($current1, $correctCurrent1, sprintf("Next '%s' różny od '%s'", $current1, $correctCurrent1));
+
+		$this->_context->remove(); 				// remove Dzisiaj
+		$current2 = $this->_context->current(); // null
+		$this->assertIdentical($current2, $correctCurrent2, sprintf("Next '%s' różny od '%s'", $current2, $correctCurrent2));
+
+		$this->_context->next();				// null
+		$current3 = $this->_context->current(); // null
+		$this->assertEqual($current3, $correctCurrent3, sprintf("Next '%s' różny od '%s'", $current3, $correctCurrent3));
+
+		$result = $this->_context->getInput();
+		$this->dump($result);
+		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
+    }
 }
 
 $r = new KontorX_Search_Semantic_ContextTest();
