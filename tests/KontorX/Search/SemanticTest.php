@@ -136,7 +136,7 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 		$this->assertEqual($data, $correct, $message);
     }
     
-public function testLogic2() {
+	public function testLogic2() {
 		$correct = array();
 		$context = "ulica Opolska 13, godzina 22, dzien niedziela";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
@@ -238,6 +238,25 @@ public function testLogic2() {
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);
+    }
+    
+    public function testConfig() {
+    	$correct = array();
+		$context = "ulica Opolska 13, godzina 22, dzien niedziela";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+
+    	require_once 'Zend/Config/Xml.php';
+    	$c = new Zend_Config_Xml(dirname(__FILE__) . '/config.xml');
+
+    	$this->_semantic->setConfig($c);
+
+    	$this->_semantic->interpret($contextInstance);
+		$data = $contextInstance->getOutput();
+		$this->dump($data);
+
+		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
+		$this->assertEqual($data, $correct, $message);
+    	
     }
 }
 

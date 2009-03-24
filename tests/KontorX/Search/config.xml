@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<interpreters>
+		<!-- Interpreter: wyszukuje dni tygodnia, lub frazę poprzedzoną słowem kluczowym dzień! -->
+		<interprateWeek type="logic" interpreter="OrLogic">
+			<options>
+				<interpreters>
+					<interprateWeek type="logic" interpreter="AndLogic">
+						<options>
+							<interpreters>
+								<keyword interpreter="InArray">
+									<options>
+										<option>dzień</option>
+									</options>
+								</keyword>
+								<week interpreter="ArrayKeyExsists">
+									<options>
+										<poniedziałek>1</poniedziałek>
+										<wtorek>2</wtorek>
+										<środa>3</środa>
+										<czwartek>4</czwartek>
+										<piątek>5</piątek>
+										<sobota>6</sobota>
+										<niedziela>7</niedziela>
+									</options>
+								</week>
+							</interpreters>
+						</options>
+					</interprateWeek>
+					<week interpreter="ArrayKeyExsists">
+						<options>
+							<poniedziałek>1</poniedziałek>
+							<wtorek>2</wtorek>
+							<środa>3</środa>
+							<czwartek>4</czwartek>
+							<piątek>5</piątek>
+							<sobota>6</sobota>
+							<niedziela>7</niedziela>
+						</options>
+					</week>
+				</interpreters>
+			</options>
+		</interprateWeek>
+		
+		<!-- Interpreter: nazwy ulic, alej poprzedzonych słowem kluczowym! -->
+		<street type="logic" interpreter="AndLogic">
+			<options>
+				<interpreters>
+					<keyword interpreter="InArray">
+						<options>ul</options>
+						<options>ul.</options>
+						<options>ulica</options>
+						<options>al</options>
+						<options>al.</options>
+						<options>aleja</options>
+					</keyword>
+					<street interpreter="ContextToSeparator" />
+				</interpreters>
+			</options>
+		</street>
+	</interpreters>
+</root>
