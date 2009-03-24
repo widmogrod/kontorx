@@ -15,20 +15,23 @@ class KontorX_Search_Semantic_Interpreter_Date extends KontorX_Search_Semantic_I
 			if (is_numeric($word)) {
 				$hour = (int) $word;
 				if ($hour >= 0 && $hour <= 24) {
-					$context->remove();
 					$context->setOutput($word);
+					$context->remove();
+					$context->next();
 					return true;
 				}
 			} else
 			// sprawdzanie formatu a'la godzina lub data
 			if (false !== strstr($word,':') || false !== strstr($word,'-')) {
-				$context->remove();
 				$context->setOutput($word);
+				$context->remove();
+				$context->next();
 				return true;
 			} else
 			if (Zend_Date::isDate($word)) {
-				$context->remove();
 				$context->setOutput($word);
+				$context->remove();
+				$context->next();
 				return true;
 			}
 

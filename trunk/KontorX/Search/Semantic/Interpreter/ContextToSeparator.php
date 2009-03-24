@@ -25,24 +25,31 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 	}
 
 	public function interpret(KontorX_Search_Semantic_Context_Interface $context) {
-		$currentWord = null;
 		$storedContext = array();
+		
+		$cloneContext = clone $context;
+		$cloneContext->clearOutput();
 
-		while ($context->valid()) {
-			$word = $context->current();
-
-			// zapisz pierwsze słowo
-			if (null === $currentWord) {
-				$currentWord = $word;
-			}
+		while ($cloneContext->valid()) {
+			$word = $cloneContext->current();
 
 			// jest kończący separator
 			if ($this->_separator == $word) {
+				// aktualizuje kontekst
+				foreach ($storedContext as $cloneContext) {
+					$context->remove();
+					$context->next();
+				}
+				
+				// usowam też separator
+				$context->remove();
+
 				// połącz słowa
 				$output = implode(KontorX_Search_Semantic_Context::WORD_SEPARATOR, $storedContext);
-				// TODO Dodać remove
-				// $context->remove();
+
+				// ustaw output
 				$context->setOutput($output);
+				
 				return true;
 			}
 			// nie ma separatora, dodaj do listy
@@ -50,12 +57,18 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 				$storedContext[] = $word;
 			}
 
-			$context->next();
+			$cloneContext->remove();
+			$cloneContext->next();
 		}
 		
-		// nie znaleziono separatora, to zwróć pierwsze słowo
-		if (null !== $currentWord) {
-			$context->setOutput($currentWord);
+		// nie znaleziono separatora
+		if ($context->valid()) {
+			// pierwsze słowo
+			$context->setOutput($context->current());
+			// usuń je
+			$context->remove();
+			// przesuń kursor
+			$context->next();
 			return true;
 		}
 
