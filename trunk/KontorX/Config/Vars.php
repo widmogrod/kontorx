@@ -1,40 +1,41 @@
 <?php
+require_once 'Zend/Config.php';
+
 /**
  * Description of Vars
  *
  * @author gabriel
  */
-class KontorX_Config_Vars {
+class KontorX_Config_Vars extends Zend_Config {
     /**
      * @var array|null
      */
-    private static $_definedConstants = null;
+    protected static $_definedConstants = null;
 
     /**
-     * @param Zend_Config $config
-     * @param array $vars
-     * @return KontorX_Config_Vars
+     * @param Zend_Config|array $config
+     * @param array|bool $vars
+     * @return void
      */
-    public static function decorate(Zend_Config $config, array $vars = null) {
-        // inicjowanie stalych
+    public function __construct($config, array $vars = null) {
+	    // inicjowanie stalych
         if (null === self::$_definedConstants) {
             $definedConstants = get_defined_constants(true);
             self::$_definedConstants = (array) $definedConstants['user'];
         }
 
-        return new self($config, $vars);
-    }
-
-    /**
-     * @param Zend_Config $config
-     * @param array $vars
-     * @return void
-     */
-    private function  __construct(Zend_Config $config, array $vars = null) {
-        $this->setConfig($config);
-
         if (null !== $vars) {
-            $this->setVars($vars);
+        	$this->setVars($vars);
+        }
+        
+    	if ($config instanceof Zend_Config) {
+			parent::__construct(array(), true);
+			$this->merge($config);
+        } elseif (is_array($config)) {
+        	parent::__construct($config, true);
+        } else {
+        	require_once 'Zend/Config/Exception.php';
+        	throw new Zend_Config_Exception("Decorated config is not 'array' or instance of 'Zend_Config'");
         }
     }
 
@@ -51,82 +52,36 @@ class KontorX_Config_Vars {
     }
 
     /**
-     * @var Zend_Config
-     */
-    private $_config = array();
-
-    /**
-     * @param array $vars
-     */
-    public function setConfig(Zend_Config $config) {
-        $this->_config = $config;
-    }
-
-    /**
-     * @return Zend_Config
-     * @throws Zend_Config_Exception
-     */
-    public function getConfig() {
-        if (!$this->_config instanceof Zend_Config) {
-            $message = "Zend_Config is not set";
-            require_once 'Zend/Config/Exception.php';
-            throw new Zend_Config_Exception($message);
-        }
-        return $this->_config;
-    }
-
-    /**
-     * @return array
+     * @Override
      */
     public function toArray() {
-        $result = array();
-        foreach ($this->getConfig() as $key => $val) {
-            if ($val instanceof Zend_Config) {
-                $clone = clone $this;
-                $clone->setConfig($val);
-                $result[$key] = $clone->toArray();
+        $array = array();
+        foreach ($this->_data as $key => $value) {
+            if ($value instanceof Zend_Config) {
+            	$vars = new self($value, $this->_vars);
+            	$array[$key] = $vars->toArray();
+            } else
+            if ($value instanceof KontorX_Config_Vars) {
+                $array[$key] = $value->toArray();
             } else {
-                $result[$key] = $this->_getVar($val);
+                $array[$key] = $this->_getVar($value);
             }
         }
-        return $result;
+        return $array;
     }
 
     /**
      * @Override
      */
-    public function  __get($name) {
-        $config = $this->getConfig();
-        $value = $config->get($name);
-
-        if ($value instanceof Zend_Config) {
-            $clone = clone $this;
-            $clone->setConfig($value);
-            $value = $clone;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function __call($name, array $params = array()) {
-        $config = $this->getConfig();
-        if (!method_exists($config, $name)) {
-            $message = "Zend_Config method '$name' do not exsists";
-            require_once 'Zend/Config/Exception.php';
-            throw new Zend_Config_Exception($message);
-        }
-
-        return call_user_func_array(array($config, $name), $params);
-    }
-
-    /**
-     * @return void
-     */
-    public function __clone() {
-        $this->_config = null;
+    public function  get($name) {
+    	$value  = parent::get($name);
+    	if (is_string($value)) {
+    		$value = $this->_getVar($value);
+    	} else
+    	if ($value instanceof Zend_Config) {
+    		$value = new self($value, $this->_vars);
+    	}
+    	return $value;
     }
 
     /**
