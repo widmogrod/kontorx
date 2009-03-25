@@ -5,6 +5,8 @@ set_include_path(implode(PATH_SEPARATOR, array(
 	dirname(__FILE__) . '/../'
 )));
 
+define('SETUP_TEST',true);
+
 // simpletest
 require_once('simpletest/unit_tester.php');
 require_once('simpletest/reporter.php');

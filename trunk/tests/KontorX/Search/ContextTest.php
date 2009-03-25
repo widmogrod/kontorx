@@ -1,5 +1,8 @@
 <?php
-require_once '../../setupTest.php';
+if (!defined('SETUP_TEST')) {
+	require_once '../../setupTest.php';
+}
+
 
 /**
  * @see KontorX_Search_Semantic_Context 
