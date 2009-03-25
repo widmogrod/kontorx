@@ -1,5 +1,7 @@
 <?php
-require_once '../../setupTest.php';
+if (!defined('SETUP_TEST')) {
+	require_once '../../setupTest.php';
+}
 
 /**
  * @see KontorX_Search_Semantic 
@@ -105,13 +107,13 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 		$this->_semantic->interpret($contextInstance);
 
 		$data = $contextInstance->getOutput();
-		$this->dump($data, "Wynik zapytania: '$context'");
+//		$this->dump($data, "Wynik zapytania: '$context'");
 
 		$this->assertIdentical($data, $correct, "Interpreter nie znalazl poniedzialku");
     }
     
 	public function testLogic1() {
-		$correct = array('week'=>'poniedziałek','date'=>11);
+		$correct = array('or'=>array('and1'=>array('week'=>'poniedziałek','hour'=>11)));
 		$context = "lekarz przyjmuje w 12 poniedziałek o 11";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 		
@@ -130,14 +132,19 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 		$this->_semantic->addInterpreter($or,'or');
 		$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();
-		$this->dump($data);
+//		$this->dump($data);
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);
     }
     
 	public function testLogic2() {
-		$correct = array();
+		$correct = array(
+			'ulicaAnd' => array('keyword' => 'ulica','name'=>'Opolska 13'),
+			'godzinaOr' => array('godzina1' => 22),
+			'dzieńOr' => array('dzień1' => array(
+				'keyword'=>'dzien',
+				'name' => 'niedziela')));
 		$context = "ulica Opolska 13, godzina 22, dzien niedziela";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 		
@@ -180,7 +187,7 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 
 		$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();
-		$this->dump($data);
+//		$this->dump($data);
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);
@@ -191,7 +198,10 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testLogic3() {
-		$correct = array();
+		$correct = array(
+			'godzinaOr' => array('godzina1' => 13),
+			'dzieńOr' => array('dzień2' => 'niedziela'));
+
 		$context = "Opolska 13, niedziela";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 		
@@ -234,14 +244,19 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 
 		$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();
-		$this->dump($data);
+//		$this->dump($data);
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);
     }
     
     public function testConfig() {
-    	$correct = array();
+    	$correct = array(
+	    	'week' => array('week' => '7'),
+	        'street' => array('keyword' => 'ulica','street' => 'Opolska 13'),
+	        'district' => array('keyword' => 'dzielnica','district' => 'krowodrza-lobzow')
+    	);
+
 		$context = "ulica Opolska 13, godzina 22, dzien niedziela, dzielnica krowodrza";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 
@@ -249,11 +264,9 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
     	$c = new Zend_Config_Xml(dirname(__FILE__) . '/config.xml');
 
     	$this->_semantic->setConfig($c);
-//    	$this->dump($c->toArray());
 
     	$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();
-		$this->dump($data);
 
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);

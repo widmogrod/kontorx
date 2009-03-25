@@ -42,8 +42,8 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 		$this->_input = (string) $input;
 		// karzdy przecinek jako osoby znak
 		$this->_input = str_replace(',', ' , ', $this->_input);
-		// tablica pozbawiona postych elementow
-		$this->_words = array_diff(explode(self::WORD_SEPARATOR, $this->_input), array());
+		// tablica pozbawiona pustych elementow
+		$this->_words = array_diff(explode(self::WORD_SEPARATOR, $this->_input), array(''));
 	}
 	
 	/**

@@ -2,7 +2,7 @@
 <root>
 	<interpreters>
 		<!-- Interpreter: wyszukuje dni tygodnia, lub frazę poprzedzoną słowem kluczowym dzień! -->
-		<interprateWeek type="logic" interpreter="OrLogic">
+		<week type="logic" interpreter="OrLogic">
 			<options>
 				<interpreters>
 					<interprateWeek type="logic" interpreter="AndLogic">
@@ -40,7 +40,7 @@
 					</week>
 				</interpreters>
 			</options>
-		</interprateWeek>
+		</week>
 		
 		<!-- Interpreter: nazwy ulic, alej poprzedzonych słowem kluczowym! -->
 		<street type="logic" interpreter="AndLogic">
