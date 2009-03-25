@@ -24,7 +24,7 @@ class KontorX_Config_Generate_Xml extends KontorX_Config_Generate_Abstract {
 	 */
 	public function generate() {
 		$xml = new SimpleXMLElement('<kontorx-config/>');
-		$xml = $this->_generate($this->getConfig(), $xml);
+		$this->_generate($this->getConfig(), $xml);
 
 		// generowanie pliku
 		$dom = dom_import_simplexml($xml)->ownerDocument;
@@ -49,11 +49,10 @@ class KontorX_Config_Generate_Xml extends KontorX_Config_Generate_Abstract {
 
 			if (is_array($value)) {
 				$child = $xml->addChild($key);
-				$xml = $this->_generate($value, $child);
+				$this->_generate($value, $child);
 			} else {
 				$xml->addChild($key, (string) $value);
 			}
 		}
-		return $xml;
 	}
 }
