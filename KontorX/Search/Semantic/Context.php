@@ -20,6 +20,11 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	/**
 	 * @var int
 	 */
+	private $_count = null;
+	
+	/**
+	 * @var int
+	 */
 	private $_position = 0;
 
 	/**

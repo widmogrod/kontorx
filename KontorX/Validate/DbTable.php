@@ -70,11 +70,9 @@ class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
         if (is_string($table)) {
             Zend_Loader::loadClass($table);
             $table = new $table();
-        } elseif (is_array($table)) {
-            // TODO
         }
 
-        if (!$table instanceof Zend_Db_Table_Abstract) {
+        if (!($table instanceof Zend_Db_Table_Abstract)) {
             $message = "table is not instance of Zend_Db_Table_Abstract";
             require_once 'Zend/Validate/Exception.php';
             throw new Zend_Validate_Exception($message);
