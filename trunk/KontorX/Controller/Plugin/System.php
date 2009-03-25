@@ -396,7 +396,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         }
 
         $path 	= $this->_templatePath . '/' . $templateName;
-        $path 	= $this->getPublicHtmlPath($path);
+//        $path 	= $this->getTemplateHtmlPath($path);
         $pathI18n	= $path . '/' . $this->getLanguage();
 
         return array($path, $pathI18n);
@@ -464,6 +464,33 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         }
         return $this->_publicHtmlPath;
     }
+    
+	/**
+     * @var string
+     */
+//    protected $_templateHtmlPath = null;
+
+    /**
+     * Ustawia ścieżkę do katalogu publi_html
+     *
+     * @param string $path
+     */
+    /*public function setTemplateHtmlPath($path) {
+        $this->_templateHtmlPath = (string) $path;
+    }*/
+
+    /**
+     * Zwraca ścieżkę do katalogu template
+     *
+     * @param string $append
+     * @return string
+     */
+    /*public function getTemplateHtmlPath($append = null) {
+        if (null !== $append) {
+            return $this->_templateHtmlPath . '/' . $append;
+        }
+        return $this->_templateHtmlPath;
+    }*/
 
     /**
      * @var string
