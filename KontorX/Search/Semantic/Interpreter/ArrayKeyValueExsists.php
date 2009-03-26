@@ -28,6 +28,8 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists extends KontorX_S
 			// XXX Czy wymagane jest sprawdzanie? .. napewno posypią się NOTICE..
 			$this->_array[(string)$data[self::KEY]] = $data[self::VALUE];
 		}
+		
+		var_dump($this->_array);
 	}
 
 	public function interpret(KontorX_Search_Semantic_Context_Interface $context) {
