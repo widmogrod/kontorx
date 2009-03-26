@@ -7,6 +7,7 @@ $testAll = new TestSuite();
 
 // Context
 $testAll->addFile('./ContextTest.php');
+$testAll->addFile('./ContextHelperInputFormatingTest.php');
 
 // Interpreter
 $testAll->addFile('./Interpreter/ArrayKeyExsistsTest.php');

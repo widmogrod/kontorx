@@ -6,6 +6,8 @@ require_once 'KontorX/Search/Semantic/Context/Interface.php';
  */
 class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context_Interface {
 	const WORD_SEPARATOR = ' ';
+	
+	const CONTEXT_SEPARATOR = '"';
 
 	/**
 	 * @var string
@@ -47,8 +49,35 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 		$this->_input = (string) $input;
 		// karzdy przecinek jako osoby znak
 		$this->_input = str_replace(',', ' , ', $this->_input);
+
+		$words = array();
+		// Podziel słowa jako tekst w cudzysłowach
+		if (substr_count($this->_input, self::CONTEXT_SEPARATOR) > 1) {
+			$explod = explode(self::CONTEXT_SEPARATOR, $this->_input);
+			foreach ($explod as $key => $value) {
+				$value = trim($value);
+				// Tylko parzyste części nie są w cudzysłowie "" 
+				if ($key % 2 == 0) {
+					// czy klucz zawiera inne podzielne znaki?
+					if(substr_count($value, self::WORD_SEPARATOR) > 0) {
+						foreach (explode(self::WORD_SEPARATOR, $value) as $value) {
+							$words[] = $value;
+						}
+					} else {
+						$words[] = $value;
+					}
+				} else {
+					$words[] = $value;				
+				}
+			}
+		} else {
+			$words = explode(self::WORD_SEPARATOR, $this->_input);
+		}
+		
 		// tablica pozbawiona pustych elementow
-		$this->_words = array_diff(explode(self::WORD_SEPARATOR, $this->_input), array(''));
+		$words = array_diff($words, array(''));
+		// Resetowanie kluczy
+		$this->_words = array_values($words);
 	}
 	
 	/**
