@@ -1,5 +1,9 @@
 <?php
+/**
+ * @see Zend_Filter_Interface
+ */
 require_once 'Zend/Filter/Interface.php';
+
 class KontorX_Filter_Array implements Zend_Filter_Interface {
     public function filter($value) {
         if (!is_array($value)) {

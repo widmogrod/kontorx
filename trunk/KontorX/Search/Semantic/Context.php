@@ -88,9 +88,17 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	public function setOutput($data) {
 		$this->_output = $data;
 	}
-	
-	public function addOutput($name, $data) {
-		$this->_output[(string)$name] = $data;
+
+	public function addOutput($name, $data = null) {
+		if (!is_array($this->_output)){
+			$this->_output = array($this->_output);
+		}
+
+		if (null === $data) {
+			array_push($this->_output, $name);
+		} else {
+			$this->_output[(string)$name] = $data;
+		}
 	}
 	
 	public function getOutput() {

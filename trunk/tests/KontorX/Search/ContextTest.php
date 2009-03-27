@@ -3,7 +3,6 @@ if (!defined('SETUP_TEST')) {
 	require_once '../../setupTest.php';
 }
 
-
 /**
  * @see KontorX_Search_Semantic_Context 
  */
@@ -98,7 +97,33 @@ class KontorX_Search_Semantic_ContextTest extends UnitTestCase {
 		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
     }
     
-	public function testOutput3() {
+	public function testOutputAdd1() {
+		$correct = array("Dzisiaj","jest poniedziałek");
+		$context1 = "Dzisiaj";
+		$context2 = "jest poniedziałek";
+		
+		$this->_context->addOutput($context1);
+		$this->_context->addOutput($context2);
+		
+		$result = $this->_context->getOutput();
+
+		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
+    }
+    
+	public function testOutputAdd2() {
+		$correct = array("Dzisiaj","jest poniedziałek");
+		$context1 = "Dzisiaj";
+		$context2 = "jest poniedziałek";
+		
+		$this->_context->setOutput($context1);
+		$this->_context->addOutput($context2);
+		
+		$result = $this->_context->getOutput();
+
+		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
+    }
+    
+	public function testInput() {
 		$correct = "Dzisiaj jest poniedziałek";
 		$context = "Dzisiaj jest poniedziałek";
 		
