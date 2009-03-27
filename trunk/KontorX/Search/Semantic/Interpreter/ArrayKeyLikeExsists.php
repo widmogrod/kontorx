@@ -33,13 +33,17 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 	public function __construct(array $array) {
 		if (array_key_exists('multi', $array)) {
 			$this->setMulti($array['multi']);
+			unset($array['multi']);
 		}
 
 		foreach ($array as $data) {
-			foreach ($this->_getDataKey($data) as $key) {
-				$this->_arrayKey[] = $key;
-				// XXX Czy wymagane jest sprawdzanie? .. napewno posypią się NOTICE..
-				$this->_arrayValue[] = @$data[self::VALUE];
+			// @todo Exception?
+			if (is_array($data)) {
+				foreach ($this->_getDataKey($data) as $key) {
+					$this->_arrayKey[] = $key;
+					// XXX Czy wymagane jest sprawdzanie? .. napewno posypią się NOTICE..
+					$this->_arrayValue[] = @$data[self::VALUE];
+				}
 			}
 		}
 	}
