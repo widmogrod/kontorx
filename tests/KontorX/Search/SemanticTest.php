@@ -254,7 +254,7 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
     	$correct = array(
 	    	'week' => array('week' => '7'),
 	        'street' => array('keyword' => 'ulica','street' => 'Opolska 13'),
-	        'district' => array('keyword' => 'dzielnica','district' => 'krowodrza-lobzow')
+	        'district' => array('keyword' => 'dzielnica','district' => 'krowodrza-lobzow'),
     	);
 
 		$context = "ulica Opolska 13, godzina 22, dzien niedziela, dzielnica krowodrza";
@@ -267,7 +267,8 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
 
     	$this->_semantic->interpret($contextInstance);
 		$data = $contextInstance->getOutput();
-
+//		$this->dump($data);
+		
 		$message = sprintf('Fraza "%s" niepoprawnie rozpoznana', $context);
 		$this->assertEqual($data, $correct, $message);
     	
