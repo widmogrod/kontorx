@@ -57,7 +57,6 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 		while ($context->valid()) {
 			$word = $this->_getWord($context);
 			if (false !== ($key = array_search($word, $this->_arrayKey))) {
-				var_dump($word);
 				$finded = true;
 				// kolejne dopasowanie
 				if ($this->_multi) {
@@ -89,7 +88,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 		$key = $data[self::KEY];
 		$key = $this->_sanitize($key);
 		$key = explode(' ', $key);
-		return array_filter($key);
+		return (array) array_filter($key);
 	}
 	
 	/**

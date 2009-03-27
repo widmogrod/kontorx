@@ -168,90 +168,95 @@
 			</options>
 		</district>
 		
-		<district2 interpreter="ArrayKeyLikeExsists">
+		<!-- Interpreter: nazwy, nr. dzielnic, poprzedzonyej słowem kluczowm lub nie! dla testu -->
+		<districtLike type="logic" interpreter="AndLogic">
 			<options>
-				<key>Stare Miasto</key>
-				<value>stare-miasto</value>
+				<district2 interpreter="ArrayKeyLikeExsists">
+					<options>
+						<key>Stare Miasto</key>
+						<value>stare-miasto</value>
+					</options>
+					<options>
+						<key>Kraków Grzegórzki</key>
+						<value>krakow-grzegorzki</value>
+					</options>
+					<options>
+						<key>Prądnik Czerwony</key>
+						<value>proadnik-czerwony</value>
+					</options>
+					<options>
+						<key>Prądnik Biały</key>
+						<value>prodnik-bialy</value>
+					</options>
+					
+					<options>
+						<key>Krowodrza/Łobzów</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>krowodrza</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>lobzow</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>łobzów</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					
+					<options>
+						<key>Bronowice</key>
+						<value>bronowice</value>
+					</options>
+					<options>
+						<key>Zwierzyniec</key>
+						<value>zwierzyniec</value>
+					</options>
+					<options>
+						<key>Dębniki</key>
+						<value>debniki</value>
+					</options>
+					<options>
+						<key>Łagiewniki-Borek Fałęcki</key>
+						<value>lagiewniki-borek-falecki</value>
+					</options>
+					<options>
+						<key>Swoszowice</key>
+						<value>swoszowice</value>
+					</options>
+					<options>
+						<key>Podgórze Duchackie</key>
+						<value>podgorze-duchackie</value>
+					</options>
+					<options>
+						<key>Bieżanów-Prokocim</key>
+						<value>biezanow-prokocim</value>
+					</options>
+					<options>
+						<key>Podgórze</key>
+						<value>podgorze</value>
+					</options>
+					<options>
+						<key>Czyżyny</key>
+						<value>czyzyny</value>
+					</options>
+					<options>
+						<key>Mistrzejowice</key>
+						<value>mistrzejowice</value>
+					</options>
+					<options>
+						<key>Wzgórza Krzesławickie </key>
+						<value>wzgorza-krzeslawickie</value>
+					</options>
+					<options>
+						<key>Nowa Huta</key>
+						<value>nowa-huta</value>
+					</options>
+				</district2>
 			</options>
-			<options>
-				<key>Kraków Grzegórzki</key>
-				<value>krakow-grzegorzki</value>
-			</options>
-			<options>
-				<key>Prądnik Czerwony</key>
-				<value>proadnik-czerwony</value>
-			</options>
-			<options>
-				<key>Prądnik Biały</key>
-				<value>prodnik-bialy</value>
-			</options>
-			
-			<options>
-				<key>Krowodrza/Łobzów</key>
-				<value>krowodrza-lobzow</value>
-			</options>
-			<options>
-				<key>krowodrza</key>
-				<value>krowodrza-lobzow</value>
-			</options>
-			<options>
-				<key>lobzow</key>
-				<value>krowodrza-lobzow</value>
-			</options>
-			<options>
-				<key>łobzów</key>
-				<value>krowodrza-lobzow</value>
-			</options>
-			
-			<options>
-				<key>Bronowice</key>
-				<value>bronowice</value>
-			</options>
-			<options>
-				<key>Zwierzyniec</key>
-				<value>zwierzyniec</value>
-			</options>
-			<options>
-				<key>Dębniki</key>
-				<value>debniki</value>
-			</options>
-			<options>
-				<key>Łagiewniki-Borek Fałęcki</key>
-				<value>lagiewniki-borek-falecki</value>
-			</options>
-			<options>
-				<key>Swoszowice</key>
-				<value>swoszowice</value>
-			</options>
-			<options>
-				<key>Podgórze Duchackie</key>
-				<value>podgorze-duchackie</value>
-			</options>
-			<options>
-				<key>Bieżanów-Prokocim</key>
-				<value>biezanow-prokocim</value>
-			</options>
-			<options>
-				<key>Podgórze</key>
-				<value>podgorze</value>
-			</options>
-			<options>
-				<key>Czyżyny</key>
-				<value>czyzyny</value>
-			</options>
-			<options>
-				<key>Mistrzejowice</key>
-				<value>mistrzejowice</value>
-			</options>
-			<options>
-				<key>Wzgórza Krzesławickie </key>
-				<value>wzgorza-krzeslawickie</value>
-			</options>
-			<options>
-				<key>Nowa Huta</key>
-				<value>nowa-huta</value>
-			</options>
-		</district2>
+		</districtLike>
 
 	</interpreters>
 </root>
