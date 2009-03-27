@@ -57,7 +57,7 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparatorTest extends UnitTes
     
 	public function testContextToSeparator3() {
 		$day = 'poniedziałek i wtorek no ba!';
-		$correct = 'poniedziałek';
+		$correct = array();
 		$context = "$day";
 		$contextInstance = new KontorX_Search_Semantic_Context($context);
 

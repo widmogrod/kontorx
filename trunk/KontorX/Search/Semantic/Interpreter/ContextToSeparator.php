@@ -61,16 +61,16 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 			$cloneContext->next();
 		}
 		
-		// nie znaleziono separatora
-		if ($context->valid()) {
-			// pierwsze słowo
-			$context->setOutput($context->current());
-			// usuń je
-			$context->remove();
-			// przesuń kursor
-			$context->next();
-			return true;
-		}
+//		// nie znaleziono separatora
+//		if ($context->valid()) {
+//			// pierwsze słowo
+//			$context->setOutput($context->current());
+//			// usuń je
+//			$context->remove();
+//			// przesuń kursor
+//			$context->next();
+//			return true;
+//		}
 
 		return false;
 	}
