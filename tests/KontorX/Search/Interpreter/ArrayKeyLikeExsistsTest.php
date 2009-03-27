@@ -59,6 +59,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsistsTest extends UnitTe
 		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'true'");
 
 		$data = $contextInstance->getOutput();
+		$this->dump($data);
 		
 		$message = sprintf('Znaleziona dzień "%s" w tekscie "%s" jest inny od oczekiwanego "%s"', $data, $context, $correct);
 		$this->assertEqual($data, $correct, $message);
