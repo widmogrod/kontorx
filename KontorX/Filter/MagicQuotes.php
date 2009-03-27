@@ -1,8 +1,10 @@
 <?php
+/**
+ * @see Zend_Filter_Interface
+ */
+require_once 'Zend/Filter/Interface.php';
 
 /**
- * Description of MagicQuotes
- *
  * @author gabriel
  */
 class KontorX_Filter_MagicQuotes implements Zend_Filter_Interface{

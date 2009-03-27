@@ -12,6 +12,7 @@ $testAll->addFile('./ContextHelperInputFormatingTest.php');
 // Interpreter
 $testAll->addFile('./Interpreter/ArrayKeyExsistsTest.php');
 $testAll->addFile('./Interpreter/ArrayKeyValueExsistsTest.php');
+$testAll->addFile('./Interpreter/ArrayKeyLikeExsistsTest.php');
 $testAll->addFile('./Interpreter/ContextToSeparatorTest.php');
 $testAll->addFile('./Interpreter/DateTest.php');
 $testAll->addFile('./Interpreter/InArrayTest.php');
