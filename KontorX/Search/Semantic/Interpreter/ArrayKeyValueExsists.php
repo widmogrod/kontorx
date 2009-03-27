@@ -14,6 +14,8 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists extends KontorX_S
 	
 	const VALUE = 'value';
 	
+	private $_multi = false;
+	
 	/**
 	 * @var array
 	 */
@@ -29,24 +31,46 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists extends KontorX_S
 	 * @return void
 	 */
 	public function __construct(array $array) {
+		if (array_key_exists('multi', $array)) {
+			$this->setMulti($array['multi']);
+		}
+
 		foreach ($array as $data) {
 			// XXX Czy wymagane jest sprawdzanie? .. napewno posypią się NOTICE..
 			$this->_arrayKey[] = @$data[self::KEY];
 			$this->_arrayValue[] = @$data[self::VALUE];
 		}
 	}
+	
+	/**
+	 * @param bool $flag
+	 * @return void
+	 */
+	public function setMulti($flag = true) {
+		$this->_multi = (bool) $flag;
+	}
 
 	public function interpret(KontorX_Search_Semantic_Context_Interface $context) {
+		$finded = false;
 		while ($context->valid()) {
 			$word = $context->current();
 			if (false !== ($key = array_search($word, $this->_arrayKey))) {
-				$context->setOutput($this->_arrayValue[$key]);
-				$context->remove();
-				$context->next();
-				return true;
+				$finded = true;
+				// kolejne dopasowanie
+				if ($this->_multi) {
+					$context->addOutput($key, $this->_arrayValue[$key]);
+				}
+				// tylko jedno dopasowanie
+				else {
+					$context->setOutput($this->_arrayValue[$key]);
+					$context->remove();
+					$context->next();
+					return true;
+				}
 			}
 			$context->next();
 		}
-		return false;
+		
+		return ($this->_multi && $finded) ? true : false;			
 	}
 }

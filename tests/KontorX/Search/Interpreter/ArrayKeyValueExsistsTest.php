@@ -75,7 +75,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsistsTest extends UnitT
 		$this->assertEqual($data, $correct, $message);
     }
     
-	public function testArrayKeyValueExsistsMultiCorrectTrue() {
+	public function testArrayKeyValueExsists2True() {
 		$day = 'poniedziałek wtorek środa';
 		$correct = 1;
 		$correctResult = true;
@@ -91,6 +91,25 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsistsTest extends UnitT
 		$message = sprintf('Znaleziona dzień "%s" w tekscie "%s" jest inny od oczekiwanego "%s"', $data, $context, $correct);
 		$this->assertEqual($data, $correct, $message);
     }
+    
+	public function testArrayKeyValueExsistsMultiCorrectTrue() {
+		$day = 'poniedziałek wtorek środa';
+		$correct = array(1,2,3);
+		$correctResult = true;
+		$context = "Dzisiaj jest $day";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+
+		$this->_interpreter->setMulti(true);
+		$result = $this->_interpreter->interpret($contextInstance);
+		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'true'");
+		$data = $contextInstance->getOutput();
+
+		$this->dump($data);
+		
+		$message = sprintf('Znaleziona dzień "%s" w tekscie "%s" jest inny od oczekiwanego "%s"', $data, $context, $correct);
+		$this->assertEqual($data, $correct, $message);
+    }
+
     // @todo Może nowy interpreter, który będzie alizował treść sorawdzał dopasowanie i odwołanie
     // do konkretnych rekoród .. przypisywał wagi.. zalatuje SI
 	public function testArrayKeyValueExsistsBigArray() {
@@ -118,7 +137,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsistsTest extends UnitT
 		$this->assertIdentical($result, $correctResult, "Interpretacja kontekstu powinna zwrócić 'true'");
 		$data = $contextInstance->getOutput();
 
-		$this->dump($data);
+//		$this->dump($data);
 		
 		$message = sprintf('Znaleziona dzień "%s" w tekscie "%s" jest inny od oczekiwanego "%s"', $data, $context, $correct);
 		$this->assertEqual($data, $correct, $message);
