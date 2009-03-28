@@ -159,6 +159,8 @@ class KontorX_Search_Semantic {
     			$context->addOutput($interpreterName, $interpreterContext->getOutput());
     		}
     	}
+    	
+    	$context->setInput($interpreterContext->getInput());
     }
 
 	const INTERPRETER = 'interpreter';

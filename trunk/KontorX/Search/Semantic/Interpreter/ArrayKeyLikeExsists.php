@@ -60,6 +60,8 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 			if (array_key_exists($word, $this->_arrayKey)) {
 				$finded = true;
 				
+				$context->remove();
+				
 				// kolejne dopasowanie
 				if ($this->_multi) {
 					// każda wartośc z osobana jest dodawana
@@ -73,7 +75,6 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 						: current($this->_arrayKey[$word]);
 
 					$context->setOutput($value);
-					$context->remove();
 					$context->next();
 					return true;
 				}
