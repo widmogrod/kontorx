@@ -172,7 +172,7 @@ class KontorX_Search_Semantic_ContextTest extends UnitTestCase {
 		$correctCurrent1 = "Dzisiaj";
 		$correctCurrent2 = null;
 		$correctCurrent3 = null;
-		$correct = array();
+		$correct = null;
 		$context = "Dzisiaj";
 		
 		$this->_context->setInput($context);
@@ -188,7 +188,7 @@ class KontorX_Search_Semantic_ContextTest extends UnitTestCase {
 		$this->assertEqual($current3, $correctCurrent3, sprintf("Next '%s' różny od '%s'", $current3, $correctCurrent3));
 
 		$result = $this->_context->getInput();
-//		$this->dump($result);
+		$this->dump($result);
 		$this->assertEqual($result, $correct, sprintf("Output nie jest taki sam jak oczekiwany '%s'", $correct));
     }
 }
