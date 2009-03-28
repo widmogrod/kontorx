@@ -22,11 +22,6 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 	private $_arrayKey = array();
 	
 	/**
-	 * @var array
-	 */
-	private $_arrayValue = array();
-
-	/**
 	 * @param array $array
 	 * @return void
 	 */
@@ -40,9 +35,11 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 			// @todo Exception?
 			if (is_array($data)) {
 				foreach ($this->_getDataKey($data) as $key) {
-					$this->_arrayKey[] = $key;
+					if (!array_key_exists($key, $this->_arrayKey)) {
+						$this->_arrayKey[$key] = array();
+					}
 					// XXX Czy wymagane jest sprawdzanie? .. napewno posypią się NOTICE..
-					$this->_arrayValue[] = @$data[self::VALUE];
+					$this->_arrayKey[$key][] = @$data[self::VALUE];
 				}
 			}
 		}
@@ -60,15 +57,22 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 		$finded = false;
 		while ($context->valid()) {
 			$word = $this->_getWord($context);
-			if (false !== ($key = array_search($word, $this->_arrayKey))) {
+			if (array_key_exists($word, $this->_arrayKey)) {
 				$finded = true;
+				
 				// kolejne dopasowanie
 				if ($this->_multi) {
-					$context->addOutput($this->_arrayValue[$key]);
+					// każda wartośc z osobana jest dodawana
+					array_map(array($context,'addOutput'), $this->_arrayKey[$word]);
 				}
 				// tylko jedno dopasowanie
 				else {
-					$context->setOutput($this->_arrayValue[$key]);
+					// Dla zgodności wstecz
+					$value = (count($this->_arrayKey[$word]) > 1)
+						? $this->_arrayKey[$word]
+						: current($this->_arrayKey[$word]);
+
+					$context->setOutput($value);
 					$context->remove();
 					$context->next();
 					return true;
