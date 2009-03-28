@@ -43,6 +43,7 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 				
 				// usowam też separator
 				$context->remove();
+				$context->next();
 
 				// połącz słowa
 				$output = implode(KontorX_Search_Semantic_Context::WORD_SEPARATOR, $storedContext);

@@ -134,6 +134,7 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	}
 
  	public function rewind() {
+ 		$this->_count = null;
  		$this->_position = 0;
  		// Resetuję klucze, bo np. po remove są puste luki!
  		$this->_words = (array) array_values($this->_words);
@@ -156,7 +157,7 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 			// Resetuję klucze
 //			$this->_words = (array) array_values($this->_words);
 			// Resetuję count
-			--$this->_count;
+//			--$this->_count;
 		}
 	}
 }
