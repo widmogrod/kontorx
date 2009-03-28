@@ -60,6 +60,9 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists extends KontorX_S
 			$word = $context->current();
 			if (false !== ($key = array_search($word, $this->_arrayKey))) {
 				$finded = true;
+
+				$context->remove();
+
 				// kolejne dopasowanie
 				if ($this->_multi) {
 					$context->addOutput($key, $this->_arrayValue[$key]);
@@ -67,7 +70,6 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyValueExsists extends KontorX_S
 				// tylko jedno dopasowanie
 				else {
 					$context->setOutput($this->_arrayValue[$key]);
-					$context->remove();
 					$context->next();
 					return true;
 				}
