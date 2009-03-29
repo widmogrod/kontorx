@@ -1,28 +1,41 @@
 <?php
 /**
- * KontorX_Loader
- * 
- * @category 	KontorX
- * @package 	KontorX_Loader
- * @version 	0.1.0
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
+ * @author gabriel
+ * @todo Przekazanie w 'getInstance' konfiguracji i nazw obiektów, które
+ * będą wczytywane z czasem ich uzycia.
+ * Instancje tych obiektów będą trzymane .. ale będzie tez możliwość utworzenia nowego,
+ * dzięki czemu wszystkie klasy, będą a'la leazy load...
  */
-class KontorX_Loader extends Zend_Loader {
-	public static function autoload($class) {
-		try {
-			if ('ezcBase' == $class && !class_exists('ezcBase', false)) {
-				require_once 'ezcomponents/Base/src/base.php';
-			} else
-			if ('ezc' == substr($class, 0, 3)){
-				ezcBase::autoload($class);
-			} else {
-				self::loadClass($class);
-			}
-            return $class;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+class KontorX_Loader {
+	/**
+	 * @var KontorX_Loader
+	 */
+	private static $_instance = null;
+	
+	/**
+	 * @param Zend_Config $config
+	 * @return KontorX_Loader
+	 */
+	public static function getInstance(Zend_Config $config) {
+		if (null === self::$_instance) {
+			self::$_instance = new self($config);
+		}
+		return self::$_instance;
+	}
+	
+	/**
+	 * @param Zend_Config $config
+	 * @return void
+	 */
+	private function __construct(Zend_Config $config) {
+		array(
+			'KontorX_Semantic' => array(
+				'class' => 'KontorX_Semantic',
+				// niebędzie trzeba ich definiować
+				'params' => array()
+			)
+		);
+	}
+
+	public function get($name);
 }
-?>
