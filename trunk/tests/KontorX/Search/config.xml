@@ -13,7 +13,7 @@
 										<option>dzień</option>
 									</options>
 								</keyword>
-								<week interpreter="ArrayKeyExsists">
+								<week interpreter="ArrayKeyExsists" name="week">
 									<options>
 										<poniedziałek>1</poniedziałek>
 										<wtorek>2</wtorek>
@@ -27,7 +27,7 @@
 							</interpreters>
 						</options>
 					</interprateWeek>
-					<week interpreter="ArrayKeyExsists">
+					<week interpreter="ArrayKeyExsists" name="week">
 						<options>
 							<poniedziałek>1</poniedziałek>
 							<wtorek>2</wtorek>
@@ -54,7 +54,7 @@
 						<options>al.</options>
 						<options>aleja</options>
 					</keyword>
-					<street interpreter="ContextToSeparator" />
+					<street interpreter="ContextToSeparator" name="street" />
 				</interpreters>
 			</options>
 		</street>
@@ -67,7 +67,7 @@
 						<options>oferta</options>
 						<options>serwis</options>
 					</keyword>
-					<service interpreter="ContextToSeparator" />
+					<service interpreter="ContextToSeparator" name="service" />
 				</interpreters>
 			</options>
 		</service>
@@ -80,7 +80,7 @@
 						<options>dzielnica</options>
 						<options>obszar</options>
 					</keyword>
-					<district interpreter="ArrayKeyValueExsists">
+					<district interpreter="ArrayKeyValueExsists" name="district">
 						<options>
 							<key>Stare Miasto</key>
 							<value>stare-miasto</value>

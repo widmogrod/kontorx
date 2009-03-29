@@ -13,5 +13,5 @@ interface KontorX_Search_Semantic_Logic_Interface extends KontorX_Search_Semanti
 	 * @param string $name
 	 * @return void
 	 */
-	public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name);
+	public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name = null);
 }

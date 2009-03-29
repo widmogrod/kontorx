@@ -252,10 +252,11 @@ class KontorX_Search_SemanticTest extends UnitTestCase {
     
     public function testConfig() {
     	$correct = array(
-	    	'week' => array('week' => '7'),
-	        'street' => array('keyword' => 'ulica','street' => 'Opolska 13'),
-	        'district' => array('keyword' => 'dzielnica','district' => 'krowodrza-lobzow'),
-    		'districtLike' => array()
+    		'0' => 'ulica',
+    		'week' => '7',
+    		'street' => 'Opolska 13',
+    		'1' => 'dzielnica',
+			'district' => 'krowodrza-lobzow'
     	);
 
 		$context = "ulica Opolska 13, godzina 22, dzien niedziela, dzielnica krowodrza";
