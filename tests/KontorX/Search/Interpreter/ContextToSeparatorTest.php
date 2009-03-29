@@ -67,6 +67,20 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparatorTest extends UnitTes
 		$message = sprintf('Znaleziona tresc "%s" w tekscie "%s" jest inna od oczekiwanej "%s"', $data, $context, $correct);
 		$this->assertEqual($data, $correct, $message);
     }
+    
+	public function testContextToSeparator4() {
+		$day = 'poniedziałek i wtorek no ba!';
+		$correct = 'poniedziałek';
+		$context = "$day";
+		$contextInstance = new KontorX_Search_Semantic_Context($context);
+
+		$this->_interpreter->setSeparatorRequired(false);
+		$this->_interpreter->interpret($contextInstance);
+		$data = $contextInstance->getOutput();
+		
+		$message = sprintf('Znaleziona tresc "%s" w tekscie "%s" jest inna od oczekiwanej "%s"', $data, $context, $correct);
+		$this->assertEqual($data, $correct, $message);
+    }
 }
 
 $r = new KontorX_Search_Semantic_Interpreter_ContextToSeparatorTest();

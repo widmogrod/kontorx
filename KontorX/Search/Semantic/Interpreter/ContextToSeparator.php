@@ -14,6 +14,8 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 	 */
 	private $_separator = ',';
 	
+	private $_separatorRequired = true;
+	
 	/**
 	 * @param string $separator
 	 * @return void
@@ -21,6 +23,10 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 	public function __construct($separator = null) {
 		if (is_string($separator)) {
 			$this->_separator = $separator; 
+		} elseif (is_array($separator)) {
+			if (isset($separator['separatorRequired'])) {
+				$this->setSeparatorRequired($separator['separatorRequired']);
+			}
 		}
 	}
 
@@ -62,17 +68,35 @@ class KontorX_Search_Semantic_Interpreter_ContextToSeparator extends KontorX_Sea
 			$cloneContext->next();
 		}
 		
-//		// nie znaleziono separatora
-//		if ($context->valid()) {
-//			// pierwsze słowo
-//			$context->setOutput($context->current());
-//			// usuń je
-//			$context->remove();
-//			// przesuń kursor
-//			$context->next();
-//			return true;
-//		}
+		// nie znaleziono separatora
+		if (!$this->_separatorRequired) {
+			if ($context->valid()) {
+				// pierwsze słowo
+				$context->setOutput($context->current());
+				// usuń je
+				$context->remove();
+				// przesuń kursor
+				$context->next();
+				return true;
+			}
+		}
 
 		return false;
+	}
+	
+	/**
+	 * @param string $separator
+	 * @return void
+	 */
+	public function setSeparator($separator) {
+		$this->_separator = (string) $separator;
+	}
+	
+	/**
+	 * @param string $separatorRequired
+	 * @return void
+	 */
+	public function setSeparatorRequired($flag = true) {
+		$this->_separatorRequired = (bool) $flag;
 	}
 }
