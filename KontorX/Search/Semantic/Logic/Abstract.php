@@ -69,6 +69,7 @@ abstract class KontorX_Search_Semantic_Logic_Abstract implements KontorX_Search_
      */
     public function addInterpreters(array $interpreters) {
     	foreach ($interpreters as $name => $options) {
+    		$name = null;
     		// Typ domyślny: interpreter
     		$type = KontorX_Search_Semantic::INTERPRETER;
 
@@ -114,8 +115,12 @@ abstract class KontorX_Search_Semantic_Logic_Abstract implements KontorX_Search_
      * @param string $name
      * @return KontorX_Search_Semantic
      */
-    public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name) {
-    	$this->_interpreter[(string)$name] = $interpreter;
+    public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name = null) {
+    	if (null === $name) {
+    		$this->_interpreter[] = $interpreter;
+    	} else {
+    		$this->_interpreter[(string)$name] = $interpreter;
+    	}
     	return $this;
     }
 

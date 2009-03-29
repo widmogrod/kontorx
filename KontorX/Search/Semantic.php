@@ -62,7 +62,8 @@ class KontorX_Search_Semantic {
      * @return void
      */
     public function addInterpreters(array $interpreters) {
-    	foreach ($interpreters as $name => $options) {
+    	foreach ($interpreters as $options) {
+    		$name = null;
     		// Typ domyślny: interpreter
     		$type = self::INTERPRETER;
 
@@ -108,8 +109,12 @@ class KontorX_Search_Semantic {
      * @param string $name
      * @return KontorX_Search_Semantic
      */
-    public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name) {
-    	$this->_interpreter[(string)$name] = $interpreter;
+    public function addInterpreter(KontorX_Search_Semantic_Interpreter_Interface $interpreter, $name = null) {
+    	if (null === $name) {
+    		$this->_interpreter[] = $interpreter;
+    	} else {
+    		$this->_interpreter[(string)$name] = $interpreter;
+    	}
     	return $this;
     }
 

@@ -97,7 +97,22 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 		if (null === $data) {
 			array_push($this->_output, $name);
 		} else {
-			$this->_output[(string)$name] = $data;
+			if (is_numeric($name)) {
+				if (is_array($data)) {
+					/**
+					 * Niesprecyzowanie nazwy, łączenie danych.
+					 * Pomocne podczas wielozagnieżdzonych interpretatorów.
+					 * Umożliwie "leprze" tworzenie tablic wynikowych, bez
+					 * dodatkowych zagnieżdzeń.. no chyba że takie sobie zażyczymy
+					 * podając nazwę intepretatora.
+					 */
+					$this->_output = array_merge($this->_output, $data);
+				} else {
+					$this->_output[(string)$name] = $data;
+				}
+			} else {
+				$this->_output[(string)$name] = $data;
+			}
 		}
 	}
 	
@@ -154,10 +169,6 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	public function remove() {
 		if ($this->valid()) {
 			unset($this->_words[$this->_position]);
-			// Resetuję klucze
-//			$this->_words = (array) array_values($this->_words);
-			// Resetuję count
-//			--$this->_count;
 		}
 	}
 }
