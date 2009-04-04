@@ -82,4 +82,8 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
 
         return $result;
     }
+    
+	protected function _getCacheId() {
+        return self::CACHE_PREFIX . md5((string)$this->getSelect());
+    }
 }
