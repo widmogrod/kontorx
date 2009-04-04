@@ -101,4 +101,8 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 
         return $result;
     }
+    
+	protected function _getCacheId() {
+        return self::CACHE_PREFIX . md5((string)$this->getTable()->getSelect());
+    }
 }

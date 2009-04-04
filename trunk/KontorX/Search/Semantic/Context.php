@@ -42,7 +42,7 @@ class KontorX_Search_Semantic_Context implements KontorX_Search_Semantic_Context
 	public function getInput() {
 		return ($this->count() > 0)
 			? implode(self::WORD_SEPARATOR, $this->_words)
-			: array(); 
+			: null; 
 	}
 	
 	public function setInput($input) {
