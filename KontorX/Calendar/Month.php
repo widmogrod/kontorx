@@ -49,45 +49,26 @@ class KontorX_Calendar_Month {
 	}
 	
 	/**
-	 * @var array of @see KontorX_Calendar_Week
+	 * @var KontorX_Calendar_Weeks
 	 */
 	private $_weeks = null;
 	
 	/**
-	 * @param KontorX_Calendar_Week $week
-	 * @param integer $number
-	 * @return void
-	 */
-	public function setWeek(KontorX_Calendar_Week $week, $number) {
-		
-	}
-	
-	/**
-	 * @param integer $number
-	 * @return KontorX_Calendar_Week
-	 */
-	public function getWeek($number) {
-		
-	}
-	
-	/**
-	 * @return array od @see KontorX_Calendar_Week
+	 * @return KontorX_Calendar_Weeks
 	 */
 	public function getWeeks() {
 		if (null === $this->_weeks) {
-			if (!class_exists('KontorX_Calendar_Week', false)) {
-				require_once 'KontorX/Calendar/Week.php';
+			if (!class_exists('KontorX_Calendar_Weeks', false)) {
+				require_once 'KontorX/Calendar/Weeks.php';
 			}
-
-			$this->_weeks = array();
-
-			$weeks = $this->getWeeksCount();
-			for($i=1; $i <= $weeks; ++$i) {
-				$this->_weeks[$i] = new KontorX_Calendar_Week($this->_timestamp);
-			}
+			
+			$this->_weeks = new KontorX_Calendar_Weeks(array(
+				'timestamp' => $this->_timestamp, 
+				'monthLimit' => true));
 		}
+		return $this->_weeks;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -99,6 +80,10 @@ class KontorX_Calendar_Month {
 
 		require_once 'KontorX/Calendar/Exception.php';
 		throw new KontorX_Calendar_Exception(sprintf('Unknown month "%s"', $number));
+	}
+	
+	public function __toString() {
+		return $this->getMonthName();
 	}
 
 	/**

@@ -51,6 +51,12 @@ class KontorX_Calendar_WeeksTest extends UnitTestCase {
     	$number = $this->_weeks->key();
     	$this->assertEqual($number, 1, "Numer tygodnia nie jest prawidłowy");
     }
+
+    public function testMonthLimit() {
+    	$this->_weeks->setMonthLimit(true);
+    	$this->assertEqual($this->_weeks->getMinWeek(), 14, "Ograniczenie tygodnia do miesiąca jest nieprawidłowe - min");
+    	$this->assertEqual($this->_weeks->getMaxWeek(), 18, "Ograniczenie tygodnia do miesiąca jest nieprawidłowe - max");
+    }
 }
 
 $r = new KontorX_Calendar_WeeksTest();
