@@ -26,6 +26,7 @@ class KontorX_Calendar_WeeksTest extends UnitTestCase {
 	}
 	
 	public function testKey_WeekNumber() {
+		var_dump($this->_weeks->key());
 		$this->assertEqual($this->_weeks->key(), 15, "Numer tygodnia jest nieprawidłowy");
     }
     

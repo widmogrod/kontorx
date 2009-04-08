@@ -112,11 +112,10 @@ class KontorX_Calendar_Week implements Iterator {
 				require_once 'KontorX/Calendar/Day.php';
 			}
 
-			$move = ($this->_startDay - $this->_pointer);
-			// określa w którą stronę przesunąć czas
-			$strtime = ($move < 0) ? '+%d day' : '-%d day';
+			$move = ($this->_pointer-$this->_startDay);
 			// przesuń znacznik czasu 'n' dzień
-			$timestamp = strtotime(sprintf($strtime, abs($move)), $this->getTimestamp());
+			$timestamp = strtotime(sprintf('%d day', $move),$this->getTimestamp());
+//			$timestamp = $this->getTimestamp()-(60*60*24*$move);
 			// tworzenie obiektu tygodnia
 			$this->_days[$this->_pointer] = new KontorX_Calendar_Day($timestamp);
 		}
