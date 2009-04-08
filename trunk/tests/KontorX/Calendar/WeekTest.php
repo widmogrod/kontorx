@@ -58,7 +58,6 @@ class KontorX_Calendar_WeekTest extends UnitTestCase {
     	$this->_week->rewind();
     	// wyjście poza zasieng tygodnia
     	$this->_week->preview();
-
     	$day = $this->_week->current();
     	$this->assertFalse($this->_week->hasDay($day), "Dzień NIE powinien należeć do tygodnia");
     }

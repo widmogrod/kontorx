@@ -67,10 +67,7 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 	 * @return string
 	 */
 	public function render2() {
-		$day = 0;
-		$days = $this->_month->getDays();
-		$weeks = $this->_month->getWeeks();
-		$startDay = $this->_month->getMonthStartFromDay();
+		
 
 		$result = array('<table>');
 		$result[] = '<caption>';
@@ -80,7 +77,8 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 //		$result[] = '<tr>';
 //		$this->_month->getDayOrder();
 //		$result[] = '</tr>';
-		
+
+		$weeks = $this->_month->getWeeks();
 		$weeks->rewind();
 		while ($weeks->valid()) {
 			$week = $weeks->current();

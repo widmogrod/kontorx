@@ -60,14 +60,8 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 	 * @return void
 	 */
 	public function setTimestamp($timestamp) {
-		/**
-		 * Liczenie tygodni zaczynamy od pierwszego dnia tygodnia tj. poniedziałku.
-		 * Omija to błąd w przesunięciu '(+|-) week' w @method current()
-		 */
-		$dayOffset = date('N',mktime(0,0,0,date('n', $this->_timestamp),1, date('Y', $this->_timestamp)))-1;
-		$timestamp = strtotime(sprintf('-%d day', $dayOffset), $timestamp);
-
-		$this->_timestamp = $timestamp;
+		$this->_timestamp = (int) $timestamp;
+//		$this->_timestamp = ($timestamp - (60*60*24*(date('N',$timestamp)-1)));
 		$this->_pointer = $this->_startWeek = (int) date('W', $timestamp);
 	}
 	
@@ -89,7 +83,7 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 	public function setMonthLimit($flag = true) {
 		if (true === $flag) {
 			// numer pierwszego tygodnia miesiąca
-			$this->setMinWeek(date('W', mktime(0,0,0,date('n',$this->getTimestamp())    ,1,date('Y', $this->getTimestamp()))));
+			$this->setMinWeek(date('W', mktime(0,0,0, date('n',$this->getTimestamp())   ,1,date('Y', $this->getTimestamp()))));
 			// numer ostatniego tygodnia miesiąca
 			$this->setMaxWeek(date('W', mktime(0,0,0,(date('n',$this->getTimestamp())+1),0,date('Y', $this->getTimestamp()))));
 		} else {
@@ -178,15 +172,11 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 	}
 	
 	public function preview() {
-		// pomijamy 0
 		--$this->_pointer;
-//		$this->_pointer = (--$this->_pointer == 0) ? -1 : $this->_pointer;
 	}
 
 	public function next() {
-		// pomijamy 0
 		++$this->_pointer;
-//		$this->_pointer = ($this->_pointer++ == 0) ? 1 : $this->_pointer;
 	}
 
 	public function valid() {
@@ -206,16 +196,17 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 			if (!class_exists('KontorX_Calendar_Week', false)) {
 				require_once 'KontorX/Calendar/Week.php';
 			}
-			// przesuń znacznik czasu 'n' tydzień
-			$move = ($this->_startWeek - $this->_pointer);
-			// określa w którą stronę przesunąć czas
-			$strtime = ($move < 0) ? '+%d week' : '-%d week';
-			
-			var_dump(sprintf($strtime, abs($move)));
-			
-			
-			// przesuń znacznik czasu 'n' dzień
-			$timestamp = strtotime(sprintf($strtime, abs($move)), $this->getTimestamp());
+
+			// przesuń znacznik czasu 'n' tydzień			
+			if ($this->_pointer == 1) {
+				// masara! taki hack.. i nie wiem czy zawsze będzie działał
+				$move = -$this->_startWeek;
+				$timestamp = $this->getTimestamp() - (60*60*24*7*$move);
+				$timestamp -= 60*60*24*date('N', $timestamp);
+			} else {
+				$move = ($this->_pointer - $this->_startWeek);
+				$timestamp = strtotime(sprintf('%d week', $move),$this->getTimestamp());
+			}
 			// tworzenie obiektu tygodnia
 			$this->_weeks[$this->_pointer] = new KontorX_Calendar_Week($timestamp);
 		}
