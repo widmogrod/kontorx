@@ -51,6 +51,51 @@ class KontorX_Calendar_WeeksTest extends UnitTestCase {
     	$number = $this->_weeks->key();
     	$this->assertEqual($number, 1, "Numer tygodnia nie jest prawidłowy");
     }
+    
+	public function testHasWeekTrue() {
+    	$this->_weeks->rewind();
+    	$week = $this->_weeks->current();
+    	$this->assertTrue($this->_weeks->hasWeek($week), "Miesiąc powinien należeć do roku");
+    }
+    
+	public function testHasWeekFalse() {
+    	$this->_weeks->rewind();
+    	// wyjście poza zasieng tygodnia
+    	$this->_weeks->preview();
+    	$week = $this->_weeks->current();
+    	$this->assertFalse($this->_weeks->hasWeek($week), "Miesiąc NIE powinien należeć do roku");
+    }
+    
+    public function testValidRange1() {
+    	$this->_weeks->rewind();
+    	// wyjście poza zasieng tygodnia
+    	$this->_weeks->preview();
+    	$this->assertFalse($this->_weeks->valid(), "Zasięgu tygodnii nie można przekroczyć");
+    }
+    
+	public function testValidRange2() {
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	$this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next(); $this->_weeks->next();
+    	
+    	// wyjście poza zasieng tygodnia
+    	$this->assertFalse($this->_weeks->valid(), "Zasięgu tygodnii nie można przekroczyć");
+    }
+    
+	public function testValidRange3() {
+    	$this->_weeks->rewind();
+    	$this->assertTrue($this->_weeks->valid(), "Zasięg tygodnii nie powienien zostać przekroczony");
+    }
 
     public function testMonthLimit() {
     	$this->_weeks->setMonthLimit(true);

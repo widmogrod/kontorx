@@ -47,6 +47,50 @@ class KontorX_Calendar_WeekTest extends UnitTestCase {
     	$number = $this->_week->key();
     	$this->assertEqual($number, 1, "Numer dnia nie jest prawidłowy");
     }
+    
+	public function testHasDayTrue() {
+    	$this->_week->rewind();
+    	$day = $this->_week->current();
+    	$this->assertTrue($this->_week->hasDay($day), "Dzień powinien należeć do tygodnia");
+    }
+    
+	public function testHasDayFalse() {
+    	$this->_week->rewind();
+    	// wyjście poza zasieng tygodnia
+    	$this->_week->preview();
+
+    	$day = $this->_week->current();
+    	$this->assertFalse($this->_week->hasDay($day), "Dzień NIE powinien należeć do tygodnia");
+    }
+    
+    public function testValidRange1() {
+    	$this->_week->rewind();
+    	// wyjście poza zasieng tygodnia
+    	$this->_week->preview();
+    	$this->assertFalse($this->_week->valid(), "Zasięg tygodnia nie można przekroczyć");
+    }
+    
+	public function testValidRange2() {
+    	$this->_week->rewind();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	$this->_week->next();
+    	// wyjście poza zasieng tygodnia
+    	$this->assertFalse($this->_week->valid(), "Zasięg tygodnia nie można przekroczyć");
+    }
+    
+	public function testValidRange3() {
+    	$this->_week->rewind();
+    	// wyjście poza zasieng tygodnia
+    	$this->assertTrue($this->_week->valid(), "Zasięg tygodnia nie powinien zostać przekroczony");
+    }
 }
 
 $r = new KontorX_Calendar_WeekTest();

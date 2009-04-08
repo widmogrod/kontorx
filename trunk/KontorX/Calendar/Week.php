@@ -73,6 +73,14 @@ class KontorX_Calendar_Week implements Iterator {
 		}
 		return $this->_timestamp;
 	}
+	
+	/**
+	 * @param KontorX_Calendar_Day $day
+	 * @return bool
+	 */
+	public function hasDay(KontorX_Calendar_Day $day) {
+		return (date('N', $this->getTimestamp()) === date('N', $day->getTimestamp()));
+	}
 
 	public function key() {
 		return $this->_pointer;
@@ -95,6 +103,9 @@ class KontorX_Calendar_Week implements Iterator {
 		$this->_pointer = 1;
 	}
 	
+	/**
+	 * @return KontorX_Calendar_Day
+	 */
 	public function current() {
 		if (!isset($this->_days[$this->_pointer])) {
 			if (!class_exists('KontorX_Calendar_Day', false)) {

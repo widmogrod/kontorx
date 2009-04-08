@@ -41,13 +41,54 @@ class KontorX_Calendar_Month {
 	private $_timestamp = null;
 
 	public function __construct($options = null) {
+		if (is_array($options)) {
+			$this->setOptions($options);
+		} else
+		if ($options instanceof Zend_Config) {
+			$this->setOptions($options->toArray());
+		} else
 		if (is_integer($options)) {
-			$this->_timestamp = $options;
-		} else {
-			$this->_timestamp = time();
+			$this->setTimestamp($options);
 		}
 	}
 	
+	/**
+     * @param array $options
+     * @return void
+     */
+    public function setOptions(array $options) {
+    	// bo timestamp musi być ustawiany zawsze jako pierwszy
+    	if (isset($options['timestamp'])) {
+    		$this->setTimestamp($options['timestamp']);
+    		unset($options['timestamp']);
+    	}
+
+        foreach ($options as $name => $value) {
+            $method = 'set'.ucfirst($name);
+            if (method_exists($this, $method)) {
+                 call_user_func_array(array($this, $method), (array) $value);
+            }
+        }
+    }
+	
+	/**
+	 * @param integer $timestamp
+	 * @return void
+	 */
+	public function setTimestamp($timestamp) {
+		$this->_timestamp = $timestamp;
+	}
+	
+	/**
+	 * @return integer
+	 */
+	public function getTimestamp() {
+		if (null === $this->_timestamp) {
+			$this->_timestamp = time();
+		}
+		return $this->_timestamp;
+	}
+
 	/**
 	 * @var KontorX_Calendar_Weeks
 	 */
@@ -92,6 +133,14 @@ class KontorX_Calendar_Month {
 	 */
 	public function getDay() {
 		return date('j', $this->_timestamp);
+	}
+	
+	/**
+	 * @param KontorX_Calendar_Day $day
+	 * @return bool
+	 */
+	public function hasDay(KontorX_Calendar_Day $day) {
+		return (date('n', $this->getTimestamp()) === date('n', $day->getTimestamp()));
 	}
 	
 	/**

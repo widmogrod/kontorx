@@ -77,6 +77,10 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 		$result[] = ucfirst($this->_month->getMonthName());
 		$result[] = '</caption>';
 
+//		$result[] = '<tr>';
+//		$this->_month->getDayOrder();
+//		$result[] = '</tr>';
+		
 		$weeks->rewind();
 		while ($weeks->valid()) {
 			$week = $weeks->current();
@@ -85,8 +89,12 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 			$week->rewind();
 			while ($week->valid()) {
 				$day = $week->current();
-
-				$result[] = '<td>';
+				$class = $day->getDayName();
+				$class .= ($this->_month->hasDay($day))
+					? ' '
+					: ' day-out-of-month';
+				
+				$result[] = sprintf('<td class="%s">', $class);
 				$result[] = (string) $day;
 				$result[] = '</td>';
 
