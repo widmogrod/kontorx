@@ -267,13 +267,23 @@ class KontorX_Form_DbTable extends Zend_Form {
         // TODO Dodać możliwośc pobierania nazwy z opisu pola w DB (?)
         $elementName = $options['COLUMN_NAME'];
         $elementOptions = array(
-                        'label' => $elementName
+			'label' => $elementName
         );
 
-        $dataType = strtoupper($options['DATA_TYPE']);
-        switch ($dataType) {
+        $dataType = $options['DATA_TYPE'];
+        
+        // Rozpoznawanie typu ENUM
+        if (false !== stristr($dataType,'enum')) {
+        	$options['enum_options'] = explode(',', str_replace(array('enum','(',')',"'"), null, $dataType));
+        	// tylko po to by pierwszy rekord był pusty
+        	$options['enum_options'] = array_merge(array(null), $options['enum_options']);
+        	// ustawienie typu
+        	$dataType = 'ENUM';
+        }
+        
+        switch (strtoupper($dataType)) {
             case 'TIMESTAMP':
-                case 'DATETIME':
+            case 'DATETIME':
                     $element = 'text';
                     // dodanie atrybutu class
                     if (isset($elementOptions['class'])) {
@@ -310,6 +320,10 @@ class KontorX_Form_DbTable extends Zend_Form {
             case 'MEDIUMTEXT':
                     $element = 'textarea';
                     break;
+            case 'ENUM':
+            		$element = 'select';
+            		$elementOptions['multiOptions'] = (array) $options['enum_options'];
+            	break;
             default:
                 if ($loop) {
                     $element = 'text';
