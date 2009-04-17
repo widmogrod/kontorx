@@ -345,12 +345,14 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             $meta = array();
             $headMeta = $view->headMeta();
             foreach ($headMeta->getContainer() as $key) {
-                if ($key->name == 'keywords') {
-                    $meta['keywords'] = true;
-                } else
-                if ($key->name == 'description') {
-                    $meta['description'] = true;
-                }
+            	if (isset($key->name)) {
+            		if ($key->name == 'keywords') {
+	                    $meta['keywords'] = true;
+	                } else
+	                if ($key->name == 'description') {
+	                    $meta['description'] = true;
+	                }
+            	}
             }
 
             if (!isset($meta['keywords'])) {

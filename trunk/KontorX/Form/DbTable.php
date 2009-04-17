@@ -1,5 +1,5 @@
 <?php
-require_once 'Zend/Form.php';
+require_once 'Zend/Dojo/Form.php';
 
 /**
  * KontorX_Form_DbTable
@@ -9,7 +9,7 @@ require_once 'Zend/Form.php';
  * @license		GNU GPL
  * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
-class KontorX_Form_DbTable extends Zend_Form {
+class KontorX_Form_DbTable extends Zend_Dojo_Form {
 
     /**
      * Tablica kolumn, które ignorujemy podczas tworzenia elementów @see Zend_Form_Element
@@ -19,6 +19,11 @@ class KontorX_Form_DbTable extends Zend_Form {
     protected $_ignoreColumns = array();
 
     /**
+     * @var Zend_Db_Table_Abstract
+     */
+    protected $_table;
+    
+    /**
      * Konstruktor
      *
      * @param Zend_Db_Table_Abstract $table
@@ -26,6 +31,8 @@ class KontorX_Form_DbTable extends Zend_Form {
      * @param array $ignoreColumns
      */
     public function __construct(Zend_Db_Table_Abstract $table, $options = null, array $ignoreColumns = array()) {
+    	$this->_table = $table;
+    	
         $this->_setIgnoreColumns($ignoreColumns);
 
         if ($options instanceof Zend_Config) {
@@ -56,6 +63,10 @@ class KontorX_Form_DbTable extends Zend_Form {
         }
 
         $this->_setupFormFromTable($table, $options);
+        
+        if ($this->_hasSubFormsGrouping()) {
+        	$this->_createSubFormsGrouping();
+        }
 
         $this->postInit();
     }
@@ -341,5 +352,65 @@ class KontorX_Form_DbTable extends Zend_Form {
         }
 
         return array($element, $elementName, $elementOptions);
+    }
+    
+    /**
+     * @var array
+     */
+    protected $_subFormsGrouping = array();
+
+	/**
+     * @param  array $fieldsetGroup 
+     * @return Zend_Form
+     */
+    public function setSubFormsGrouping(array $SubFormsGrouping) {
+    	$this->_subFormsGrouping = $SubFormsGrouping;
+    }
+
+    /**
+     * @return void
+     */
+    protected function _createSubFormsGrouping() {
+    	foreach ($this->_subFormsGrouping as $key => $options) {
+    		$name = null;
+    		if (isset($options['name'])) {
+    			$name = $options['name'];
+    			unset($options['name']);
+    		} else
+    		if (!is_numeric($key)) {
+    			$name = $key;
+    		}
+    		
+    		$elements = array();
+    		if (isset($options['elements'])) {
+    			$elements = (array) $options['elements'];
+    			unset($options['elements']);
+    		}
+
+    		$subForm = new KontorX_Form_DbTable_SubForm($options);
+    		
+//    		$this->removeDecorator('HtmlTag');
+//    		$subForm->removeDecorator('DtDdWrapper');
+    		
+    		$subForm->setPluginLoader($this->getPluginLoader(self::DECORATOR), self::DECORATOR);
+    		$subForm->setPluginLoader($this->getPluginLoader(self::ELEMENT), self::ELEMENT);
+
+    		foreach ($elements as $elementName) {
+    			if (null === ($element = $this->getElement($elementName))) {
+    				continue;
+    			}
+    			$subForm->addElement($element, $elementName);
+    			$this->removeElement($elementName);
+    		}
+
+    		$this->addSubForm($subForm, $name);
+    	}
+    }
+    
+    /**
+     * @return bool
+     */
+    public function _hasSubFormsGrouping() {
+    	return !empty($this->_subFormsGrouping);
     }
 }
