@@ -132,4 +132,3 @@ class KontorX_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 		return $result;
 	}
 }
-?>

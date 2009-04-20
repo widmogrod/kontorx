@@ -339,16 +339,18 @@ class KontorX_DataGrid {
 
         // create filter
         if (isset($options['filter'])) {
-            $filter = $this->_createFilter($columnName, (array) $options['filter']);
+        	// TODO Teraz nie muszę przekazywać 'columnName'
+            $filter = $this->_createFilter((array) $options['filter']);
             $columnInstance->addFilter($filter);
         }
         // create row
         if (isset($options['row'])) {
-            $row = $this->_createRow($columnName, (array) $options['row']);
+        	// TODO Teraz nie muszę przekazywać 'columnName'
+            $row = $this->_createRow((array) $options['row']);
             $columnInstance->setRow($row);
         }
 
-        $this->_columns[(string)$columnName] = $columnInstance;
+        $this->_columns[$columnInstance->getColumnName()] = $columnInstance;
     }
 
     /**
@@ -410,11 +412,10 @@ class KontorX_DataGrid {
 
     /**
      * Create filter object @see KontorX_DataGrid_Filter_Interface
-     * @param string $columnName
      * @param array $options
      * @return KontorX_DataGrid_Filter_Interface
      */
-    private function _createFilter($columnName, $options = null) {
+    private function _createFilter($options = null) {
         if (null === $options) {
             $options = array();
         } else
@@ -432,9 +433,6 @@ class KontorX_DataGrid {
         if (isset($options['type'])) {
             $type = $options['type'];
         }
-        if (!isset($options['columnName'])) {
-            $options['columnName'] = $columnName;
-        }
 
         if (!isset($type)) {
             $type = self::DEFAULT_FILTER_TYPE;
@@ -449,11 +447,10 @@ class KontorX_DataGrid {
 
     /**
      * Create row object @see KontorX_DataGrid_Row_Interface
-     * @param string $columnName
      * @param array $options
      * @return KontorX_DataGrid_Row_Interface
      */
-    private function _createRow($columnName, $options = null) {
+    private function _createRow($options = null) {
         if (null === $options) {
             $options = array();
         } else
@@ -471,9 +468,6 @@ class KontorX_DataGrid {
         if (isset($options['type'])) {
             $type = $options['type'];
             unset ($options['type']);
-        }
-        if (!isset($options['columnName'])) {
-            $options['columnName'] = $columnName;
         }
 
         if (!isset($type)) {

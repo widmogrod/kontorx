@@ -1,7 +1,27 @@
 <?php
 require_once 'KontorX/DataGrid/Row/ViewHelper.php';
-class KontorX_DataGrid_Row_Editable extends KontorX_DataGrid_Row_ViewHelper {
+abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_Row_ViewHelper {
 
+	const SEPARATOR = ':|:';
+	
+	/**
+	 * @var string
+	 */
+	protected $_helper = null;
+	
+	/**
+	 * @return string
+	 * @throws KontorX_DataGrid_Exception
+	 */
+	public function getHelperName() {
+		if (null === $this->_helper) {
+			require_once 'KontorX/DataGrid/Exception.php';
+			throw new KontorX_DataGrid_Exception('Helper name is not set');
+		}
+
+		return (string) $this->_helper;
+	}
+	
 	/**
 	 * @var string
 	 */
@@ -51,16 +71,15 @@ class KontorX_DataGrid_Row_Editable extends KontorX_DataGrid_Row_ViewHelper {
 	public function render() {
 		// Tworzenie prefisku, klucza głównego
 		$primaryVal = $this->getPrimaryKey();
-		$primaryKey = implode('][%s][',$primaryVal);
-		$primaryKey = '['.$primaryKey.'][%s]';
-		$primaryKey = vsprintf($primaryKey, array_intersect_key($this->getData(), array_flip($primaryVal)));
+		$primaryKey = implode(self::SEPARATOR, array_intersect_key($this->getData(), array_flip($primaryVal)));
 
 		$columnName = $this->getColumnName();
 		$prefix = $this->getPrefix();
 
-		$name = sprintf('%s%s[%s]', $prefix, $primaryKey, $columnName);
+		$name = sprintf('%s[%s][%s]', $prefix, $primaryKey, $columnName);
 		$value = $this->getData($columnName);
-		
-		return $this->getView()->formText($name, $value, $this->getAttribs());
+
+		$helper = $this->getHelperName();
+		return $this->getView()->$helper($name, $value, $this->getAttribs());
 	}
 }
