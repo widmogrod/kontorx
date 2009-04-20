@@ -134,6 +134,29 @@ class KontorX_DataGrid {
     }
 
     /**
+     * @param array $paths
+     * @return void
+     */
+    public function addPrefixPaths(array $paths) {
+    	foreach ($paths as $data) {
+    		if (isset($data['prefix']) && isset($data['path']) && isset($data['type'])) {
+    			$this->addPrefixPath($data['prefix'], $data['path'], $data['type']);
+    		}
+    	}
+    }
+    
+    /**
+     * @param string $prefix
+     * @param string $path
+     * @param string $type
+     * @return void
+     */
+    public function addPrefixPath($prefix, $path, $type) {
+    	$loader = $this->getPluginLoader($type);
+    	$loader->addPrefixPath($prefix, $path);
+    }
+
+    /**
      * @param Zend_Config $config
      * @return void
      */
@@ -146,12 +169,14 @@ class KontorX_DataGrid {
      * @return void
      */
     public function setOptions(array $options) {
-        $attribs = array();
+    	if (isset($options['prefixPaths'])) {
+    		$this->addPrefixPaths((array) $options['prefixPaths']);
+    	}
+
         foreach ($options as $name => $value) {
             $method = 'set'.ucfirst($name);
             if (method_exists($this, $method)) {
                 $this->$method($value);
-                // call_user_func_array(array($this, $method), (array) $value);
             }
         }
     }
