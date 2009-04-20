@@ -7,10 +7,6 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
      */
     public function __construct(array $options = null) {
         if (null != $options) {
-            if (isset($options['columnName'])) {
-                $this->setColumnName($options['columnName']);
-                unset($options['columnName']);
-            }
             $this->setOptions($options);
         }
     }
@@ -54,19 +50,23 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
      * @return void
      */
     public function setOptions(array $options) {
-        $attribs = array();
+    	if (isset($options['columnName'])) {
+			$this->setColumnName($options['columnName']);
+			unset($options['columnName']);
+		}
+
         foreach ($options as $name => $value) {
             $ucname = ucfirst($name);
             if (!in_array($ucname, $this->_protectedMethods)) {
                 $method = 'set'.ucfirst($ucname);
                 if (method_exists($this, $method)) {
                     $this->$method($value);
-                } else {
-                    $attribs[$name] = $value;
+                    unset($options[$name]);
                 }
             }
         }
-        $this->addAttribs($attribs);
+
+        $this->addAttribs($options);
     }
 
     /**

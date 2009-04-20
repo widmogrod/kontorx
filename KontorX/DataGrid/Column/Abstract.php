@@ -3,18 +3,18 @@ require_once 'KontorX/DataGrid/Column/Interface.php';
 abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Column_Interface {
 
     /**
+     * @param string $columnName;
      * @param array $options
      */
-    public function __construct(array $options = null) {
+    public function __construct($columnName, array $options = null) {
+    	if (is_null($columnName)) {
+    		require_once 'KontorX/DataGrid/Exception.php';
+    		throw new KontorX_DataGrid_Exception('Column name is required');
+    	}
+
+    	$this->setColumnName($columnName);
+
         if (null != $options) {
-            if (isset($options['name'])) {
-                $this->setName($options['name']);
-                unset ($options['name']);
-            }
-            if (isset($options['columnName'])) {
-                $this->setColumnName($options['columnName']);
-                unset ($options['columnName']);
-            }
             $this->setOptions($options);
         }
         $this->_init();
@@ -36,6 +36,7 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @param KontorX_DataGrid_Filter_Interface $filter
      */
     public function addFilter(KontorX_DataGrid_Filter_Interface $filter) {
+    	$filter->setColumnName($this->getColumnName());
         $this->_filters[] = $filter;
     }
 
@@ -57,6 +58,7 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @param KontorX_DataGrid_Row_Interface $filter
      */
     public function setRow(KontorX_DataGrid_Row_Interface $row) {
+    	$row->setColumnName($this->getColumnName());
         $this->_row = $row;
     }
 
@@ -186,19 +188,27 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @return void
      */
     public function setOptions(array $options) {
-        $attribs = array();
+    	if (isset($options['name'])) {
+			$this->setName($options['name']);
+			unset ($options['name']);
+		}
+		if (isset($options['columnName'])) {
+			$this->setColumnName($options['columnName']);
+			unset ($options['columnName']);
+		}
+
         foreach ($options as $name => $value) {
             $ucname = ucfirst($name);
             if (!in_array($ucname, $this->_protectedMethods)) {
                 $method = 'set'.$ucname;
                 if (method_exists($this, $method)) {
                     $this->$method($value);
-                } else {
-                    $attribs[$name] = $value;
+                    unset($options[$name]);
                 }
             }
         }
-        $this->addAttribs($attribs);
+
+        $this->addAttribs($options);
     }
 
     /**

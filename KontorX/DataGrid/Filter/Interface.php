@@ -17,6 +17,12 @@ interface KontorX_DataGrid_Filter_Interface {
      * @return string
      */
     public function getClassName();
+    
+    /**
+     * Set column displayed name
+     * @return void
+     */
+    public function setColumnName($name);
 
     /**
      * Set attribs if need to rendered
