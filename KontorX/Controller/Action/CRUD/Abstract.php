@@ -66,9 +66,13 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         }
 
         if (null === $this->_model) {
-            // akcja dodaje katalog z modelem do autoloadu
-            // zatem moge sobie na coś takiego pozwolić ;]
-            require_once $this->_modelClass . '.php';
+        	if (!class_exists($this->_modelClass)) {
+        		/**
+        		 * akcja dodaje katalog z modelem do autoloadu
+        		 * zatem moge sobie na coś takiego pozwolić ;]
+        		 */ 
+            	require_once $this->_modelClass . '.php';
+        	}
             $this->_model = new $this->_modelClass;
         }
         return $this->_model;

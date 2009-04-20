@@ -7,7 +7,7 @@ abstract class KontorX_DataGrid_Row_ViewHelper extends KontorX_DataGrid_Row_Abst
 	/**
 	 * @var Zend_View
 	 */
-	protected $_view;
+	protected static $_view;
 	
 	/**
 	 * @param Zend_View $view
@@ -21,16 +21,16 @@ abstract class KontorX_DataGrid_Row_ViewHelper extends KontorX_DataGrid_Row_Abst
 	 * @return Zend_View
 	 */
 	public function getView() {
-		if (null === $this->_view) {
+		if (null === self::$_view) {
 			if (Zend_Registry::isRegistered('Zend_View')) {
-				$this->_view = Zend_Registry::get('Zend_View');
+				self::$_view = Zend_Registry::get('Zend_View');
 			} elseif(Zend_Registry::isRegistered('view')) {
-				$this->_view = Zend_Registry::get('view');
+				self::$_view = Zend_Registry::get('view');
 			} else {
 				require_once 'Zend/View.php';
-				$this->_view = new Zend_View();				
+				self::$_view = new Zend_View();				
 			}
 		}
-		return $this->_view;
+		return self::$_view;
 	}
 }
