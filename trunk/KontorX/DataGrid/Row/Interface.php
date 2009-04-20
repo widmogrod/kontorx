@@ -12,6 +12,12 @@ interface KontorX_DataGrid_Row_Interface {
      * @return string
      */
     public function getClassName();
+    
+    /**
+     * Set column displayed name
+     * @return void
+     */
+    public function setColumnName($name);
 
     /**
      * Set data

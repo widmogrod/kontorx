@@ -40,8 +40,8 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
      * Return columns
      * @return array
      */
-    public function getColumns(array $columns = null) {
-        return empty($this->_columns) ? $columns : $this->_columns;
+    public function getColumns() {
+        return $this->_columns;
     }
 
     /**

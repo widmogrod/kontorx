@@ -7,6 +7,19 @@ interface KontorX_DataGrid_Column_Interface {
     public function render();
 
     /**
+     * Set column displayed name
+     * @param string $name
+     * @return void
+     */
+    public function setColumnName($name);
+    
+    /**
+     * Get column displayed name
+     * @return string
+     */
+    public function getColumnName();
+    
+    /**
      * Return class name without prefix
      * @return string
      */

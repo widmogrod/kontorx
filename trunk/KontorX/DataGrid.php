@@ -329,9 +329,13 @@ class KontorX_DataGrid {
             $type = self::DEFAULT_COLUMN_TYPE;
         }
 
-        // create column instance
-        $columnClass = $this->getPluginLoader(self::COLUMN)->load($type);
-        $columnInstance = new $columnClass($options);
+        if (!$columnName instanceof KontorX_DataGrid_Column_Interface) {
+        	// create column instance
+	        $columnClass = $this->getPluginLoader(self::COLUMN)->load($type);
+	        $columnInstance = new $columnClass($columnName, $options);
+        } else {
+        	$columnInstance = $columnName;
+        }
 
         // create filter
         if (isset($options['filter'])) {
@@ -344,7 +348,7 @@ class KontorX_DataGrid {
             $columnInstance->setRow($row);
         }
 
-        $this->_columns[$columnName] = $columnInstance;
+        $this->_columns[(string)$columnName] = $columnInstance;
     }
 
     /**
@@ -599,16 +603,22 @@ class KontorX_DataGrid {
     /**
      * Renderowanie
      * @param Zend_View_Interface $view
+     * @param string $partial
+     * @return string
      */
-    public function render(Zend_View_Interface $view = null) {
+    public function render(Zend_View_Interface $view = null, $partial = null) {
         if (null != $view) {
             $this->setView($view);
         }
 
         $view = $this->getView();
 
+        if(!$view->getHelperPath('KontorX_View_Helper_')) {
+        	$view->addHelperPath('KontorX/View/Helper', 'KontorX_View_Helper_');
+        }
+
         // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this);
+        return $view->dataGrid($this, $partial);
     }
 
     /**
