@@ -1,5 +1,11 @@
 <?php
 interface KontorX_DataGrid_Column_Interface {
+	
+	/**
+     * @param string $columnName;
+     */
+    public function __construct($columnName);
+
     /**
      * Render column view
      * @return string
