@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Abstract.php';
-abstract class KontorX_DataGrid_Row_ViewHelper extends KontorX_DataGrid_Row_Abstract {
+require_once 'KontorX/DataGrid/Column/Abstract.php';
+abstract class KontorX_DataGrid_Column_ViewHelper extends KontorX_DataGrid_Column_Abstract {
 
 	/**
 	 * @var Zend_View

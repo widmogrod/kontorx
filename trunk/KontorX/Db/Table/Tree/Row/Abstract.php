@@ -1,6 +1,6 @@
 <?php
 require_once 'Zend/Db/Table/Row/Abstract.php';
-
+require_once 'KontorX/Db/Table/Tree/Row/Interface.php';
 /**
  * KontorX_Db_Table_Tree_Row_Abstract
  *
@@ -9,7 +9,7 @@ require_once 'Zend/Db/Table/Row/Abstract.php';
  * @subpackage	Table
  * @version		0.3.1
  */
-abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abstract {
+abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abstract implements KontorX_Db_Table_Tree_Row_Interface {
 	/**
      * Nazwa kolumny poziomu zagnieżdżenia
      *
