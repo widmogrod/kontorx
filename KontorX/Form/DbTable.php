@@ -329,6 +329,7 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
                 break;
             case 'TEXT':
             case 'MEDIUMTEXT':
+            case 'LONGTEXT':
                     $element = 'textarea';
                     break;
             case 'ENUM':

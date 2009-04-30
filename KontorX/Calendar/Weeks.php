@@ -197,6 +197,12 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 				require_once 'KontorX/Calendar/Week.php';
 			}
 
+			/**
+			 * TODO Problem tkwi w tym ze przesunięcie pierwszego tygodnia o tydzień
+			 * zmiania rok.. nalerzy przesunąć o liczbę dni do 1g stycznia
+			 * Podobnie może być z ostatnim miesiącem..  
+			 */
+			
 			// przesuń znacznik czasu 'n' tydzień			
 			if ($this->_pointer == 1) {
 				// masara! taki hack.. i nie wiem czy zawsze będzie działał

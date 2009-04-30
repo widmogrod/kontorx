@@ -142,7 +142,7 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 
 	/**
 	 * @param string $status
-	 * @return KontorX_Controller_Action_Helper_Scaffold
+	 * @return void
 	 */
 	protected function _setStatus($status) {
 		$this->_status = $status;
@@ -166,6 +166,20 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 	 */
 	protected function _setResult($result) {
 		$this->_result = $result;
+	}
+	
+	/**
+	 * @var bool
+	 */
+	private $_suppressArrayNotation = false;
+	
+	/**
+	 * @param bool $flag
+	 * @return KontorX_Controller_Action_Helper_Scaffold
+	 */
+	public function setSuppressArrayNotation($flag = true) {
+		$this->_suppressArrayNotation = (bool) $flag;
+		return $this;
 	}
 
 	/**
@@ -203,7 +217,7 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 			return;
 		}
 		
-		$row->setFromArray($form->getValues());
+		$row->setFromArray($form->getValues($this->_suppressArrayNotation));
 
 		try {
 			$result = $row->save();
@@ -244,7 +258,7 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 			return;
 		}
 
-		$row->setFromArray($form->getValues());
+		$row->setFromArray($form->getValues($this->_suppressArrayNotation));
 		
 		try {
 			$result = $row->save();

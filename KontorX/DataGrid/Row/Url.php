@@ -1,5 +1,5 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Abstract.php';
+require_once 'KontorX/DataGrid/Row/ViewHelper.php';
 class KontorX_DataGrid_Row_Url extends KontorX_DataGrid_Row_ViewHelper {
 
 	/**
