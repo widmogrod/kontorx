@@ -61,8 +61,7 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 	 */
 	public function setTimestamp($timestamp) {
 		$this->_timestamp = (int) $timestamp;
-//		$this->_timestamp = ($timestamp - (60*60*24*(date('N',$timestamp)-1)));
-		$this->_pointer = $this->_startWeek = (int) date('W', $timestamp);
+		$this->_pointer = $this->_startWeek = ceil((date('z',$timestamp)+1) / 7)+1;
 	}
 	
 	/**
@@ -82,10 +81,14 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 	 */
 	public function setMonthLimit($flag = true) {
 		if (true === $flag) {
+			// FIX: Jest problem z wykryciem numeru tygodnia
+			$timestampMin = mktime(0,0,0, date('n',$this->getTimestamp())   ,1,date('Y', $this->getTimestamp()));
+			$timestampMax = mktime(0,0,0,(date('n',$this->getTimestamp())+1),0,date('Y', $this->getTimestamp()));
+
 			// numer pierwszego tygodnia miesiąca
-			$this->setMinWeek(date('W', mktime(0,0,0, date('n',$this->getTimestamp())   ,1,date('Y', $this->getTimestamp()))));
+			$this->setMinWeek(ceil((date('z',$timestampMin)+1) / 7)+1);
 			// numer ostatniego tygodnia miesiąca
-			$this->setMaxWeek(date('W', mktime(0,0,0,(date('n',$this->getTimestamp())+1),0,date('Y', $this->getTimestamp()))));
+			$this->setMaxWeek(ceil((date('z',$timestampMax)+1) / 7)+1);
 		} else {
 			// reset
 			$this->resetMaxWeek();
@@ -202,7 +205,7 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 			 * zmiania rok.. nalerzy przesunąć o liczbę dni do 1g stycznia
 			 * Podobnie może być z ostatnim miesiącem..  
 			 */
-			
+
 			// przesuń znacznik czasu 'n' tydzień			
 			if ($this->_pointer == 1) {
 				// masara! taki hack.. i nie wiem czy zawsze będzie działał
@@ -213,6 +216,7 @@ class KontorX_Calendar_Weeks implements Iterator, Countable {
 				$move = ($this->_pointer - $this->_startWeek);
 				$timestamp = strtotime(sprintf('%d week', $move),$this->getTimestamp());
 			}
+
 			// tworzenie obiektu tygodnia
 			$this->_weeks[$this->_pointer] = new KontorX_Calendar_Week($timestamp);
 		}
