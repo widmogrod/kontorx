@@ -9,7 +9,7 @@ require_once 'Zend/Db/Table/Rowset/Abstract.php';
  * @subpackage	Table
  * @version		0.1.4
  */
-class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstract {
+class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstract implements RecursiveIterator {
 	/**
      * Nazwa kolumny poziomu zagnieżdżenia
      *
@@ -89,5 +89,47 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		  			? -1 : 1 ;
 	    	}
   		}
+	}
+
+	private $_childrens = array();
+	
+	public function hasChildren () {
+		$result = false;
+
+		$current = $this->current();
+		$key = $current->{$this->_level} . $this->_separator . $current->id;
+		
+		if (isset($this->_childrens[$key])) {
+			return (count($this->_childrens[$key]) > 0);
+		} else {
+			$this->_childrens[$key] = array();
+		}
+		
+		foreach ($this->_data as $data) {
+			if ($data[$this->_level] == $key) {
+				$this->_childrens[$key][] = $data;
+				$result = true;
+			}
+		}
+
+		return $result;
+	}
+
+	public function getChildren () {
+		$current = $this->current();
+		$key = $current->{$this->_level} . $this->_separator . $current->id;
+
+		if (isset($this->_childrens[$key])) {
+			$data  = array(
+	            'table'    => $this->_table,
+	            'data'     => $this->_childrens[$key],
+	            'readOnly' => $this->_readOnly,
+	            'rowClass' => $this->_rowClass,
+	            'stored'   => true
+	        );
+	        return new self($data);
+		}
+		
+		return null;
 	}
 }

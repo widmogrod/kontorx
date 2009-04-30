@@ -439,4 +439,10 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends Zend_Db_Table_Row_Abst
 		$where = $db->quoteInto("$this->_level LIKE ?", $level . '%');
 		$db = $this->getTable()->delete($where);
 	}
+	
+	public function toArray() {
+		$data = $this->_data;
+		$data['depth'] = $this->getDepth();
+        return (array) $data;
+    }
 }
