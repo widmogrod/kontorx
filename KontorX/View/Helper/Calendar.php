@@ -31,8 +31,15 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 		return $this->_date;
 	}
 
+	/**
+	 * @var array
+	 */
 	protected $_fromTo = array();
 	
+	/**
+	 * @param $array
+	 * @return KontorX_View_Helper_Calendar
+	 */
 	public function setFromTo($array) {
 		$this->_fromTo = array();
 		foreach ($array as $key => $val) {
@@ -45,80 +52,49 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 		return $this;
 	}
 	
+	/**
+	 * @param string $from
+	 * @param string $to
+	 * @param mixed $options
+	 * @return KontorX_View_Helper_Calendar
+	 */
 	public function addFromTo($from, $to, $options = null) {
 		$this->_fromTo[] = array($from, $to, $options);
 		return $this;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getFromTo() {
 		return $this->_fromTo;
 	}
 
+	/**
+	 * @param $day
+	 * @return bool|mixed
+	 */
 	public function isFromTo(KontorX_Calendar_Day  $day) {
 		$date = $this->_getDate();
 		foreach ($this->_fromTo as $fromTo) {
 			list($from, $to, $options) = $fromTo;
 			$date->setTimestamp($day->getTimestamp());
-			if ($date->isEarlier($to) && $date->isLater($from)) {
+			if (($date->isEarlier($to) && $date->isLater($from))) {
+				return $options;
+			} else
+			// zapewnia że te same dni równiez są poprawne
+			if (date('Y-m-d',strtotime($to)) == date('Y-m-d', $day->getTimestamp())
+				|| date('Y-m-d',strtotime($from)) == date('Y-m-d', $day->getTimestamp())) {
 				return $options;
 			}
 		}
 		return false;
 	}
-
-	/**
-	 * @return string
-	 */
-	public function render() {
-		$day = 0;
-		$days = $this->_month->getDays();
-		$weeks = $this->_month->getWeeksCount();
-		$startDay = $this->_month->getMonthStartFromDay();
-
-		$result = array('<table>');
-		$result[] = '<caption>';
-		$result[] = ucfirst($this->_month->getMonthName());
-		$result[] = '</caption>';
-
-		// każdy tydzień
-		for($i=1; $i <= $weeks; ++$i) {
-			$result[] = '<tr>';
-			$resultWeek = array();
-
-			// kazdy dzień w tygodniu
-			for ($j=0; $j<=6; ++$j) {
-				$resultWeek[] = '<td>';
-
-				$dayValue = null;
-
-				// dla pierwszego tygodnia
-				if ($i == 1) {
-					// sprawdz  od którego dnia zaczyna się miesiąc o go ewentualnie dopełnij..
-					if ($startDay <= $j) {
-						$dayValue = ++$day;
-					}
-				} else
-				if ($day < $days) {
-					$dayValue = ++$day;
-				}
-
-				$resultWeek[] = $dayValue;
-				$resultWeek[] = '</td>';
-			}
-			$result[] = implode($resultWeek);
-			$result[] = '</tr>';
-		}
-		$result[] = '</table>';
-
-		return implode($result);
-	}
 	
 	/**
 	 * @return string
 	 */
-	public function render2() {
-		
-
+	public function render() {
 		$result = array('<table>');
 		$result[] = '<caption>';
 		$result[] = ucfirst($this->view->translate($this->_month->getMonthName()));
@@ -182,6 +158,6 @@ class KontorX_View_Helper_Calendar extends Zend_View_Helper_Abstract {
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->render2();
+		return $this->render();
 	}
 }
