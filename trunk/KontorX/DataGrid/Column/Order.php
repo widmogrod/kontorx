@@ -28,10 +28,10 @@ class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_ViewHelper {
 
         // klonowanie wzrtosci i zmiana atrybotow
         // umozliwia ich aktywacje po kliknieciu linku!
-        $backup = $this->getValues();
+        $backup = $this->getValue();
         $this->setValue($orderNext);
         $values = clone $this->getValues();
-        $this->setValues($backup);
+        $this->setValue($backup);
 
         if (null === ($href = $this->getAttrib('href'))) {
         	$router = $this->getAttrib('router');
