@@ -4,6 +4,8 @@ abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_R
 
 	const SEPARATOR = ':|:';
 	
+	const HTML_CLASS = 'kx_editable';
+	
 	/**
 	 * @var string
 	 */
@@ -79,6 +81,13 @@ abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_R
 		$name = sprintf('%s[%s][%s]', $prefix, $primaryKey, $columnName);
 		$value = $this->getData($columnName);
 
+		// ustawienie attrybutu 'class' dla elementu widoku.
+		if (null !== ($class = $this->getAttrib('class'))) {
+			$this->setAttrib('class', self::HTML_CLASS . ' ' . $class);
+		} else {
+			$this->setAttrib('class', self::HTML_CLASS);
+		}
+		
 		$helper = $this->getHelperName();
 		return $this->getView()->$helper($name, $value, $this->getAttribs());
 	}
