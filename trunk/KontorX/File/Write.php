@@ -118,8 +118,8 @@ class KontorX_File_Write {
      * @var array
      */
     private $_chmod = array(
-        self::CHMOD_DIR => 0755,
-        self::CHMOD_FILE => 0644
+        self::CHMOD_DIR => 0775,
+        self::CHMOD_FILE => 0664
     );
 
     /**
