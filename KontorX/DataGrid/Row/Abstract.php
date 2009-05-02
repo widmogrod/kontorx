@@ -131,6 +131,15 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
         return array_key_exists($name, $this->_attribs)
             ? $this->_attribs[$name] : $default;
     }
+    
+	/**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function setAttrib($name, $value) {
+        return $this->_attribs[$name] = $value;
+    }
 
     /**
      * Return attrib key => value

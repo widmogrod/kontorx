@@ -34,6 +34,13 @@ class KontorX_DataGrid_Row_Editable_FormSelect extends KontorX_DataGrid_Row_Edit
 
 		$name = sprintf('%s[%s][%s]', $prefix, $primaryKey, $columnName);
 		$value = $this->getData($columnName);
+		
+		// ustawienie attrybutu 'class' dla elementu widoku.
+		if (null !== ($class = $this->getAttrib('class'))) {
+			$this->setAttrib('class', self::HTML_CLASS . ' ' . $class);
+		} else {
+			$this->setAttrib('class', self::HTML_CLASS);
+		}
 
 		$helper = $this->getHelperName();
 		return $this->getView()->$helper($name, $value, $this->getAttribs(), $this->getMultiOptions());
