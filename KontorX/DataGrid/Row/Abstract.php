@@ -9,7 +9,14 @@ abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Int
         if (null != $options) {
             $this->setOptions($options);
         }
+        
+        $this->_init();
     }
+    
+    /**
+     * @return void
+     */
+    protected function _init() {}
 
     /**
      * @var string

@@ -70,6 +70,22 @@ abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_R
 		return $this->_primaryKey;
 	}
 	
+	/**
+	 * @return string
+	 */
+	protected function _getClassAttr() {
+		return self::HTML_CLASS . '-' . $this->getClassName();
+	}
+	
+	/**
+	 * @return string
+	 */
+	protected function _prepareClassAttr($class = null) {
+		return (null === $class)
+			? $this->_getClassAttr()
+			: $this->_getClassAttr() . ' ' . $class;
+	}
+
 	public function render() {
 		// Tworzenie prefisku, klucza głównego
 		$primaryVal = $this->getPrimaryKey();
@@ -82,12 +98,10 @@ abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_R
 		$value = $this->getData($columnName);
 
 		// ustawienie attrybutu 'class' dla elementu widoku.
-		if (null !== ($class = $this->getAttrib('class'))) {
-			$this->setAttrib('class', self::HTML_CLASS . ' ' . $class);
-		} else {
-			$this->setAttrib('class', self::HTML_CLASS);
-		}
-		
+		$class = $this->getAttrib('class');
+		$class = $this->_prepareClassAttr($class);
+		$this->setAttrib('class', $class);
+
 		$helper = $this->getHelperName();
 		return $this->getView()->$helper($name, $value, $this->getAttribs());
 	}
