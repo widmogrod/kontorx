@@ -1,5 +1,5 @@
 <?php
-class Promotor_Bootstrap_Resource_Layout extends Zend_Application_Resource_Base {
+class Promotor_Bootstrap_Resource_Layout extends Zend_Application_Resource_ResourceAbstract {
 	/**
 	 * @var Zend_View
 	 */

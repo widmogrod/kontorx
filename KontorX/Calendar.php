@@ -23,7 +23,7 @@ class KontorX_Calendar {
 			}
 
 			for ($i=1; $i<13; ++$i) {
-				$timestamp = mktime(1,0,0,$i,1,date('Y', $this->_timestamp));
+				$timestamp = mktime(0,0,0,$i,1,date('Y', $this->_timestamp));
 				$this->_months[$i] = new KontorX_Calendar_Month($timestamp);
 			}
 		}

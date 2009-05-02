@@ -183,6 +183,33 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 	}
 
 	/**
+	 * @var Zend_Filter_Input
+	 */
+	private $_filterInput;
+	
+	/**
+	 * @param Zend_Filter_Input $filter
+	 * @return KontorX_Controller_Action_Helper_Scaffold
+	 */
+	public function setFilterInput(Zend_Filter_Input $filter) {
+		$this->_filterInput = $filter;
+		return $this;
+	}
+	
+	/**
+	 * @return Zend_Filter_Input
+	 */
+	public function getFilterInput() {
+		if (null === $this->_filterInput) {
+			$this->_filterInput = new Zend_Filter_Input(array(
+				Zend_Filter_Input::RULE_WILDCARD => new KontorX_Filter_MagicQuotes()
+			), array());
+			$this->_filterInput->setDefaultEscapeFilter(new KontorX_Filter_None());
+		}
+		return $this->_filterInput;
+	}
+
+	/**
 	 * default C(R)UD .. 
 	 */
 	
@@ -217,7 +244,12 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 			return;
 		}
 		
-		$row->setFromArray($form->getValues($this->_suppressArrayNotation));
+		$values = $form->getValues($this->_suppressArrayNotation);
+
+		$filterInput = $this->getFilterInput();
+		$filterInput->setData($values);
+
+		$row->setFromArray($filterInput->getEscaped());
 
 		try {
 			$result = $row->save();
@@ -257,8 +289,13 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 			$this->_setStatus(self::NO_VALID);
 			return;
 		}
+		
+		$values = $form->getValues($this->_suppressArrayNotation);
 
-		$row->setFromArray($form->getValues($this->_suppressArrayNotation));
+		$filterInput = $this->getFilterInput();
+		$filterInput->setData($values);
+
+		$row->setFromArray($filterInput->getEscaped());
 		
 		try {
 			$result = $row->save();
@@ -302,7 +339,12 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 			return;
 		}
 
-		$row->setFromArray($form->getValues());
+		$values = $form->getValues($this->_suppressArrayNotation);
+
+		$filterInput = $this->getFilterInput();
+		$filterInput->setData($values);
+
+		$row->setFromArray($filterInput->getEscaped());
 
 		try {
 			$result = $row->delete();
