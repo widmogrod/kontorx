@@ -32,6 +32,6 @@ class KontorX_Filter_File_UniqName implements Zend_Filter_Interface {
      * @return string
      */
     protected function _uniqFilename($filename) {
-        return uniqid() . $filename;
+        return uniqid() . '_' . $filename;
     }
 }

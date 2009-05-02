@@ -9,9 +9,9 @@ class KontorX_DataGrid_Row_Html extends KontorX_DataGrid_Row_Abstract {
     public function render() {
         $content = $this->getAttrib('content');
         if (null !== $content) {
-            $content = preg_replace("/{([\wd_\-^}}]+)}/ie", "\$this->getData('\\1')", $content);
+            $content = preg_replace("/{([\wd_\-^}]+)}/ie", "\$this->getData('$1')", $content);
         } else {
-            $content = "<!-- KontorX_DataGrid_Row_Html::render() '' was not set-->";
+            $content = $this->getColumnName();
         }
         return $content;
     }

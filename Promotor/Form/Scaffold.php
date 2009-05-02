@@ -22,4 +22,14 @@ class Promotor_Form_Scaffold extends Zend_Dojo_Form {
 
         return $values;
     }
+    
+	private $_pk = null;
+	
+	public function setPrimaryKey($pk) {
+		$this->_pk = $pk;
+	}
+
+	public function getPrimaryKey() {
+		return $this->_pk;
+	}
 }
