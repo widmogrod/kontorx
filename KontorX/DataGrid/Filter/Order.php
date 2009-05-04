@@ -15,7 +15,7 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
         if (null !== $order) {
             $order = ($order != 'asc') ? 'desc' : $order;
             $column = $this->getColumnName();
-            $select->order("$column $order");
+            $select->order(sprintf('%s %s', $column, $order));
         }
     }
 

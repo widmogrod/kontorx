@@ -718,7 +718,7 @@ class KontorX_DataGrid {
         if (null === $this->_paginator) {
             require_once 'Zend/Paginator.php';
 
-            $data = $this->getRawData();
+            $data = $this->getAdapter();
             $this->_paginator = Zend_Paginator::factory($data);
         }
         return $this->_paginator;
