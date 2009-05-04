@@ -18,11 +18,26 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
         $text = $this->getValue();
 
         if (strlen($text)) {
-            $adapter->getSelect()
-            ->where("$column LIKE ?", "%$text%");
+        	$where = sprintf("%s LIKE ?", $this->_prepareColumnName($column, $select));
+            $adapter->getSelect()->where($where, sprintf('%%%s%%',$text));
         }
     }
 
+    /**
+     * @param string $column
+     * @param Zend_Db_Select $select
+     * @return string
+     */
+    protected function _prepareColumnName($column, $select) {
+    	foreach ($select->getPart(Zend_Db_Select::COLUMNS) as $cols) {
+        	list($correlationName, $col, $alias) = $cols;
+        	if ($column == $alias) {
+        		return sprintf('`%s`.`%s`', $correlationName, $col);
+        	}
+        }
+        return $column;
+    }
+    
     /**
      * @return string
      */

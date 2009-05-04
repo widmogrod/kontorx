@@ -49,7 +49,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$status = $scaffold->getStatus();
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
 			$this->_helper->flashMessenger($status);
-			$this->_helper->redirector->goTo('list');
+			$this->_helper->redirector->goTo('add');
 		} else {
 			$this->_helper->flashMessenger($status);
 			$this->view->form = $form;
@@ -114,5 +114,15 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->flashMessenger($status);
 			$this->view->form = $form;
 		}
+	}
+	
+	/**
+	 * @param KontorX_DataGrid $grid
+	 * @return void
+	 */
+	protected function _setupDataGridPaginator(KontorX_DataGrid $grid) {
+		$page = $this->_getParam('page',1);
+		$count = $this->_getParam('itemCountPerPage', 30);
+		$grid->setPagination($page, $count);
 	}
 }

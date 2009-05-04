@@ -6,6 +6,7 @@ class Promotor_Bootstrap_Resource_View extends Zend_Application_Resource_Resourc
 
 		$view->addHelperPath('advertising/views/helpers','Advertising_View_Helper_');
 		$view->addHelperPath('KontorX/View/Helper','KontorX_View_Helper_');
+		$view->addHelperPath('Promotor/View/Helper','Promotor_View_Helper_');
 		
 //		$view->addHelperPath('ZendX/JQuery/View/Helper','ZendX_JQuery_View_Helper_');
 		

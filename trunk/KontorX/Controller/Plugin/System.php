@@ -371,11 +371,13 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             }
         }
         // link
-        $headLink = $view->headLink();
         if (isset($templateConfig->links)) {
-            foreach ($templateConfig->links->css as $file) {
+            foreach ($templateConfig->links->css->toArray() as $file) {
                 // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
-                $headLink->appendStylesheet($file->href);
+                if (!isset($file['rel'])) {
+                	$file['rel'] = 'stylesheet';
+                }
+                $view->headLink($file);
             }
         }
     }
