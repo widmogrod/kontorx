@@ -8,11 +8,9 @@ class KontorX_File_Write {
     const CHMOD_FILE = 'FILE';
 
     /**
-     * @param string $pathname
-     * @param string $data
      * @param Zend_Config|mixed $options
      */
-    public function __construct($pathname, $data = null, $options = null) {
+    public function __construct($options = null) {
         if (is_bool($options)) {
             $this->setForce($options);
         } elseif (is_string($options)) {
@@ -118,8 +116,8 @@ class KontorX_File_Write {
      * @var array
      */
     private $_chmod = array(
-        self::CHMOD_DIR => 0775,
-        self::CHMOD_FILE => 0664
+        self::CHMOD_DIR => 0777,
+        self::CHMOD_FILE => 0666
     );
 
     /**
@@ -144,8 +142,6 @@ class KontorX_File_Write {
             require_once 'KontorX/File/Exception.php';
             throw new KontorX_File_Exception($message);
         }
-
-        $mode = '0'.(int) $mode;
 
         if (null === $type) {
             $this->_chmod[self::CHMOD_DIR] = $mode;
@@ -214,7 +210,7 @@ class KontorX_File_Write {
         
         if (!is_dir($pathname)) {
             if (!(@mkdir($pathname, $this->getChmod(self::CHMOD_DIR), $this->isForced()))) {
-                $message = "Canot create directory";
+                $message = sprintf('Canot create directory "%s"', $pathname);
                 if (function_exists('error_get_last')) {
                     $error = error_get_last();
                     $message .= ', ' . $error['message'];

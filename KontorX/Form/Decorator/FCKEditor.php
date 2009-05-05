@@ -8,11 +8,21 @@ class KontorX_Form_Decorator_FCKEditor extends Zend_Form_Decorator_Abstract {
 	}
 
 	public function render($content) {
-		$view = $this->getElement()->getView();
-		$view->inlineScript()->appendScript("
-		var editor = new FCKeditor('" . $this->getElement()->getId() . "');
-		editor.BasePath = '" . $this->_basePath . "';
-		editor.ReplaceTextarea();");
+		$inline = $this->getElement()->getView()->inlineScript();
+		
+		$script = 'var editor = new FCKeditor("' . $this->getElement()->getId() . '");'. PHP_EOL .
+				  'editor.BasePath = "' . $this->_basePath . '";'. PHP_EOL;
+
+		if (null !== ($lang = $this->getOption('Language'))) {
+			$script .= 'editor.Config["DefaultLanguage"] = "'. $lang .'";'. PHP_EOL;
+		}
+		if (null !== ($skin = $this->getOption('skin'))) {
+			$script .= 'editor.Config["SkinPath"] = "/js/fckeditor/editor/skins/'. $skin .'/";'. PHP_EOL;
+		}
+
+		$script .= 'editor.ReplaceTextarea();';
+		$inline->appendScript($script);
+
 		return $content;
 	}	
 }
