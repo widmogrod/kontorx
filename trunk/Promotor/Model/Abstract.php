@@ -48,10 +48,38 @@ class Promotor_Model_Abstract {
 
 	/**
 	 * @param string $status
-	 * @return KontorX_Controller_Action_Helper_Scaffold
+	 * @return Promotor_Model_Abstract
 	 */
 	protected function _setStatus($status) {
 		$this->_status = $status;
+	}
+	
+	/**
+	 * @var array
+	 */
+	private $_messages = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getMessages() {
+		return $this->_messages;
+	}
+
+	/**
+	 * @param array $messages
+	 * @return Promotor_Model_Abstract
+	 */
+	protected function _setMessages(array $messages) {
+		$this->_messages = $messages;
+	}
+	
+	/**
+	 * @param string $message
+	 * @return Promotor_Model_Abstract
+	 */
+	protected function _addMessage($message) {
+		$this->_messages[] = $message;
 	}
 	
 	/**
