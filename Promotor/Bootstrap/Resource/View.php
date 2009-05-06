@@ -12,10 +12,10 @@ class Promotor_Bootstrap_Resource_View extends Zend_Application_Resource_Resourc
 		$view->doctype('XHTML1_TRANSITIONAL');
 		$view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8');
 
-//		$view->dojo()->setDjConfigOption('parseOnLoad', true)
-//					 ->setLocalPath('/js/dojo/dojo/dojo.js')
-//					 ->addStyleSheetModule('dijit.themes.tundra')
-//					 ->disable();
+		$view->dojo()->setDjConfigOption('parseOnLoad', true)
+					 ->setLocalPath('/js/dojo/dojo/dojo.js')
+					 ->addStyleSheetModule('dijit.themes.tundra')
+					 ->disable();
 	
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
 		$viewRenderer->setView($view);
