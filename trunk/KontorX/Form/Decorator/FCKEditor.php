@@ -4,7 +4,7 @@ class KontorX_Form_Decorator_FCKEditor extends Zend_Form_Decorator_Abstract {
 	private $_basePath = '/js/fckeditor/';
 
 	public function setBasePath($path) {
-		$this->_basePath = $path;
+		$this->_basePath = (string) $path;
 	}
 
 	public function render($content) {
