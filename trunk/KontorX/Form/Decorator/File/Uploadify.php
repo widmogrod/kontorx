@@ -30,6 +30,7 @@ class KontorX_Form_Decorator_File_Uploadify extends Zend_Form_Decorator_Abstract
 		'auto',
 		'fileDesc',
 		'fileExt',
+		'fileDataName',
 		'sizeLimit',
 		'buttonText',
 		'buttonImg',
@@ -65,13 +66,30 @@ class KontorX_Form_Decorator_File_Uploadify extends Zend_Form_Decorator_Abstract
 	 */
 	protected function _getOptions() {
 		$options = $this->getOptions();
+		
+		if (!isset($options['fileDataName'])) {
+			$options['fileDataName'] = $this->getElement()->getName();
+		}
+		
 		// only setings keys
 		$options = array_intersect_key($options, array_flip($this->_uploadifyOptions));
 		// set default
 		$options += $this->_uploadifyDefaultOptions;
+		
+		$result = array();
+		foreach ($options as $key => $val) {
+			if (is_bool($val)) {
+				$val = $val ? 'true' : 'false';
+			} else
+			if (is_string($val)) {
+				if (substr($val,0,strlen('function')) != 'function') {
+					$val = "'$val'";
+				}
+			}
 
-		require_once 'Zend/Json/Encoder.php';
-		$options = Zend_Json_Encoder::encode($options);
+			$result[] = $key . ':' . $val;
+		}
+		$options = implode(',',$result);
 
 		$replace = array(
 			'[basePath]' => trim($this->_basePath,'/'),
@@ -90,7 +108,7 @@ class KontorX_Form_Decorator_File_Uploadify extends Zend_Form_Decorator_Abstract
 
 		$id = $element->getId();
 		$options = $this->_getOptions();
-		$script = sprintf('jQuery("#%s").fileUpload(%s)', $id, $options);
+		$script = sprintf('jQuery("#%s").fileUpload({%s})', $id, $options);
 
 		$element->getView()->inlineScript()->appendScript($script);
 		
