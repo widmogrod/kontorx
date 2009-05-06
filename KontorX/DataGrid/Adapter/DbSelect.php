@@ -3,26 +3,17 @@ require_once 'KontorX/DataGrid/Adapter/Abstract.php';
 class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstract {
 
     /**
-     * Konstruktor
-     *
      * @param Zend_Db_Table_Abstract $table
      */
     public function __construct(Zend_Db_Select $select) {
-        $this->_select = $select;
+        $this->setData($select);
     }
 
     /**
-     * @var Zend_Db_Select
-     */
-    protected $_select = null;
-
-    /**
-     * Zwraca @see Zend_Db_Select
-     *
      * @return Zend_Db_Select
      */
     public function getSelect() {
-        return $this->_select;
+        return $this->getData();
     }
 
     /**

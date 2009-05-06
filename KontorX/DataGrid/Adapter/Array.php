@@ -3,26 +3,10 @@ require_once 'KontorX/DataGrid/Adapter/Abstract.php';
 class KontorX_DataGrid_Adapter_Array extends KontorX_DataGrid_Adapter_Abstract {
 
     /**
-     * Konstruktor
-     *
      * @param array $array
      */
     public function __construct(array $array) {
-        $this->_array = $array;
-    }
-
-    /**
-     * @var array
-     */
-    protected $_array = null;
-
-    /**
-     * Zwraca array
-     *
-     * @return array
-     */
-    public function getArray() {
-        return $this->_array;
+        $this->setData($array);
     }
 
     /**
@@ -30,7 +14,7 @@ class KontorX_DataGrid_Adapter_Array extends KontorX_DataGrid_Adapter_Abstract {
      * @return array
      */
     public function fetchData() {
-        $array = $this->getArray();
+        $array = $this->getData();
 
         // czy jest paginacja
         if ($this->isPagination()) {
