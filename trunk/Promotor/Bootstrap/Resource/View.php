@@ -9,15 +9,13 @@ class Promotor_Bootstrap_Resource_View extends Zend_Application_Resource_Resourc
 		$view->addHelperPath('Promotor/View/Helper','Promotor_View_Helper_');
 		
 //		$view->addHelperPath('ZendX/JQuery/View/Helper','ZendX_JQuery_View_Helper_');
-		
-		$view->doctype('XHTML1_STRICT');
-//		$view->headTitle()->setSeparator(' - ')->append('My Site');
+		$view->doctype('XHTML1_TRANSITIONAL');
 		$view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8');
 
-		$view->dojo()->setDjConfigOption('parseOnLoad', true)
-					 ->setLocalPath('/js/dojo/dojo/dojo.js')
-					 ->addStyleSheetModule('dijit.themes.tundra')
-					 ->disable();
+//		$view->dojo()->setDjConfigOption('parseOnLoad', true)
+//					 ->setLocalPath('/js/dojo/dojo/dojo.js')
+//					 ->addStyleSheetModule('dijit.themes.tundra')
+//					 ->disable();
 	
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
 		$viewRenderer->setView($view);
