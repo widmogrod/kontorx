@@ -4,12 +4,10 @@ require_once 'KontorX/DataGrid/Adapter/Abstract.php';
 class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract {
 
     /**
-     * Konstruktor
-     *
      * @param Zend_Db_Table_Abstract $table
      */
     public function __construct(Zend_Db_Table_Abstract $table) {
-        $this->_table = $table;
+        $this->setData($table);
     }
 
     /**
@@ -23,7 +21,7 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
      * @return Zend_Db_Table_Abstract
      */
     public function getTable() {
-        return $this->_table;
+        return $this->getData();
     }
 
     /**
