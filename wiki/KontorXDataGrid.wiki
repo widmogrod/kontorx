@@ -1,9 +1,9 @@
-#summary One-sentence summary of this page.
+#summary DataGrid example
 #labels Phase-Deploy,Featured
 
 = Introduction =
 
-KontorX_DataGrid
+`KontorX_DataGrid`
 
 == Example ==
 
