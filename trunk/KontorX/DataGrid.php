@@ -719,7 +719,16 @@ class KontorX_DataGrid {
             require_once 'Zend/Paginator.php';
 
             $data = $this->getAdapter()->getData();
-            $this->_paginator = Zend_Paginator::factory($data);
+
+            // HACK for new adapter..
+            // TODO move id to KontorX_Paginator
+            // try {} cache (Zend_Paginator_Exception $e) {}
+            $adapter = Zend_Paginator::INTERNAL_ADAPTER;
+            if ($data instanceof Zend_Db_Table_Abstract) {
+            	Zend_Paginator::addAdapterPrefixPath('KontorX_Paginator_Adapter','KontorX/Paginator/Adapter/');
+            	$adapter = 'DbTable';
+            }
+            $this->_paginator = Zend_Paginator::factory($data, $adapter);
         }
         return $this->_paginator;
     }
