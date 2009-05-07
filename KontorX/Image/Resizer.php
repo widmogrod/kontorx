@@ -153,7 +153,41 @@ class KontorX_Image_Resizer {
         }
         return $this->_type;
     }
+    
+    /**
+     * @var array
+     */
+    protected $_chains = array();
+    
+    /**
+     * @param array $chains
+     * @return void
+     */
+    public function setChains(array $chains) {
+    	$this->_chains = $chains;
+    }
 
+    /**
+     * @return array
+     */
+    public function getChains() {
+    	return $this->_chains;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChains() {
+    	return (bool) count($this->_chains);
+    }
+
+    /**
+     * @return void
+     */
+    public function clearChains() {
+    	$this->_chains = array();
+    }
+    
     /**
      * @var string
      */
@@ -184,15 +218,33 @@ class KontorX_Image_Resizer {
      * @return void
      */
     public function setMultiTypesOptions(array $multiTypes) {
-        $this->_multiTypesOptions = $multiTypes;
+        $this->_multiTypesOptions = array();
+        $this->addMultiTypesOptions($multiTypes);
     }
 
     /**
      * @return array
      */
-    public function getMultiTypesOptions($type) {
+    public function getMultiTypesOptions() {
+    	return $this->_multiTypesOptions;
+    }
+    
+    /**
+     * @param string $type
+     * @return array
+     */
+    public function getMultiTypesOption($type) {
         return isset($this->_multiTypesOptions[$type])
-            ? (array) $this->_multiTypesOptions[$type] : $this->_multiTypesOptions;
+        	? $this->_multiTypesOptions[$type]
+        	: array();
+    }
+
+    /**
+     * @param array $multiTypes
+     * @return void
+     */
+    public function addMultiTypesOptions($multiTypes) {
+    	$this->_multiTypesOptions = array_merge($this->_multiTypesOptions, $multiTypes);
     }
 
     protected function _setupMultiTypesOptions($type = null) {
@@ -201,7 +253,7 @@ class KontorX_Image_Resizer {
                 return;
             }
         }
-        $this->setOptions($this->getMultiTypesOptions($type));
+        $this->setOptions($this->getMultiTypesOption($type));
     }
 
     /**
@@ -275,7 +327,21 @@ class KontorX_Image_Resizer {
     public function resize($multiType = null) {
         $this->_setupMultiTypesOptions($multiType);
 
-        $image = $this->_getImage();
+        $this->_resize();
+
+        if ($this->hasChains()) {
+        	foreach ($this->getChains() as $chain) {
+        		$this->setOptions($chain);
+        		$this->_resize();
+        	}
+        	$this->clearChains();
+        }
+
+        return $this->_getImage();
+    }
+
+    protected function _resize() {
+    	$image = $this->_getImage();
 
         switch ($this->getType()) {
             default:
