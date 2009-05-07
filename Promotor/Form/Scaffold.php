@@ -4,6 +4,7 @@
  *
  */
 class Promotor_Form_Scaffold extends Zend_Dojo_Form {
+	
 	public function getValues($suppressArrayNotation = false) {
         $values = array();
         foreach ($this->getElements() as $key => $element) {

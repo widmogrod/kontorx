@@ -1,8 +1,7 @@
 <?php
-class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
+class Promotor_View_Helper_GalleryPreview extends Zend_View_Helper_Abstract {
+	const PARTIAL = 'galleryPreview.phtml';
 
-	const PARTIAL = 'galleryAlbum.phtml';
-	
 	/**
 	 * @var integer
 	 */
@@ -12,11 +11,13 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 	 * @param integer $primaryKey
 	 * @return unknown_type
 	 */
-	public function galleryAlbum($primaryKey) {
-		$this->_primaryKey = $primaryKey;
+	public function galleryPreview($primaryKey = null) {
+		if (null !== $primaryKey) {
+			$this->_primaryKey = (int) $primaryKey;
+		}
 		return $this;
 	}
-	
+
 	/**
 	 * @var array
 	 */
@@ -26,10 +27,13 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 	 * @param integer $primaryKey
 	 * @return array
 	 */
-	protected function _getData($primaryKey) {
+	protected function _getData($primaryKey = null) {
 		if (!array_key_exists($primaryKey, $this->_data)) {
-			$model = new Gallery_Model_Album();
-			$this->_data[$primaryKey] = $model->fetchAllByIdCache($primaryKey);
+			$model = new Gallery_Model_Gallery();
+
+			$this->_data[$primaryKey] = (null === $primaryKey)
+				? $model->fetchAllImagesGroupAlbumCache()
+				: $model->fetchAllImagesGroupAlbumByIdCache($primaryKey);		
 		}
 		return $this->_data[$primaryKey];
 	}
