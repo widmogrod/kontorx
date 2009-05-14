@@ -31,9 +31,11 @@ class Promotor_View_Helper_GalleryPreview extends Zend_View_Helper_Abstract {
 		if (!array_key_exists($primaryKey, $this->_data)) {
 			$model = new Gallery_Model_Gallery();
 
-			$this->_data[$primaryKey] = (null === $primaryKey)
+			$data = (null === $primaryKey)
 				? $model->fetchAllImagesGroupAlbumCache()
-				: $model->fetchAllImagesGroupAlbumByIdCache($primaryKey);		
+				: $model->fetchAllImagesGroupAlbumByIdCache($primaryKey);
+				
+			$this->_data[$primaryKey] = $data;
 		}
 		return $this->_data[$primaryKey];
 	}
