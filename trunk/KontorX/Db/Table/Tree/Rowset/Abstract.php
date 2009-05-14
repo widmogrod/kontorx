@@ -50,10 +50,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 	public function hasChildren () {
 		$result = false;
 
-		$current = $this->current();
-		$key = $current->{$this->_level} == ''
-			? $current->id
-			: $current->{$this->_level} . $this->_separator . $current->id;
+		$key = $this->_getLevelKey();
 
 		if (isset($this->_childrens[$key])) {
 			return (count($this->_childrens[$key]) > 0);
@@ -80,11 +77,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 	 * @return KontorX_Db_Table_Tree_Rowset_Abstract
 	 */
 	public function getChildren () {
-		$current = $this->current();
-		$key = $current->{$this->_level} == ''
-			? $current->id
-			: $current->{$this->_level} . $this->_separator . $current->id;
-
+		$key = $this->_getLevelKey();
 		if (isset($this->_childrens[$key])) {
 			$data  = array(
 	            'table'    => $this->_table,
@@ -105,7 +98,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 	/**
 	 * @return string
 	 */
-	protected function _getLevelPath() {
+	protected function _getLevelKey() {
 		$current = $this->current();
 		return $current->{$this->_level} == ''
 			? $current->id
