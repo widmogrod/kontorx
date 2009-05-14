@@ -32,8 +32,13 @@ class KontorX_DataGrid {
     public static function factory($data, $options = null) {
         $instance = null;
         if ($data instanceof Zend_Db_Table_Abstract) {
-            require_once 'KontorX/DataGrid/Adapter/DbTable.php';
-            $adapter = new KontorX_DataGrid_Adapter_DbTable($data);
+        	if ($data instanceof KontorX_Db_Table_Tree_Abstract) {
+        		require_once 'KontorX/DataGrid/Adapter/DbTable.php';
+            	$adapter = new KontorX_DataGrid_Adapter_DbTableTree($data);
+        	} else {
+        		require_once 'KontorX/DataGrid/Adapter/DbTable.php';
+            	$adapter = new KontorX_DataGrid_Adapter_DbTable($data);
+        	}
         } else
         if ($data instanceof Zend_Db_Select) {
             require_once 'KontorX/DataGrid/Adapter/DbSelect.php';

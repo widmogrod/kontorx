@@ -29,7 +29,8 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 	protected function _getData($primaryKey) {
 		if (!array_key_exists($primaryKey, $this->_data)) {
 			$model = new Gallery_Model_Album();
-			$this->_data[$primaryKey] = $model->fetchAllByIdCache($primaryKey);
+			$data = $model->fetchAllByIdCache($primaryKey);
+			$this->_data[$primaryKey] = $data;
 		}
 		return $this->_data[$primaryKey];
 	}
