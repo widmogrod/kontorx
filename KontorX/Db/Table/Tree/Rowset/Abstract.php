@@ -36,26 +36,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		if (null === $this->_level) {
 			require_once 'KontorX/Db/Table/Tree/Rowset/Exception.php';
 			throw new KontorX_Db_Table_Tree_Rowset_Exception('Field `$_level` name for nested records is not definded');
-		}
-		
-		// rekordy kłówne zawsze jako pierwsze
-//		usort($this->_data, array($this, '_sortRootLevel'));
-	}
-	
-	/**
-	 * @param $a
-	 * @param $b
-	 * @return unknown_type
-	 */
-	protected function _sortRootLevel($a, $b) {
-		if ('' == $a[$this->_level]) {
-			return 1;
-		} else
-		if ('' == $b[$this->_level]) {
-			return 0;
-		} else {
-			return -1;
-		};
+		}		
 	}
 
 	/**
@@ -70,25 +51,30 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		$result = false;
 
 		$key = $this->_getLevelKey();
-
 		if (isset($this->_childrens[$key])) {
-			return count($this->_childrens[$key]);
+			return (bool) count($this->_childrens[$key]);
 		}
 
 		$this->_childrens[$key] = array();
 
-		foreach ($this->_data as $i => $data) {
+		foreach ($this->_data as $pointer => $data) {
+			if ($pointer === $this->_pointer) {
+				continue;
+			}
+
 			if (false !== strstr($data[$this->_level], $key)) {
 				$this->_childrens[$key][] = $data;
-				unset($this->_data[$i]);
+				unset($this->_data[$pointer]);
 				--$this->_count;
 				$result = true;
 			}
 		}
 
-		// reset keys
-		$this->_data = array_values($this->_data);
-		
+		if ($result) {
+			// reset keys
+			$this->_data = array_values($this->_data);
+		}
+
 		return $result;
 	}
 
@@ -97,21 +83,23 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 	 */
 	public function getChildren() {
 		$key = $this->_getLevelKey();
-		if (isset($this->_childrens[$key])) {
-			$data  = array(
-	            'table'    => $this->_table,
-	            'data'     => $this->_childrens[$key],
-	            'readOnly' => $this->_readOnly,
-	            'rowClass' => $this->_rowClass,
-	            'stored'   => true,
-				// KontorX stuff
-				'level'	   => $this->_level,
-				'separator'=> $this->_separator,
-	        );
-	        return new self($data);
+		if (!isset($this->_childrens[$key])) {
+			if (!$this->hasChildren()) {
+				return null;
+			}
 		}
-		
-		return null;
+
+		$data  = array(
+            'table'    => $this->_table,
+            'data'     => $this->_childrens[$key],
+            'readOnly' => $this->_readOnly,
+            'rowClass' => $this->_rowClass,
+            'stored'   => true,
+			// KontorX stuff
+			'level'	   => $this->_level,
+			'separator'=> $this->_separator,
+        );
+        return new self($data);
 	}
 
 	/**
@@ -119,8 +107,8 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 	 */
 	protected function _getLevelKey() {
 		$current = $this->current();
-		return $current->{$this->_level} == ''
-			? $current->id
-			: $current->{$this->_level} . $this->_separator . $current->id;
+		return $current->__get($this->_level) == ''
+			? $current->__get('id')
+			: $current->__get($this->_level) . $this->_separator . $current->__get('id');
 	}
 }
