@@ -68,13 +68,15 @@ class KontorX_DataGrid_Adapter_DbTableTree extends KontorX_DataGrid_Adapter_Abst
         $columns = $this->getColumns();
         $rows   = $this->getRows();
 
-        $result = array();
-
         $i = 0;
+        $result = array();
         $dataset = $table->fetchAll($select);
-        $rii = new RecursiveIteratorIterator($dataset, RecursiveIteratorIterator::SELF_FIRST);
-        while ($rii->valid()) {
-        	$data = $rii->current();
+
+        $recursive = new RecursiveIteratorIterator($dataset, RecursiveIteratorIterator::SELF_FIRST);
+        $recursive->rewind();
+
+        while ($recursive->valid()) {
+        	$data = $recursive->current();
             $rawData = $data->toArray();
 
             // tworzymy tablice wielowymiarowa rekordow
@@ -94,7 +96,7 @@ class KontorX_DataGrid_Adapter_DbTableTree extends KontorX_DataGrid_Adapter_Abst
                 }
             }
             ++$i;
-            $rii->next();
+            $recursive->next();
         }
 
         // cache save
