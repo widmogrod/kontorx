@@ -22,6 +22,8 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	 */
 	public function create() {
 		$this->_parentPage = $this->_navigation;
+
+		$this->rewind();
 		while ($this->valid()) {
 			$current = $this->current()->toArray();
 			if (null !== $this->_visitor) {
@@ -33,6 +35,7 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 			$this->_parentPage->addPage($this->_currentPage);
 			$this->next();
 		}
+
 		return $this->_navigation;
 	}
 
