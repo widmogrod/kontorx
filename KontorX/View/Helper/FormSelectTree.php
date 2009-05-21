@@ -32,25 +32,18 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 
 		// tworzenie opcji
 		$options = array();
-
-		$recursice = new RecursiveIteratorIterator($rowset, RecursiveIteratorIterator::SELF_FIRST);
-		$recursice->rewind();
-		while ($recursice->valid()) {
-			$current = $recursice->current();
-			
-			$label = str_repeat('--', $recursice->getDepth()) . " ";
-			$label .= strip_tags($current->__get($labelCol));
+		foreach ($rowset as $row) {
+			$label = str_repeat('--', $row->depth) . " ";
+			$label .= strip_tags($row->{$labelCol});
 
 			// bez etykiety
 			if (null === $valueCol) {
 				$options[] = $label;
 			} else {
-				$options[$current->__get($valueCol)] = $label;
+				$options[$row->{$valueCol}] = $label;
 			}
-			
-			$recursice->next();
 		}
-
+		
 		return $this->formSelect($name, $value, $attribs, $options, $listsep);
 	}
 }

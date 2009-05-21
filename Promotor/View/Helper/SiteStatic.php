@@ -5,24 +5,24 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 	/**
 	 * @var string
 	 */
-	protected $_alias = null;
+	protected $_url = null;
 	
 	/**
-	 * @param $alias
+	 * @param $url
 	 * @return Promotor_View_Helper_SiteStatic
 	 */
-	public function setAlias($alias) {
-		$this->_alias = (string) $alias;
+	public function setUrl($url) {
+		$this->_url = (string) $url;
 		return $this;
 	}
 	
 	/**
-	 * @param $alias
+	 * @param $url
 	 * @return Promotor_View_Helper_SiteStatic
 	 */
-	public function siteStatic($alias = null) {
-		if (null !== $alias) {
-			$this->setAlias($alias);
+	public function siteStatic($url = null) {
+		if (null !== $url) {
+			$this->setUrl($url);
 		}
 		return $this;
 	}
@@ -33,16 +33,16 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 	protected $_data = array();
 	
 	/**
-	 * @param integer $alias
+	 * @param integer $url
 	 * @return array
 	 */
-	protected function _getData($alias = null) {
-		if (!array_key_exists($alias, $this->_data)) {
+	protected function _getData($url = null) {
+		if (!array_key_exists($url, $this->_data)) {
 			$model = new Site_Model_Site();
-			$data = $model->findByAliasCache($alias);
-			$this->_data[$alias] = $data;
+			$data = $model->findByUrlCache($url);
+			$this->_data[$url] = $data;
 		}
-		return $this->_data[$alias];
+		return $this->_data[$url];
 	}
 	
 	/**
@@ -54,7 +54,7 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 			$partial = self::PARTIAL;
 		}
 
-		$data = $this->_getData($this->_alias);
+		$data = $this->_getData($this->_url);
 		return $this->view->partial($partial, array('data' => $data));
 	}
 

@@ -11,7 +11,6 @@ class Promotor_View_Helper_SiteNavigation extends Zend_View_Helper_Navigation {
 
 		$model = new Site_Model_Site();
 		$container = $model->getNavigation();
-		
 		$this->setContainer($container);
 		return $this;
 	}
