@@ -18,16 +18,16 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
     const CONFIG_INI = 'ini';
     const CONFIG_XML = 'xml';
 
+    const MODULE_CONFIG_DIRNNAME = 'configuration';
+    
     /**
      * Przechowuje wczytane obiekty konfiguracji @see Zend_Config
-     *
      * @var array
      */
     protected $_storeConfig = array();
 
     /**
      * Wczytuje konfiguracje
-     *
      * @param string $fileName
      * @param string $module
      * @param string $type
@@ -72,7 +72,6 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
 
     /**
      * Sprawdza czy plik konfiguracyjny istnieje
-     *
      * @param string $fileName
      * @param string $module
      * @return bool
@@ -84,19 +83,15 @@ class KontorX_Controller_Action_Helper_Loader extends Zend_Controller_Action_Hel
 
     /**
      * Zwraca scieżkę do pliku konfiguracji
-     *
      * @param string $fileName
      * @param string $module
      * @return string
      */
     protected function _getPathConfig($fileName, $module = null) {
-    $dispatcher = $this->getFrontController()->getDispatcher();
-        $request    = $this->getRequest();
-
         if (null === $module) {
-            $module = $request->getModuleName();
+            $module = $this->getRequest()->getModuleName();
         }
 
-        return APP_MODULES_PATHNAME . "$module/$fileName";
+        return APP_MODULES_PATHNAME . $module . DIRECTORY_SEPARATOR . self::MODULE_CONFIG_DIRNNAME . DIRECTORY_SEPARATOR. $fileName;
     }
 }
