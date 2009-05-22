@@ -60,10 +60,18 @@ class Promotor_Model_Abstract {
 	private $_messages = array();
 	
 	/**
+	 * @param bool $withExceptions
 	 * @return array
 	 */
-	public function getMessages() {
-		return $this->_messages;
+	public function getMessages($withExceptions = true) {
+		$message = $this->_messages;
+		if ($withExceptions) {
+			foreach ($this->_exception as $exception) {
+				$message = $exception->getMessage() . "\n" . $exception->getTraceAsString();
+				$messages[] = $message;
+			}
+		}
+		return $message;
 	}
 
 	/**
@@ -72,6 +80,7 @@ class Promotor_Model_Abstract {
 	 */
 	protected function _setMessages(array $messages) {
 		$this->_messages = $messages;
+		return $this;
 	}
 	
 	/**
@@ -80,6 +89,25 @@ class Promotor_Model_Abstract {
 	 */
 	protected function _addMessage($message) {
 		$this->_messages[] = $message;
+		return $this;
+	}
+	
+	/**
+	 * @var array
+	 */
+	protected $_exception = array();
+
+	public function getExceptions() {
+		return $this->_exception;
+	}
+	
+	/**
+	 * @param Exception $exception
+	 * @return Promotor_Model_Abstract
+	 */
+	protected function _addException(Exception $exception) {
+		$this->_exception[] = $exception;
+		return $this;
 	}
 	
 	/**
@@ -100,8 +128,7 @@ class Promotor_Model_Abstract {
      * @return Zend_Cache_Core
      * @throws Promotor_Model_Exception
      */
-    protected static function _setupMetadataCache($metadataCache)
-    {
+    protected static function _setupMetadataCache($metadataCache) {
         if ($metadataCache === null) {
             return null;
         }

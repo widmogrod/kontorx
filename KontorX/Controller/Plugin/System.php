@@ -377,6 +377,9 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }
+            	if (!isset($file['media'])) {
+					$file['media'] = 'screen';
+				}
                 $view->headLink($file);
             }
         }

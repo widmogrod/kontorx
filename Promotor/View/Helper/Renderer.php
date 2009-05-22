@@ -1,20 +1,9 @@
 <?php
-require_once 'Zend/View/Helper/Abstract.php';
-
 /**
- * KontorX_View_Helper_Renderer
- * 
- * @category 	KontorX
- * @package 	KontorX_View
- * @subpackage  Helper
- * @version 	0.1.8
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
+ * Promotor_View_Helper_Renderer
  */
-class KontorX_View_Helper_Renderer extends Zend_View_Helper_Abstract {
+class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 	/**
-	 * "Konstruktor"
-	 *
 	 * @param string $content
 	 * @return string
 	 */
@@ -95,7 +84,7 @@ class KontorX_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 		$view = $this->view;
 		switch ($type) {
 			default:	 return "<!-- $value -->";
-			case 'page': return $view->url(array('url'=>$value),'page');
+			case 'site': return $view->url(array('alias'=>$value),'site');
 			case 'action':
 				// separator parametrow ;
 				$params = explode(';',$value);

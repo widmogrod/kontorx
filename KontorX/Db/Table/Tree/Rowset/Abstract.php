@@ -36,16 +36,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 			require_once 'KontorX/Db/Table/Tree/Rowset/Exception.php';
 			throw new KontorX_Db_Table_Tree_Rowset_Exception('Field `$_level` name for nested records is not definded');
 		}
-		
-//		usort($this->_data, array($this, '_sort'));
 	}
-	
-//	protected function _sort($a, $b) {
-//		if (null != $a[$this->_level]) {
-//			return 1;
-//		}
-//		return 0;
-//	}
 
 	/**
 	 * @var array
