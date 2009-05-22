@@ -46,7 +46,10 @@ class KontorX_DataGrid_Row_Url extends KontorX_DataGrid_Row_ViewHelper {
 	 */
 	public function getName() {
 		if (null === $this->_name) {
-			return $this->getColumnName();
+			$columnName = $this->getColumnName();
+			if (null === ($this->_name = $this->getData($columnName))) {
+				$this->_name = $columnName;
+			}
 		}
 		return $this->_name;
 	}
