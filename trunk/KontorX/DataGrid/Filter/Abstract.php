@@ -73,7 +73,7 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
         $values = $this->_values->filter;
         $column = $this->getColumnName();
         if (isset($values->$column)) {
-            return $values->$column->$key;
+            return @$values->$column->$key;
         }
         return null;
     }

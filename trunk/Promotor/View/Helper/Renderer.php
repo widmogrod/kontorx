@@ -69,7 +69,11 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->render();
+		try {
+			return $this->render();
+		} catch (Exception $e) {
+			trigger_error($e->getMessage(), E_USER_WARNING);
+		}
 	}
 	
 	/**

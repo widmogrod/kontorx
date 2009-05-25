@@ -1,5 +1,5 @@
 <?php
-class Promotor_Bootstrap_Resource_View extends Zend_Application_Resource_ResourceAbstract {
+class Promotor_Application_Resource_View extends Zend_Application_Resource_ResourceAbstract {
 	public function init(array $options = array()) {
 		$view = new Zend_View($options);
 		Zend_Dojo::enableView($view);

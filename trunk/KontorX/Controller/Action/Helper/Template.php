@@ -1,8 +1,8 @@
 <?php
-class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Helper_Abstract {
+class KontorX_Controller_Action_Helper_Template extends Zend_Controller_Action_Helper_Abstract {
 
-    public function _init() {
-        $action  = $this->getActionController();
+    public function postDispatch() {
+    $action  = $this->getActionController();
         $request = $action->getRequest();
         $plugin  = $this->getPluginInstance();
 
@@ -54,10 +54,6 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
         }
     }
 
-    public function postDispatch() {
-    	$this->_init();
-    }
-
     /**
      * @return KontorX_Controller_Plugin_System
      */
@@ -91,13 +87,6 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
      */
     public function setPluginInstance(KontorX_Controller_Plugin_System $plugin) {
         $this->_pluginInstance = $plugin;
-    }
-
-    /**
-     * @return string
-     */
-    public  function language() {
-        return $this->getPluginInstance()->getLanguage();
     }
 
     /**

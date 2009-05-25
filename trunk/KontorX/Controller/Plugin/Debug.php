@@ -2,25 +2,25 @@
 require_once 'Zend/Controller/Plugin/Abstract.php';
 class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
 
-    private function __construct() {}
+//    private function __construct() {}
 
-    private static $_instance = null;
-
-    public static function getInstance() {
-        if (null === self::$_instance) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
-
-    /**
-     * Loguje tylko gdy plugin jest zainicjonowany!
-     */
-    public static function log($message) {
-        if (null !== self::$_instance) {
-            self::$_instance->_log($message);
-        }
-    }
+//    private static $_instance = null;
+//
+//    public static function getInstance() {
+//        if (null === self::$_instance) {
+//            self::$_instance = new self();
+//        }
+//        return self::$_instance;
+//    }
+//
+//    /**
+//     * Loguje tylko gdy plugin jest zainicjonowany!
+//     */
+//    public static function log($message) {
+//        if (null !== self::$_instance) {
+//            self::$_instance->_log($message);
+//        }
+//    }
 
     /**
      * @var integer
@@ -69,12 +69,12 @@ class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
 
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
         $this->_log('preDispatch');
-//        $this->_log($request->getParams());
+        $this->_log($request->getParams());
     }
 
     public function postDispatch(Zend_Controller_Request_Abstract $request) {
         $this->_log('postDispatch');
-//        $this->_log($request->getParams());
+        $this->_log($request->getParams());
     }
 
     public function dispatchLoopShutdown() {
