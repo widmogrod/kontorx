@@ -6,7 +6,6 @@
  * @package 	KontorX_Validate
  * @version 	0.1.1
  * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Validate_Compare extends Zend_Validate_Abstract {
 	const NOT_SAME      = 'notSameValue';

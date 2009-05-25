@@ -64,14 +64,14 @@ class Promotor_Model_Abstract {
 	 * @return array
 	 */
 	public function getMessages($withExceptions = true) {
-		$message = $this->_messages;
+		$messages = $this->_messages;
 		if ($withExceptions) {
 			foreach ($this->_exception as $exception) {
 				$message = $exception->getMessage() . "\n" . $exception->getTraceAsString();
 				$messages[] = $message;
 			}
 		}
-		return $message;
+		return $messages;
 	}
 
 	/**
@@ -93,10 +93,22 @@ class Promotor_Model_Abstract {
 	}
 	
 	/**
+	 * @param array $messages
+	 * @return Promotor_Model_Abstract
+	 */
+	protected function _addMessages(array $messages) {
+		$this->_messages = array_merge($this->_messages, $messages);
+		return $this;
+	}
+	
+	/**
 	 * @var array
 	 */
 	protected $_exception = array();
 
+	/**
+	 * @return array
+	 */
 	public function getExceptions() {
 		return $this->_exception;
 	}
