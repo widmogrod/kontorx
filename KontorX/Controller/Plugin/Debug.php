@@ -1,26 +1,35 @@
 <?php
-require_once 'Zend/Controller/Plugin/Abstract.php';
 class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
 
-//    private function __construct() {}
+	/**
+	 * @var KontorX_Controller_Plugin_Debug
+	 */
+	private static $_instance;
 
-//    private static $_instance = null;
-//
-//    public static function getInstance() {
-//        if (null === self::$_instance) {
-//            self::$_instance = new self();
-//        }
-//        return self::$_instance;
-//    }
-//
-//    /**
-//     * Loguje tylko gdy plugin jest zainicjonowany!
-//     */
-//    public static function log($message) {
-//        if (null !== self::$_instance) {
-//            self::$_instance->_log($message);
-//        }
-//    }
+    /**
+     * @return void
+     */
+    public function __construct() {
+    	if (null !== self::$_instance) {
+    		throw new Zend_Controller_Exception('Only one instance of plugin is allowed');
+    	}
+    }
+
+    public static function getInstance() {
+        if (null === self::$_instance) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
+
+    /**
+     * Loguje tylko gdy plugin jest zainicjonowany!
+     */
+    public static function log($message) {
+        if (null !== self::$_instance) {
+            self::$_instance->_log($message);
+        }
+    }
 
     /**
      * @var integer
