@@ -8,7 +8,6 @@ class Promotor_Application_Resource_View extends Zend_Application_Resource_Resou
 		$view->addHelperPath('KontorX/View/Helper','KontorX_View_Helper_');
 		$view->addHelperPath('Promotor/View/Helper','Promotor_View_Helper_');
 		
-//		$view->addHelperPath('ZendX/JQuery/View/Helper','ZendX_JQuery_View_Helper_');
 		$view->doctype('XHTML1_TRANSITIONAL');
 		$view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=utf-8');
 
@@ -21,5 +20,6 @@ class Promotor_Application_Resource_View extends Zend_Application_Resource_Resou
 		$viewRenderer->setView($view);
 	
 		Zend_Registry::set('view', $view);
+		return $view;
 	}
 }
