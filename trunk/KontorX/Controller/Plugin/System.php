@@ -315,12 +315,17 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         foreach ($templatePaths as $templatePath) {
             $templateConfigPath = $templatePath . '/' . $templateConfigFilename;
             if (is_readable($templateConfigPath)) {
-                $templateConfig = new Zend_Config_Ini($templateConfigPath, $layoutSection, true);
+                $templateConfig = new Zend_Config_Ini($templateConfigPath, null, true);
+                if (!isset($templateConfig->$layoutSection)) {
+                	$templateConfig = $templateConfig->default;
+                } else {
+                	$templateConfig = $templateConfig->$layoutSection;
+                }
                 break;
             }
         }
 
-        if (null === $templateConfig) {
+        if (!$templateConfig instanceof Zend_Config) {
             // nie ma konfiguracji layoutu
             return;
         }
