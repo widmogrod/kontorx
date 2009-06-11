@@ -7,6 +7,7 @@ class Promotor_Navigation_Recursive_Visitor_Site implements KontorX_Navigation_R
 			if (strlen(@$current['locale']) > 0) {
 				$params['locale'] = $current['locale'];
 			}
+			$current['id'] = $current['alias'];
 			$current['route'] = 'site';
 			$current['params'] = $params;
 		} else {
