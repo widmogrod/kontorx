@@ -43,12 +43,10 @@ class KontorX_DataGrid_Adapter_DbTableTree extends KontorX_DataGrid_Adapter_Abst
 
     /**
      * Wyławia szukane kolumny spełniające warunek ..
-     *
-     * @param array $columns
-     * @param array $filters
+     * @param bool $raw
      * @return array
      */
-    public function fetchData() {
+    public function fetchData($raw = false) {
         $table = $this->getTable();
         $select = $this->getSelect();
 
@@ -72,6 +70,11 @@ class KontorX_DataGrid_Adapter_DbTableTree extends KontorX_DataGrid_Adapter_Abst
         $result = array();
         $dataset = $table->fetchAll($select);
 
+        // hack.. dla potrzebnej funkcjonalności..
+        if (true === $raw) {
+        	return $dataset;
+        }
+        
         $recursive = new RecursiveIteratorIterator($dataset, RecursiveIteratorIterator::SELF_FIRST);
         $recursive->rewind();
 
