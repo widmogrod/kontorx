@@ -1,6 +1,7 @@
 <?php
 require_once 'Zend/Form/Decorator/Abstract.php';
 class KontorX_Form_Decorator_FCKEditor extends Zend_Form_Decorator_Abstract {
+
 	private $_basePath = '/js/fckeditor/';
 
 	public function setBasePath($path) {
