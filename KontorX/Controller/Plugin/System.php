@@ -339,37 +339,24 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         // title
         if (isset($templateConfig->title)) {
             $headTitle = $view->headTitle();
+            // @todo pozwolić konfiguracji ustawić separator
             $headTitle->setSeparator(' - ');
             $headTitle->prepend($templateConfig->title);
         }
         // meta
-        if (isset($templateConfig->meta)) {
-            // sprawdzanie czy są już ustawione meta dane
-            // TODO czy podwojne metadane przeszkadzają??
-            // bo wlasnie po to jest sprawdzanies
-            $meta = array();
-            $headMeta = $view->headMeta();
-            foreach ($headMeta->getContainer() as $key) {
-            	if (isset($key->name)) {
-            		if ($key->name == 'keywords') {
-	                    $meta['keywords'] = true;
-	                } else
-	                if ($key->name == 'description') {
-	                    $meta['description'] = true;
-	                }
-            	}
+        if (isset($templateConfig->meta)
+        		&& isset($templateConfig->meta->name)) {
+            $headMeta = $view->getHelper('HeadMeta');
+            if (isset($templateConfig->meta->name->keywords)) {
+                $headMeta->setName('keywords', $templateConfig->meta->name->keywords);
             }
-
-            if (!isset($meta['keywords'])) {
-                $headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
-            }
-            if (!isset($meta['description'])) {
-                $headMeta->appendName('description', $templateConfig->meta->name->description);
+            if (isset($templateConfig->meta->name->description)) {
+                $headMeta->setName('description', $templateConfig->meta->name->description);
             }
         }
         // script
         if (isset($templateConfig->script)) {
-            $headScript = $view->headScript();
+            $headScript = $view->getHelper('HeadScript');
             foreach ($templateConfig->script->js as $file) {
                 // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
                 $headScript->appendFile($file->src);
@@ -377,6 +364,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         }
         // link
         if (isset($templateConfig->links)) {
+        	$headLink = $view->getHelper('HeadLink');
             foreach ($templateConfig->links->css->toArray() as $file) {
                 // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
                 if (!isset($file['rel'])) {
@@ -385,7 +373,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             	if (!isset($file['media'])) {
 					$file['media'] = 'screen';
 				}
-                $view->headLink($file);
+                $headLink->headLink($file);
             }
         }
     }
