@@ -70,9 +70,13 @@ class KontorX_View_Helper_JsAbstract extends Zend_View_Helper_Abstract {
 				$val = $this->_dataToJSON($val);
 			}
 
-			$result[] = $key . ':' . $val;
+			$result[] = is_int($key)
+				? $val
+				: ($key . ':' . $val);
 		}
-		return '{'.implode(',',$result).'}';
+		
+		$wrapper = (array_keys($options) === array_keys(array_fill(0, count($options), null))) ? '[%s]'  : '{%s}';
+		return sprintf($wrapper, implode(',',$result));
 	}
 	
 	/**

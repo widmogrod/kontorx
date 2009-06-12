@@ -140,7 +140,11 @@ class KontorX_View_Helper_JsTree extends KontorX_View_Helper_JsAbstract {
 		$this->_setup();
 		
 		$options = $this->_getJsOptions();
-		$options = str_replace('{{fullyQualifiedName}}', $this->_fullyQualifiedName, $options);
+		$replace = array(
+			'{{id}}' => $this->_id,
+			'{{fullyQualifiedName}}' => $this->_fullyQualifiedName
+		);
+		$options = str_replace(array_keys($replace), $replace, $options);
 
 		$script = sprintf('jQuery(function (){jQuery("#%s").tree(%s);});', $this->_id, $options);
 		
@@ -155,8 +159,8 @@ class KontorX_View_Helper_JsTree extends KontorX_View_Helper_JsAbstract {
 	protected function _setup() {
 		$headScript = $this->view->getHelper('headScript');
 		$headScript
-			->appendFile($this->_scriptPath . '/_lib/css.js')
-			->appendFile($this->_scriptPath . '/source/tree_component.min.js');
+			->offsetSetFile(71, $this->_scriptPath . '/_lib/css.js')
+			->offsetSetFile(72, $this->_scriptPath . '/source/tree_component.min.js');
 		$headLink = $this->view->getHelper('headLink');
 		$headLink
 			->appendStylesheet($this->_scriptPath . '/source/tree_component.css');
@@ -164,9 +168,9 @@ class KontorX_View_Helper_JsTree extends KontorX_View_Helper_JsAbstract {
 		switch($this->_dataType) {
 			case self::DATA_TYPE_XML:
 				$headScript
-					->appendFile($this->_scriptPath . '/_lib/sarissa.js')
-					->appendFile($this->_scriptPath . '/_lib/sarissa_ieemu_xpath.js')
-					->appendFile($this->_scriptPath . '/_lib/jquery.xslt.js');
+					->offsetSetFile(73, $this->_scriptPath . '/_lib/sarissa.js')
+					->offsetSetFile(74, $this->_scriptPath . '/_lib/sarissa_ieemu_xpath.js')
+					->offsetSetFile(75, $this->_scriptPath . '/_lib/jquery.xslt.js');
 				break;
 		}
 		return $this;
