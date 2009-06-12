@@ -19,11 +19,10 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
     /**
      * Wyławia szukane kolumny spełniające warunek ..
      *
-     * @param array $columns
-     * @param array $filters
+     * @param bool $raw
      * @return array
      */
-    public function fetchData() {
+    public function fetchData($raw = false) {
         $select = $this->getSelect();
 
         // czy jest paginacja
@@ -46,6 +45,12 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
         $result = array();
 
         $stmt = $select->query();
+        
+	    // hack.. dla potrzebnej funkcjonalności..
+        if (true === $raw) {
+        	return $stmt->fetchAll(Zend_Db::FETCH_OBJ);
+        }
+        
         while (($rawData = $stmt->fetch(Zend_Db::FETCH_ASSOC))) {
             // tworzymy tablice wielowymiarowa rekordow
             foreach ($columns as $columnName => $columnInstance) {

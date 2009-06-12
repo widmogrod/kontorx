@@ -354,7 +354,6 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             $headScript = $view->getHelper('HeadScript');
             $i = 0;
             foreach ($templateConfig->script->js as $file) {
-                // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
                 $headScript->offsetSetFile(++$i, $file->src);
             }
         }
@@ -362,7 +361,6 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         if (isset($templateConfig->links)) {
         	$headLink = $view->getHelper('HeadLink');
             foreach ($templateConfig->links->css->toArray() as $file) {
-                // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }

@@ -44,11 +44,10 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
     /**
      * Wyławia szukane kolumny spełniające warunek ..
      *
-     * @param array $columns
-     * @param array $filters
+     * @param bool $raw
      * @return array
      */
-    public function fetchData() {
+    public function fetchData($raw = false) {
         $table = $this->getTable();
         $select = $this->getSelect();
 
@@ -72,6 +71,12 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
         $result = array();
 
         $dataset = $table->fetchAll($select);
+
+	    // hack.. dla potrzebnej funkcjonalności..
+        if (true === $raw) {
+        	return $dataset;
+        }
+
         foreach ($dataset as $i => $data) {
             $rawData = $data->toArray();
             // tworzymy tablice wielowymiarowa rekordow
