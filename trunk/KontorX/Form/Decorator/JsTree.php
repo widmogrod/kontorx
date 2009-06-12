@@ -10,20 +10,79 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 		'data' => array(
 			'type' => 'json'
 		),
+		'ui' => array(
+			'theme_name' => 'checkbox',
+		),
 		'callback' => array(
-			'onselect' =>
-				'function(node,tree) {
-					var checkbox = $(node).find(":checkbox:first");
-					if (!checkbox.size()) {
-						var chbox = $("<input type=\'checkbox\' checked=\'checked\' name=\'{{fullyQualifiedName}}[]\'/>").val($(node).attr("id"));
-						$(node).prepend(chbox);
-					}
-					if(checkbox.attr("checked")) {
-						checkbox.attr("checked",false);
-					} else {
-						checkbox.attr("checked",true);
-					}
-				}'
+		'onchange' =>
+'function (NODE, TREE_OBJ) {
+	var storeContainer = $("#{{id}}-store");
+	var storeElement = $(\'<input type="hidden" name="{{fullyQualifiedName}}[]">\');
+
+	var hasStoreId = function (id) {
+		return storeContainer.is(":hidden[value="+id+"]");
+	};
+	var addStoreId = function (id) {
+		if (!hasStoreId(id)) {
+			storeContainer.append(storeElement.val(id));
+		}
+	};
+	var removeStoreId = function (id) {
+		if (hasStoreId(id)) {
+			storeContainer.find(":hidden[value="+id+"]").remove();
+		}
+	};
+	
+	if(TREE_OBJ.settings.ui.theme_name == "checkbox") {
+		var $this = $(NODE).is("li") ? $(NODE) : $(NODE).parent();
+		var $id = $this.attr("id");
+		
+		if($this.children("a.unchecked").size() == 0) {
+			removeStoreId($id);
+			TREE_OBJ.container.find("a").addClass("unchecked");
+		}
+		$this.children("a").removeClass("clicked");
+		if($this.children("a").hasClass("checked")) {
+			$this.find("li").andSelf().children("a").removeClass("checked").removeClass("undetermined").addClass("unchecked");
+			var state = 0;
+			
+			$this.find("li").andSelf().each(function(){
+				var $id = $(this).attr("id");
+				removeStoreId($id);
+			});
+		}
+		else {
+			$this.find("li").andSelf().children("a").removeClass("unchecked").removeClass("undetermined").addClass("checked");
+			var state = 1;
+
+			// add
+			$this.find("li").andSelf().each(function(){
+				var $id = $(this).attr("id");
+				addStoreId($id);
+			});
+		}
+		$this.parents("li").each(function (i,k) {
+			console.log($id);
+			if(state == 1) {
+				if($(this).find("a.unchecked, a.undetermined").size() - 1 > 0) {
+					$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
+					return false;
+				} else {
+					$(this).children("a").removeClass("unchecked").removeClass("undetermined").addClass("checked");
+				}
+			}
+			else {
+				if($(this).find("a.checked, a.undetermined").size() - 1 > 0) {
+					$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
+					return false;
+				} else {
+					$(this).children("a").removeClass("checked").removeClass("undetermined").addClass("unchecked");
+				}
+			}
+		});
+	}
+}'
+			
 		)
 	);
 
@@ -34,12 +93,17 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 		$helper = $view->getHelper('jsTree');
 
 		$jsOptions = (array) $this->getOption('jsOptions', $element->getAttrib('jsOptions'));
+		if (null !== ($value = $element->getValue())) {
+			$jsOptions['selected'] = $value;
+		}
+
 		$jsOptions = array_merge_recursive($this->_jsOptions, $jsOptions);
 		$jsOptions['fullyQualifiedName'] = $element->getFullyQualifiedName();
 		
-		$helper->jsTree($element->getId(), $jsOptions);
+		$id = $element->getId();
+		$helper->jsTree($id, $jsOptions);
 		$helper->render();
 
-		return $content . sprintf('<div id="%s"></div>', $element->getId());
+		return sprintf('%s<div id="%s-store"></div><div id="%s"></div>', $content, $id, $id);
 	}
 }
