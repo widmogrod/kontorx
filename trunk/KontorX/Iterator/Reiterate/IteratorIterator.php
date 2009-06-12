@@ -29,6 +29,7 @@ class KontorX_Iterator_Reiterate_IteratorIterator extends RecursiveIteratorItera
 	final public function iterate(KontorX_Iterator_Reiterate_Container $container) {
 		$this->_new = $this->_parent = $container;
 
+		$this->rewind();
 		while ($this->valid()) {
 			$this->_current = $container->getInstance($this->current());
 			$this->_parent->addChildren($this->_current, $this->getDepth());
