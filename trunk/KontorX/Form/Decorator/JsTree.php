@@ -11,7 +11,8 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 			'type' => 'json'
 		),
 		'ui' => array(
-			'theme_name' => 'checkbox',
+			'theme_path' => 'js/jsTree/source/themes/',
+			'theme_name' => 'checkbox'
 		),
 		'callback' => array(
 		'onchange' =>
@@ -20,7 +21,7 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 	var storeElement = $(\'<input type="hidden" name="{{fullyQualifiedName}}[]">\');
 
 	var hasStoreId = function (id) {
-		return storeContainer.is(":hidden[value="+id+"]");
+		return storeContainer.find(\'[value="\'+id+\'"]\').size() > 0 ? true : false;
 	};
 	var addStoreId = function (id) {
 		if (!hasStoreId(id)) {
@@ -29,7 +30,7 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 	};
 	var removeStoreId = function (id) {
 		if (hasStoreId(id)) {
-			storeContainer.find(":hidden[value="+id+"]").remove();
+			storeContainer.find(":hidden[value=\'"+id+"\']").remove();
 		}
 	};
 	
@@ -62,7 +63,6 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 			});
 		}
 		$this.parents("li").each(function (i,k) {
-			console.log($id);
 			if(state == 1) {
 				if($(this).find("a.unchecked, a.undetermined").size() - 1 > 0) {
 					$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
@@ -99,7 +99,7 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 
 		$jsOptions = array_merge_recursive($this->_jsOptions, $jsOptions);
 		$jsOptions['fullyQualifiedName'] = $element->getFullyQualifiedName();
-		
+
 		$id = $element->getId();
 		$helper->jsTree($id, $jsOptions);
 		$helper->render();
