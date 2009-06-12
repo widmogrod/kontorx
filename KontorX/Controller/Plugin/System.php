@@ -3,8 +3,6 @@ require_once 'Zend/Controller/Plugin/Abstract.php';
 
 /**
  * KontorX_Controller_Plugin_System
- *
- * @version 0.2.0
  * @author widmogrod
  */
 class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
@@ -25,12 +23,9 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
     );
 
     /**
-     * Konstruktor
-     *
      * @param Zend_Config $config
      */
     public function __construct(Zend_Config $config) {
-        // ustawienie domyslenej konfiguracji!
         $this->setConfig($config);
     }
 
@@ -357,9 +352,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         // script
         if (isset($templateConfig->script)) {
             $headScript = $view->getHelper('HeadScript');
+            $i = 0;
             foreach ($templateConfig->script->js as $file) {
                 // TODO Dodać sprawdzenie czy sciezka jest relatywna czy nie!
-                $headScript->appendFile($file->src);
+                $headScript->offsetSetFile(++$i, $file->src);
             }
         }
         // link

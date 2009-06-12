@@ -15,6 +15,9 @@ class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
     	}
     }
 
+    /**
+     * @return KontorX_Controller_Plugin_Debug
+     */
     public static function getInstance() {
         if (null === self::$_instance) {
             self::$_instance = new self();
