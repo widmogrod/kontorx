@@ -293,17 +293,18 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         $templatePaths = $view->getScriptPaths();
 
         // ustawienia nazwy layoutu
-        $layoutName = $this->hasLayoutName()
-        ? $this->getLayoutName()
-        : $config[self::TEMPLATE]['layout'];
-
-        $layout->setLayout($layoutName);
+        if ($this->hasLayoutName()) {
+        	$layoutName = $this->getLayoutName();
+        } else
+        if(null === ($layoutName = $layout->getLayout())) {
+        	$layoutName = $config[self::TEMPLATE]['layout'];
+        }
 
         $layoutSection = $this->hasLayoutSectionName()
-        ? $this->getLayoutSectionName()
-        : $layoutName;
+	        ? $this->getLayoutSectionName()
+	        : $layoutName;
 
-        // szukanie konfiguracji
+	    // szukanie konfiguracji
         $templateConfig 		= null;
         $templateConfigType 	= $config[self::TEMPLATE]['config']['type'];
         $templateConfigFilename = $config[self::TEMPLATE]['config']['filename'];
@@ -342,10 +343,24 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         if (isset($templateConfig->meta)
         		&& isset($templateConfig->meta->name)) {
             $headMeta = $view->getHelper('HeadMeta');
-            if (isset($templateConfig->meta->name->keywords)) {
+
+            $meta = array();
+            foreach ($headMeta->getContainer() as $key) {
+            	if (isset($key->name)) {
+            		if ($key->name == 'keywords') {
+						$meta['keywords'] = true;
+					} else if ($key->name == 'description') {
+						$meta['description'] = true;
+					}
+            	}
+            }
+
+            if (!isset($meta['keywords'])
+            		&& isset($templateConfig->meta->name->keywords)) {
                 $headMeta->setName('keywords', $templateConfig->meta->name->keywords);
             }
-            if (isset($templateConfig->meta->name->description)) {
+            if (!isset($meta['description']) 
+            		&& isset($templateConfig->meta->name->description)) {
                 $headMeta->setName('description', $templateConfig->meta->name->description);
             }
         }
