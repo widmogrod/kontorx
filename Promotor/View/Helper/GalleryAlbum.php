@@ -56,7 +56,7 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 			return $this->render();
 		} catch (Exception $e) {
 			trigger_error($e->getMessage(), E_USER_WARNING);
+			return '';
 		}
-		
 	}
 }
