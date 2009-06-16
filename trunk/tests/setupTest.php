@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 
 set_include_path(implode(PATH_SEPARATOR, array(
-	'/usr/share/php/Zend/1.7.6/',
+	'/usr/share/php/Zend/1.8.1/',
 	'/usr/share/php/',
 	dirname(__FILE__) . '/../'
 )));

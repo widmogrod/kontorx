@@ -1,12 +1,6 @@
 <?php
 /**
  * KontorX_Observable
- * 
- * @category 	KontorX
- * @package 	KontorX_Observable
- * @version 	0.3.1
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 	const NOTICE = 1;
@@ -18,42 +12,36 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 
 	/**
 	 * Przechowuje obserwatorow
-	 *
 	 * @var array
 	 */
 	protected $_observers = array();
 
 	/**
 	 * Przechowuje aktualny status
-	 *
 	 * @var integer
 	 */
 	protected $_status = null;
 
 	/**
 	 * Przechowuje dane, ktore sa przekazywane pomiedzy obserwatorami
-	 *
 	 * @var arary
 	 */
 	protected $_data = array();
 
 	/**
 	 * Zawiera klucze danych ktore sa tylko do odczytu
-	 *
 	 * @var array
 	 */
 	protected $_dataReadable = array();
 	
 	/**
 	 * Przechowuje wiadomosci wg. statusow i kolejnosci ich dodania
-	 *
 	 * @var array
 	 */
 	protected $_messages = array();
 
 	/**
 	 * Przechowuje wiadomosci w kolejnosci ich dodania
-	 *
 	 * @var array
 	 */
 	protected $_messagesRaw = array();
@@ -339,7 +327,7 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 	 *
 	 * @param string $key
 	 * @param mixed $default
-	 * @return unknown
+	 * @return mixed
 	 */
 	public function getData($key = null, $default = null) {
 		if (null === $key) {
@@ -353,7 +341,6 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 	
 	/**
 	 * Zwraca liczbe obserwatorów
-	 *
 	 * @return integer
 	 */
 	public function count() {
@@ -362,7 +349,7 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 
 	/**
 	 * Nastepny obserwator
-	 *
+	 * @return void
 	 */
 	public function next() {
 		++$this->_pointer;
@@ -370,8 +357,7 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 
 	/**
 	 * Czy jest kolejny
-	 *
-	 * @return unknown
+	 * @return bool
 	 */
 	public function valid() {
 		if ($this->locked()) {
@@ -382,7 +368,6 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 
 	/**
 	 * Klucz
-	 *
 	 * @return unknown
 	 */
 	public function key() {
@@ -391,7 +376,6 @@ abstract class KontorX_Observable_Abstract implements Countable, Iterator {
 
 	/**
 	 * Aktualny obserwator
-	 *
 	 * @return KontorX_Observable_Observer_Interface
 	 */
 	public function current() {
