@@ -155,7 +155,7 @@ class Promotor_Observable_List implements Promotor_Observable_Interface {
 			$this->_observers[$key] = $observer;
 			$this->_lastObserver 	= $observer;
 
-			if ($observer->getStatus(false) === Promotor_Observable_Observer_Abstract::FAILURE
+			if ($observer->getStatus() === Promotor_Observable_Observer_Abstract::FAILURE
 					&& true === $this->_stopOnFailure) {
 				return false;
 			}
