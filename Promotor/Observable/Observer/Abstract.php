@@ -17,14 +17,10 @@ abstract class Promotor_Observable_Observer_Abstract implements Promotor_Observa
 	private $_status = null;
 	
 	/**
-	 * @param bool $clear
 	 * @return string
 	 */
-	public function getStatus($clear = true) {
+	public function getStatus() {
 		$status = $this->_status;
-		if ($clear) {
-			$this->_status = null;
-		}
 		return $status;
 	}
 
