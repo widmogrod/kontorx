@@ -74,8 +74,13 @@ class KontorX_View_Helper_JsAbstract extends Zend_View_Helper_Abstract {
 				? $val
 				: ($key . ':' . $val);
 		}
-		
-		$wrapper = (array_keys($options) === array_keys(array_fill(0, count($options), null))) ? '[%s]'  : '{%s}';
+		if (!count($options)) {
+			$wrapper = '[%s]';
+		} elseif (array_keys($options) === array_keys(array_fill(0, count($options), null))) {
+			$wrapper = '[%s]';
+		} else {
+			$wrapper = '{%s}';
+		}
 		return sprintf($wrapper, implode(',',$result));
 	}
 	
