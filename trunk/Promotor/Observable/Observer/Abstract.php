@@ -1,6 +1,7 @@
 <?php
 require_once 'Promotor/Observable/Observer/Interface.php';
 abstract class Promotor_Observable_Observer_Abstract implements Promotor_Observable_Observer_Interface {
+	const NULL = 'NULL';
 	const SUCCESS = 'SUCCESS';
 	const FAILURE = 'FAILURE';
 	
@@ -118,5 +119,20 @@ abstract class Promotor_Observable_Observer_Abstract implements Promotor_Observa
 	protected function _addException(Exception $exception) {
 		$this->_exception[] = $exception;
 		return $this;
+	}
+	
+	/**
+	 * @var Zend_Controller_Request_Abstract
+	 */
+	protected $_request;
+	
+	/**
+	 * @return Zend_Controller_Request_Abstract
+	 */
+	public function getRequest() {
+		if (null === $this->_request) {
+			$this->_request = Zend_Controller_Front::getInstance()->getRequest();
+		}
+		return $this->_request;
 	}
 }
