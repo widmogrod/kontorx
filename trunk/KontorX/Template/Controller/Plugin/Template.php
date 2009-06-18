@@ -47,7 +47,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         	return;
         }
 
-        $themeConfig = $this->getThemeConfigPath(true);
+        $themeConfig = $this->getThemeConfig();
         $view = $template->getView();
 
         // title
