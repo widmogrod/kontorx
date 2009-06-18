@@ -4,11 +4,10 @@ class Promotor_Form_Decorator_Dojo_ValidateOnSubmit extends Zend_Form_Decorator_
 	protected $_onLoad = 'function(){
 		var myForm = dijit.byId("%s");
 		dojo.connect(myForm, "onSubmit", function(e){
-			e.preventDefault();
 			if (myForm.isValid()){
 				return true;
 			} else {
-				myForm.validate();
+				return myForm.validate();
 			}
 		});
 	}';
