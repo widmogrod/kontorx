@@ -122,12 +122,22 @@ class Promotor_Observable_Manager {
 		return strtolower($name);
 	}
 
+	/**
+	 * @param string $name
+	 * @return Promotor_Observable_List 
+	 */
 	public function notify($name) {
 		$name = $this->_normalizeName($name);
 		if (!isset($this->_list[$name])) {
 			throw new KontorX_Observable_Exception(
 				sprintf('List name "%s" do not exsists', $name));
 		}
-		$this->_list[$name]->notify();
+
+		$args = func_get_args();
+		array_shift($args);
+
+		call_user_func_array(array($this->_list[$name], 'notify'), $args);
+
+		return $this->_list[$name];
 	}
 }

@@ -135,6 +135,9 @@ class Promotor_Observable_List implements Promotor_Observable_Interface {
 	 * @return bool
 	 */
 	public function notify() {
+		$args = func_get_args();
+		array_unshift($args, $this);
+
 		foreach ($this->_observers as $key => $observer) {
 			/* @var $observer Promotor_Observable_Observer_Abstract */
 			if (is_string($observer)){
@@ -150,7 +153,7 @@ class Promotor_Observable_List implements Promotor_Observable_Interface {
 					'Unknown observer param');
 			}
 
-			$observer->update($this);
+			call_user_func_array(array($observer, 'update'), $args);
 
 			$this->_observers[$key] = $observer;
 			$this->_lastObserver 	= $observer;
