@@ -1,5 +1,34 @@
 <?php
 class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller_Action_Helper_Abstract {
+	
+	/**
+	 * @param KontorX_Template $template
+	 * @return void
+	 */
+	public function __construct(KontorX_Template $template) {
+		$this->setTemplate($template);
+	}
+	
+	/**
+	 * @var KontorX_Template
+	 */
+	protected $_template;
+	
+	/**
+	 * @param KontorX_Template $template
+	 * @return void
+	 */
+	public function setTemplate(KontorX_Template $template) {
+		$this->_template = $template;
+	}
+	
+	/**
+	 * @return KontorX_Template
+	 */
+	public function getTemplate() {
+		return $this->_template;
+	}
+	
 	public function postDispatch() {
     	$this->_init();
     }
@@ -15,6 +44,10 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
         if (isset($action->skin)) {
             if (is_array($action->skin)) {
                 $options = $action->skin;
+                
+            	if (array_key_exists($actionName, $options)) {
+                    $options = $action->skin[$actionName];
+                }
 
                 // layout name
                 if (isset($options['layout'])) {
@@ -22,40 +55,25 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
                 }
 
                 // template name
-                if (isset($options['theme'])) {
-                    $template->setThemeName($options['theme']);
+            	if (isset($options['template'])) {
+                    $template->setTemplateName($options['template']);
                 }
 
                 // dodatkowa konfiguracja
                 if (isset($options['config']) && is_array($options['config'])) {
-                    $template->setOptions($options['config']);
+                	if(isset($options['config']['filename'])) {
+                		$template->setThemeConfigFilename($options['config']['filename']);
+                	} else {
+                		$template->setOptions($options['config']);
+                	}
                 }
             } else
             if (is_string($action->skin)) {
                 // template name
-                $template->setThemeName($action->skin);
+                $template->setTemplateName($action->skin);
             }
         }
     }
-
-	/**
-	 * @var KontorX_Template
-	 */
-	protected $_template;
-	
-	public function setTemplate(KontorX_Template $template) {
-		$this->_template = $template;
-	}
-	
-	/**
-	 * @return KontorX_Template
-	 */
-	public function getTemplate() {
-		if (null === $this->_template) {
-			$this->_template = KontorX_Template::getInstance();
-		}
-		return $this->_template;
-	}
 
 	/**
 	 * @return KontorX_Template
@@ -63,7 +81,7 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
 	public function direct() {
 		return $this->getTemplate();
 	}
-	
+
 	public function __call($name, $params = array()) {
         $template = $this->getTemplate();
         if(method_exists($template, $name)) {

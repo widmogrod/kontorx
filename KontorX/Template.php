@@ -110,7 +110,7 @@ class KontorX_Template {
 		foreach ($options as $name => $value) {
 			$method = 'set' . ucfirst($name);
 			if(method_exists($this, $method)) {
-				call_user_func_array(array($this, $method), $value);
+				$this->$method($value);
 			}
 		}
 	}
@@ -140,7 +140,13 @@ class KontorX_Template {
 	}
 	
 	public function isStartedLayout() {
-		return (!$this->_layout instanceof Zend_Layout);
+		/**
+		 * @todo Nie jest to jednoznacze że jest zainicjowany @see Zend_Layout? 
+		 */
+		if (class_exists('Zend_Layout',false)) {
+			return $this->getLayout()->isEnabled();
+		}
+		return false;
 	}
 	
 	/**
@@ -171,107 +177,369 @@ class KontorX_Template {
 		return $this->_view;
 	}
 
-	protected $_templatePath;
+	/**
+	 * @var array
+	 */
+	protected $_templatePaths;
 
+	/**
+	 * @param string $path
+	 * @return KontorX_Template
+	 */
 	public function setTemplatePath($path) {
-		if (!is_dir($path)) {
-			require_once 'KontorX/Template/Exception.php';
-			throw new KontorX_Template_Exception(sprintf('Template path "%s" do not exsists', $p));
-		}
-		$this->_templatePath = rtrim((string) $path, DIRECTORY_SEPARATOR);
-	}
-	
-	public function getTemplatePath($spec = null) {
-		if (true === $spec) {
-			return $this->getInflector()->filter(array(
-				'themeName' => $this->getThemeName(),
-				'styleName' => $this->getStyleName()
-			));
-		}
-		return $this->_templatePath;
-	}
-	
-	/*protected $_viewPath;
-	
-	public function setViewPath($path) {
-		$this->_viewPath = (string) $path;
+		$this->clearTemplatePaths();
+		$this->addTemplatePath($path);
+		return $this;
 	}
 
-	public function getViewPath() {
-		return $this->_viewPath;
-	}*/
+	/**
+	 * @param arary $paths
+	 * @return KontorX_Template
+	 */
+	public function setTemplatePaths(array $paths) {
+		$this->clearTemplatePaths();
+		foreach ($paths as $path) {
+			$this->addTemplatePath($path);
+		}
+		return $this;
+	}
+	
+	/**
+	 * @param string $path
+	 * @return KontorX_Template
+	 */
+	public function addTemplatePath($path) {
+		$this->_templatePaths[] = rtrim((string) $path, DIRECTORY_SEPARATOR);
+		return $this;
+	}
+	
+	/**
+	 * @param bool $inflect
+	 * @param string $inflectorTarget
+	 * @param array $sourceMerge
+	 * @return array 
+	 */
+	public function getTemplatePaths($inflect = false, $inflectorTarget = null, array $sourceMerge = array()) {
+		if (!$inflect) {
+			return $this->_templatePaths;
+		}
 
+		$target = (null === $inflectorTarget)
+			? $this->getTemplateTargetInflector()
+			: $inflectorTarget;
+		
+		$source = array(
+			'templateName' => $this->getTemplateName(),
+			'styleName' => $this->getStyleName()
+		);
+
+		$result = array();
+		$inflector = $this->getInflector();
+		foreach ($this->_templatePaths as $path) {
+			$source['templatePath'] = $path;
+			$source = array_merge($source, $sourceMerge);
+			$inflector->setTarget($target);
+			$result[] = $inflector->filter($source);
+		}
+		return $result;
+	}
+	
+	/**
+	 * @param string $file
+	 * @param string $inflectorTarget
+	 * @return string 
+	 */
+	public function getTemplatePathToFile($file, $inflectorTarget = null) {
+		if (!empty($file)) {
+			$file = (string) $file;
+			foreach ($this->getTemplatePaths(true, $inflectorTarget) as $path) {
+				$path .= $file;
+				if (is_file($path)) {
+					return $path;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return KontorX_Template
+	 */
+	public function clearTemplatePaths() {
+		$this->_templatePaths = array();
+		return $this;
+	}
+
+	/**
+	 * @var string
+	 */
+	protected $_templateName = 'default';
+	
+	/** 
+	 * @param string $template
+	 * @return KontorX_Template
+	 */
+	public function setTemplateName($template) {
+		$this->_templateName = basename((string) $template);
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTemplateName() {
+		return $this->_templateName;
+	}
+
+	/**
+	 * @var string
+	 */
 	protected $_layoutName;
 	
-	public function setLayoutName($layout) {
-		$this->getLayout()->setLayout($layout);
+	/** 
+	 * @param string $name
+	 * @return KontorX_Template
+	 */
+	public function setLayoutName($name) {
+		$this->_layoutName = basename((string) $name);
 	}
-
-	protected $_themeName;
 	
-	public function setThemeName($theme) {
-		$this->_themeName = basename((string) $theme);
+	/**
+	 * @return string
+	 */
+	public function getLayoutName() {
+		return $this->_layoutName;
 	}
-
-	public function getThemeName() {
-		return $this->_themeName;
-	}
-
-	protected $_styleName;
 	
+	/**
+	 * @var string
+	 */
+	protected $_styleName = 'default';
+	
+	/** 
+	 * @param string $template
+	 * @return KontorX_Template
+	 */
 	public function setStyleName($style) {
 		$this->_styleName = basename((string) $style);
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getStyleName() {
 		return $this->_styleName;
 	}
-	
+
+	/**
+	 * @var string
+	 */
 	protected $_styleDirName = 'styles';
-	
+
+	/**
+	 * @param string $style
+	 * @return KontorX_Template
+	 */
 	public function setStyleDirName($style) {
 		$this->_styleDirName = trim((string) $style, '/');
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getStyleDirName() {
 		return $this->_styleDirName;
 	}
 
-	protected $_allowThemeConfig = true;
+	/**
+	 * @var bool
+	 */
+	protected $_allowStyleConfig = false;
 	
-	public function setAllowThemeConfig($flag = true) {
-		$this->_allowThemeConfig = (bool) $flag;
+	/**
+	 * @param bool $flag
+	 * @return KontorX_Template
+	 */
+	public function setAllowStyleConfig($flag = true) {
+		$this->_allowStyleConfig = (bool) $flag;
+		return $this;
 	}
 
-	public function isAllowedThemeConfig() {
-		return $this->_allowThemeConfig;
+	/**
+	 * @return bool
+	 */
+	public function isAllowedStyleConfig() {
+		return $this->_allowStyleConfig;
 	}
 	
-	protected $_themeConfigFilename = 'config.ini';
-	
-	public function setThemeConfigFilename($name) {
-		$this->_themeConfigFilename = basename((string) $name);
+	/**
+	 * @var string
+	 */
+	protected $_styleConfigFilename = 'config.ini';
+
+	/**
+	 * @param string $name
+	 * @return KontorX_Template
+	 */
+	public function setStyleConfigFilename($name) {
+		$this->_styleConfigFilename = basename((string) $name);
+		return $this;
 	}
 	
-	public function getThemeConfigFilename() {
-		return $this->_themeConfigFilename;
+	/**
+	 * @return string
+	 */
+	public function getStyleConfigFilename() {
+		return $this->_styleConfigFilename;
+	}
+
+
+	/**
+	 * @var string
+	 */
+	protected $_templateTargetInflector = ':templatePath/:templateName/';
+	
+	/**
+	 * @param string $target
+	 * @return KontorX_Template
+	 */
+	public function setTemplateTargetInflector($target) {
+		$this->_templateTargetInflector = (string) $target;
+		return $this;
 	}
 	
-	public function getThemeConfig() {
-		if (!strlen($this->_themeConfigFilename)) {
+	/**
+	 * @return string
+	 */
+	public function getTemplateTargetInflector() {
+		return $this->_templateTargetInflector;
+	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_styleTargetInflector = ':templatePath/:templateName/:stylesDir/:styleName/';
+
+	/**
+	 * @param string $target
+	 * @return KontorX_Template
+	 */
+	public function setStyleTargetInflector($target) {
+		$this->_styleTargetInflector = (string) $target;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStyleTargetInflector() {
+		return $this->_styleTargetInflector;
+	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_stylesTargetInflector = ':templatePath/:templateName/:stylesDir/';
+
+	/**
+	 * @param string $target
+	 * @return KontorX_Template
+	 */
+	public function setStylesTargetInflector($target) {
+		$this->_stylesTargetInflector = (string) $target;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStylesTargetInflector() {
+		return $this->_stylesTargetInflector;
+	}
+
+	/**
+	 * @var array
+	 */
+	protected $_findTemplates;
+	
+	/**
+	 * @return array
+	 */
+	public function findTemplates() {
+		if (null === $this->_findTemplates) {
+			$this->_findTemplates = array();
+			foreach ($this->getTemplatePaths() as $path) {
+				$iterator = new DirectoryIterator($path);
+				foreach ($iterator as $file) {
+					/* @var $file DirectoryIterator */
+					if (!$file->isDot() && $file->isDir()) {
+						$filename = $file->getFilename();
+						// filtrowanie przed katalogami poprzedzonymi '.nazwa'
+						if ('.' !== substr($filename, 0,1)) {
+							$filename = ltrim($filename, '.');
+							$this->_findTemplates[$filename] = $filename;
+						}
+					}
+				}
+			}
+		}
+		return $this->_findTemplates;
+	}
+
+	/**
+	 * @var array
+	 */
+	protected $_findStyles = array();
+	
+	/**
+	 * @param string $template
+	 * @return array
+	 */
+	public function findStyles($template) {
+		$template = basename($template);
+		if (!isset($this->_findStyles[$template])) {
+			$this->_findStyles[$template] = array();
+			$source = array('templateName' => $template);
+			$styles = $this->getTemplatePaths(true,
+							$this->getStylesTargetInflector(),
+							$source);
+	
+			foreach ($styles as $path) {
+				$iterator = new DirectoryIterator($path);
+				foreach ($iterator as $file) {
+					/* @var $file DirectoryIterator */
+					if (!$file->isDot() && $file->isDir()) {
+						$filename = $file->getFilename();
+						// filtrowanie przed katalogami poprzedzonymi '.nazwa'
+						if ('.' !== substr($filename, 0,1)) {
+							$filename = ltrim($filename, '.');
+							$this->_findStyles[$template][$filename] = $filename;
+						}
+					}
+				}
+			}
+		}
+		return $this->_findStyles[$template];
+	}
+
+	/**
+	 * @return Zend_Config
+	 */
+	public function getStyleConfig() {
+		if (!strlen($this->_styleConfigFilename)) {
 			require_once 'KontorX/Template/Exception.php';
-			throw new KontorX_Template_Exception(sprintf('config filename is not set'));
+			throw new KontorX_Template_Exception(sprintf('template style config filename is not set'));
 		}
 
-		$path  = $this->getTemplatePath(true);
-		$path .= $this->_themeConfigFilename;
-		
+		$path  = $this->getTemplatePathToFile($this->_styleConfigFilename, $this->getStyleTargetInflector());
 		if (!is_file($path)) {
 			require_once 'KontorX/Template/Exception.php';
 			throw new KontorX_Template_Exception(sprintf('config pathname "%s" do not exsists', $path));
 		}
 
-		$type = strtolower(pathinfo($this->_themeConfigFilename, PATHINFO_EXTENSION));
+		$type = strtolower(pathinfo($this->_styleConfigFilename, PATHINFO_EXTENSION));
 		switch ($type) {
 			case 'ini':
 				require_once 'Zend/Config/Ini.php';
@@ -284,7 +552,7 @@ class KontorX_Template {
 				$conf = include $path;
 				if (!is_array($conf)) {
 					require_once 'KontorX/Template/Exception.php';
-					throw new KontorX_Template_Exception(sprintf('config file "%s" is not array', $this->_themeConfigFilename));
+					throw new KontorX_Template_Exception(sprintf('config file "%s" is not array', $this->_templateConfigFilename));
 				}
 				$conf = new Zend_Config($conf); break;
 			default:
@@ -295,24 +563,6 @@ class KontorX_Template {
 		return $conf;
 	}
 
-	protected $_inflectorTarget = ':templatePath/:themeName/:stylesDir/:styleName/';
-
-	/**
-     * @return string
-     */
-	public function getInflectorTarget() {
-		return $this->_inflectorTarget;
-	}
-
-    /**
-     * @param  string $inflectorTarget
-     * @return Zend_Layout
-     */
-	public function setInflectorTarget($inflectorTarget) {
-		$this->_inflectorTarget = (string) $inflectorTarget;
-		return $this;
-	}
-	
 	/**
 	 * @var Zend_Filter_Inflector
 	 */
@@ -333,16 +583,17 @@ class KontorX_Template {
 	public function getInflector() {
 		if (null === $this->_inflector) {
 			require_once 'Zend/Filter/Inflector.php';
-			$inflector = new Zend_Filter_Inflector();
-            $inflector->setTargetReference($this->_inflectorTarget)
-            		  ->setThrowTargetExceptionsOn(false)
-                      ->addRules(array(
-                      	':themeName' => array('Word_CamelCaseToDash', 'StringToLower'),
-                      	':styleName' => array('Word_CamelCaseToDash', 'StringToLower')
-                      ))
-                      ->setStaticRuleReference('templatePath', $this->_templatePath)
-                      ->setStaticRuleReference('stylesDir', $this->_styleDirName);
-			$this->setInflector($inflector);
+			$this->_inflector = new Zend_Filter_Inflector();
+            $this->_inflector->setThrowTargetExceptionsOn(false);
+            $this->_inflector->addRules(array(
+            	':templatePath' => array(),
+				':templateName' => array('Word_CamelCaseToDash', 'StringToLower'),
+				':styleName' => array('Word_CamelCaseToDash', 'StringToLower'),
+            	':stylesDir' => array()
+			))
+			->setStaticRuleReference('templateName', $this->_templateName)
+			->setStaticRuleReference('styleName', $this->_styleName)
+			->setStaticRuleReference('stylesDir', $this->_styleDirName);
 		}
 
 		return $this->_inflector;
