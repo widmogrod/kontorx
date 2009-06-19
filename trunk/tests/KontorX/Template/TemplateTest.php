@@ -30,8 +30,8 @@ class KontorX_Template_TemplateTest extends UnitTestCase {
 
 	public function testOptions() {
 		$options = array(
-			'themeConfigFilename' => 'ThemeConfigName',
-			'allowThemeConfig' => false
+			'styleConfigFilename' => 'styleConfigFilename',
+			'allowedStyleConfig' => false
 		);
 
 		try {
@@ -44,44 +44,75 @@ class KontorX_Template_TemplateTest extends UnitTestCase {
 			sprintf('Opcja "%s" nie jest taka sama jak ustawiona','styles'));
 		
 		$this->assertEqual(
-			$this->_template->getThemeConfigFilename(),
-			$options['themeConfigFilename'],
-			sprintf('Opcja "%s" nie jest taka sama jak ustawiona','themeConfigName'));
+			$this->_template->getStyleConfigFilename(),
+			$options['styleConfigFilename'],
+			sprintf('Opcja "%s" nie jest taka sama jak ustawiona','styleConfigFilename'));
 
 		$this->assertEqual(
-			$this->_template->isAllowedThemeConfig(),
-			$options['allowThemeConfig'],
-			sprintf('Opcja "%s" nie jest taka sama jak ustawiona',$options['allowThemeConfig']));
+			$this->_template->isAllowedStyleConfig(),
+			$options['allowedStyleConfig'],
+			sprintf('Opcja "%s" nie jest taka sama jak ustawiona',$options['allowedStyleConfig']));
 	}
 
 	public function testGetTemplatePath() {
 		$options = array(
 			'templatePath' => 'source/',
-			'allowThemeConfig' => false
+			'allowedStyleConfig' => false
 		);
 
 		$this->_template->setOptions($options);
 
-		$this->_template->setThemeName('xp');
-		$this->_template->setStyleName('orange');
-		
-		$templatePath = 'source/xp/styles/orange/';
-		
 		$this->assertEqual(
-			$t = $this->_template->getTemplatePath(true),
-			$templatePath,
-			sprintf('Ścieżka do szablonu "%s" jest inna niż oczekiwana "%s"',$t, $templatePath));
+			$this->_template->getTemplatePaths(),
+			array('source/'),
+			'lista ustawionych szablonów jest różna');
+	}
+	
+	public function testGetTemplatePaths() {
+		$options = array(
+			'templatePaths' => array(
+				'source/',
+				'source2/'
+			),
+			'allowedStyleConfig' => false
+		);
+
+		$this->_template->setOptions($options);
+
+		$this->assertEqual(
+			$this->_template->getTemplatePaths(),
+			array('source/','source2/'),
+			'zwrócona lista ustawionych szablonów jest różna');
+	}
+	
+	public function testGetTemplatePathsIsArray() {
+		$options = array(
+			'templatePaths' => array(
+				'source/',
+				'source2/'
+			),
+			'allowedStyleConfig' => false
+		);
+
+		$this->_template->setOptions($options);
+
+		$this->assertTrue(
+			is_array($this->_template->getTemplatePaths()),
+			'lista szablonów nie jest tablicą');
 	}
 
 	public function testConfigIni() {
 		$options = array(
-			'templatePath' => 'source/',
-			'themeConfigFilename' => 'config.ini',
-			'allowThemeConfig' => false
+			'templatePaths' => array(
+				realpath('source/'),
+				realpath('source2/')
+			),
+			'styleConfigFilename' => 'config.ini',
+			'allowedStyleConfig' => false
 		);
 		
 		$this->_template->setOptions($options);
-		$result = $this->_template->getThemeConfig();
+		$result = $this->_template->getStyleConfig();
 		
 		$this->assertTrue(
 			$result instanceof Zend_Config,
@@ -90,13 +121,19 @@ class KontorX_Template_TemplateTest extends UnitTestCase {
 	
 	public function testConfigXml() {
 		$options = array(
-			'templatePath' => 'source/',
-			'themeConfigFilename' => 'config.xml',
-			'allowThemeConfig' => false
+			'templatePaths' => array(
+				realpath('source/'),
+				realpath('source2/')
+			),
+			'styleConfigFilename' => 'config.xml',
+			'allowedStyleConfig' => false
 		);
 		
 		$this->_template->setOptions($options);
-		$result = $this->_template->getThemeConfig();
+		$this->_template
+			->setTemplateName('win')
+			->setStyleName('default');
+		$result = $this->_template->getStyleConfig();
 		
 		$this->assertTrue(
 			$result instanceof Zend_Config,
@@ -105,17 +142,49 @@ class KontorX_Template_TemplateTest extends UnitTestCase {
 	
 	public function testConfigPhp() {
 		$options = array(
-			'templatePath' => 'source/',
-			'themeConfigFilename' => 'config.php',
-			'allowThemeConfig' => false
+			'templatePaths' => array(
+				realpath('source/'),
+				realpath('source2/')
+			),
+			'styleConfigFilename' => 'config.php',
+			'allowedStyleConfig' => false
 		);
 		
 		$this->_template->setOptions($options);
-		$result = $this->_template->getThemeConfig();
+		$this->_template
+			->setTemplateName('win')
+			->setStyleName('default');
+		$result = $this->_template->getStyleConfig();
 		
 		$this->assertTrue(
 			$result instanceof Zend_Config,
 			'configuracja nie jest typu "Zend_Config"');
+	}
+	
+	public function testFindTemplates() {
+		$options = array(
+			'templatePaths' => array(
+				realpath('source/'),
+				realpath('source2/')
+			)
+		);
+
+		$this->_template->setOptions($options);
+		$templates = $this->_template->findTemplates();
+		$this->dump($templates);
+	}
+
+	public function testFindStyles() {
+		$options = array(
+			'templatePaths' => array(
+				realpath('source/'),
+				realpath('source2/')
+			)
+		);
+
+		$this->_template->setOptions($options);
+		$templates = $this->_template->findStyles('win');
+		$this->dump($templates);
 	}
 }
 
