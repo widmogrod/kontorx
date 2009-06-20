@@ -39,6 +39,8 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 			return;
 		}
 
+		$layout = $template->getLayout();
+
         /**
          * @todo nie zawsze musi to oznaczać że nie nalerzy
          * inicjować ścieżek skoro juz jakieś są..
@@ -46,16 +48,14 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         if (null === $layout->getLayoutPath()) {
         	$this->_initLayoutPath($layout);
         }
-
-        if (!$template->isAllowedThemeConfig()) {
-        	return;
+        
+		// ustawienie nazwy szablonu
+        if (null !== ($layoutName = $template->getLayoutName())) {
+        	$layout->setLayout($layoutName);
         }
 
-        // ustawienie nazwy szablonu
-        if (null === ($layoutName = $layoutName= $layout->getLayout())) {
-	        if (null !== ($layoutName = $template->getLayoutName())) {
-	        	$layout->setLayout($layoutName);
-	        }
+        if (!$template->isAllowedStyleConfig()) {
+        	return;
         }
 
         $templateConfig = $template->getStyleConfig();
@@ -76,9 +76,8 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 	 * @return KontorX_Template_Controller_Plugin_Template;
 	 */
 	protected function _initLayoutPath(Zend_Layout $layout) {
-		$view = $layout->getView();
-
 		$template = $this->getTemplate();
+		$view = $template->getView();
 		foreach ($template->getTemplatePaths(true) as $path) {
 			if (method_exists($view, 'addScriptPath')) {
                 $view->addScriptPath($path);
@@ -99,14 +98,14 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 		$view = $template->getView();
 
         // title
-        if (isset($templateConfig->title)) {
+        if (isset($options->title)) {
             $headTitle = $view->getHelper('HeadTitle');
-            $headTitle->append($templateConfig->title);
+            $headTitle->append($options->title);
         }
 
 		// meta
-        if (isset($templateConfig->meta)
-        		&& isset($templateConfig->meta->name)) {
+        if (isset($options->meta)
+        		&& isset($options->meta->name)) {
             $headMeta = $view->getHelper('HeadMeta');
 
             $meta = array();
@@ -121,28 +120,28 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             }
 
             if (!isset($meta['keywords'])
-            		&& isset($templateConfig->meta->name->keywords)) {
-                $headMeta->setName('keywords', $templateConfig->meta->name->keywords);
+            		&& isset($options->meta->name->keywords)) {
+                $headMeta->setName('keywords', $options->meta->name->keywords);
             }
             if (!isset($meta['description']) 
-            		&& isset($templateConfig->meta->name->description)) {
-                $headMeta->setName('description', $templateConfig->meta->name->description);
+            		&& isset($options->meta->name->description)) {
+                $headMeta->setName('description', $options->meta->name->description);
             }
         }
 
         // script
-        if (isset($templateConfig->script)) {
+        if (isset($options->script)) {
             $headScript = $view->getHelper('HeadScript');
             $i = 0;
-            foreach ($templateConfig->script->js as $file) {
+            foreach ($options->script->js as $file) {
                 $headScript->offsetSetFile(++$i, $file->src);
             }
         }
 
         // link
-        if (isset($templateConfig->links)) {
+        if (isset($options->links)) {
         	$headLink = $view->getHelper('HeadLink');
-            foreach ($templateConfig->links->css->toArray() as $file) {
+            foreach ($options->links->css->toArray() as $file) {
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }
