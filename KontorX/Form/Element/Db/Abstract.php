@@ -120,6 +120,26 @@ class KontorX_Form_Element_Db_Abstract extends Zend_Form_Element_Multi {
 	}
 	
 	/**
+	 * @var bool
+	 */
+	protected $_firstNull = true;
+	
+	/**
+	 * @return KontorX_Form_Element_Db_Abstract
+	 */
+	public function setFirstNull($flag = true) {
+		$this->_firstNull = (bool) $flag;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isFirstNull() {
+		return $this->_firstNull;
+	}
+
+	/**
 	 * @return Zend_Db_Statement_Interface
 	 */
 	protected function _query() {
@@ -137,6 +157,10 @@ class KontorX_Form_Element_Db_Abstract extends Zend_Form_Element_Multi {
 		$key = $this->getOptionKey();
 		$val = $this->getOptionValue();
 
+		if ($this->isFirstNull()) {
+			$this->addMultiOption(null,null);
+		}
+		
 		$stmt = $this->_query();
 		while ($row = $stmt->fetch()) {
 			$this->addMultiOption($row[$key], $row[$val]);
