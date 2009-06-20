@@ -26,8 +26,8 @@ class KontorX_Template {
 			$this->setOptions($options->toArray());
 		}
 
-//		$this->_initPlugin();
-//		$this->_initHelper();
+		$this->_initPlugin();
+		$this->_initHelper();
 	}
 	
 	/**
@@ -251,9 +251,8 @@ class KontorX_Template {
 	 */
 	public function getTemplatePathToFile($file, $inflectorTarget = null) {
 		if (!empty($file)) {
-			$file = (string) $file;
 			foreach ($this->getTemplatePaths(true, $inflectorTarget) as $path) {
-				$path .= $file;
+				$path .= (string) $file;
 				if (is_file($path)) {
 					return $path;
 				}
@@ -395,8 +394,127 @@ class KontorX_Template {
 		return $this->_styleConfigFilename;
 	}
 
+	/**
+	 * @return Zend_Config
+	 * @throws KontorX_Template_Exception
+	 */
+	public function getStyleConfig() {
+		if (!strlen($this->_styleConfigFilename)) {
+			require_once 'KontorX/Template/Exception.php';
+			throw new KontorX_Template_Exception('template style config filename is not set');
+		}
+
+		$path  = $this->getTemplatePathToFile($this->_styleConfigFilename, $this->getStyleTargetInflector());
+		if (null === $path) {
+			require_once 'KontorX/Template/Exception.php';
+			throw new KontorX_Template_Exception(sprintf(
+				'config filename "%s" do not exsists in template paths',
+				$this->_styleConfigFilename));
+		}
+		
+		// definiowanie GLOBAL..
+		if (!defined('KX_TEMPLATE_SKIN')) {
+			$skinpath = str_replace($this->getTemplatePaths(),
+									null,
+									dirname($path));
+			define('KX_TEMPLATE_SKIN', $skinpath);
+		}
+
+		$type = strtolower(pathinfo($this->_styleConfigFilename, PATHINFO_EXTENSION));
+		switch ($type) {
+			case 'ini':
+				require_once 'Zend/Config/Ini.php';
+				$conf = new Zend_Config_Ini($path); break;
+			case 'xml':
+				require_once 'Zend/Config/Xml.php';
+				$conf = new Zend_Config_Xml($path); break;
+			case 'php':
+				$conf = include $path;
+				if (!is_array($conf)) {
+					require_once 'KontorX/Template/Exception.php';
+					throw new KontorX_Template_Exception(sprintf('config file "%s" is not array', $this->_templateConfigFilename));
+				}
+				require_once 'Zend/Config.php';
+				$conf = new Zend_Config($conf); break;
+			default:
+				require_once 'KontorX/Template/Exception.php';
+				throw new KontorX_Template_Exception(sprintf('undefinded config type "%s"', $type));
+		}
+		
+		return $conf;
+	}
+
+	
 
 	/**
+	 * @var array
+	 */
+	protected $_findTemplates;
+	
+	/**
+	 * @return array
+	 */
+	public function findTemplates() {
+		if (null === $this->_findTemplates) {
+			$this->_findTemplates = array();
+			foreach ($this->getTemplatePaths() as $path) {
+				$iterator = new DirectoryIterator($path);
+				foreach ($iterator as $file) {
+					/* @var $file DirectoryIterator */
+					if (!$file->isDot() && $file->isDir()) {
+						$filename = $file->getFilename();
+						// katalogi tylko alfa-numeryczne
+						if (false !== preg_match('/^([\wd]+)$/', $filename)) {
+							$filename = ltrim($filename, '.');
+							$this->_findTemplates[$filename] = array(
+								'name' => $filename
+							);
+						}
+					}
+				}
+			}
+		}
+		return $this->_findTemplates;
+	}
+
+	/**
+	 * @var array
+	 */
+	protected $_findStyles = array();
+	
+	/**
+	 * @param string $template
+	 * @return array
+	 */
+	public function findStyles($template) {
+		$template = basename($template);
+		if (!isset($this->_findStyles[$template])) {
+			$this->_findStyles[$template] = array();
+			$source = array('templateName' => $template);
+			$styles = $this->getTemplatePaths(true,
+							$this->getStylesTargetInflector(),
+							$source);
+	
+			foreach ($styles as $path) {
+				$iterator = new DirectoryIterator($path);
+				foreach ($iterator as $file) {
+					/* @var $file DirectoryIterator */
+					if (!$file->isDot() && $file->isDir()) {
+						$filename = $file->getFilename();
+						// katalogi tylko alfa-numeryczne
+						if (false !== preg_match('/^([\wd]+)$/', $filename)) {
+							$this->_findStyles[$template][$filename] = array(
+								'name' => $filename
+							);
+						}
+					}
+				}
+			}
+		}
+		return $this->_findStyles[$template];
+	}
+
+/**
 	 * @var string
 	 */
 	protected $_templateTargetInflector = ':templatePath/:templateName/';
@@ -458,111 +576,7 @@ class KontorX_Template {
 	public function getStylesTargetInflector() {
 		return $this->_stylesTargetInflector;
 	}
-
-	/**
-	 * @var array
-	 */
-	protected $_findTemplates;
 	
-	/**
-	 * @return array
-	 */
-	public function findTemplates() {
-		if (null === $this->_findTemplates) {
-			$this->_findTemplates = array();
-			foreach ($this->getTemplatePaths() as $path) {
-				$iterator = new DirectoryIterator($path);
-				foreach ($iterator as $file) {
-					/* @var $file DirectoryIterator */
-					if (!$file->isDot() && $file->isDir()) {
-						$filename = $file->getFilename();
-						// filtrowanie przed katalogami poprzedzonymi '.nazwa'
-						if ('.' !== substr($filename, 0,1)) {
-							$filename = ltrim($filename, '.');
-							$this->_findTemplates[$filename] = $filename;
-						}
-					}
-				}
-			}
-		}
-		return $this->_findTemplates;
-	}
-
-	/**
-	 * @var array
-	 */
-	protected $_findStyles = array();
-	
-	/**
-	 * @param string $template
-	 * @return array
-	 */
-	public function findStyles($template) {
-		$template = basename($template);
-		if (!isset($this->_findStyles[$template])) {
-			$this->_findStyles[$template] = array();
-			$source = array('templateName' => $template);
-			$styles = $this->getTemplatePaths(true,
-							$this->getStylesTargetInflector(),
-							$source);
-	
-			foreach ($styles as $path) {
-				$iterator = new DirectoryIterator($path);
-				foreach ($iterator as $file) {
-					/* @var $file DirectoryIterator */
-					if (!$file->isDot() && $file->isDir()) {
-						$filename = $file->getFilename();
-						// filtrowanie przed katalogami poprzedzonymi '.nazwa'
-						if ('.' !== substr($filename, 0,1)) {
-							$filename = ltrim($filename, '.');
-							$this->_findStyles[$template][$filename] = $filename;
-						}
-					}
-				}
-			}
-		}
-		return $this->_findStyles[$template];
-	}
-
-	/**
-	 * @return Zend_Config
-	 */
-	public function getStyleConfig() {
-		if (!strlen($this->_styleConfigFilename)) {
-			require_once 'KontorX/Template/Exception.php';
-			throw new KontorX_Template_Exception(sprintf('template style config filename is not set'));
-		}
-
-		$path  = $this->getTemplatePathToFile($this->_styleConfigFilename, $this->getStyleTargetInflector());
-		if (!is_file($path)) {
-			require_once 'KontorX/Template/Exception.php';
-			throw new KontorX_Template_Exception(sprintf('config pathname "%s" do not exsists', $path));
-		}
-
-		$type = strtolower(pathinfo($this->_styleConfigFilename, PATHINFO_EXTENSION));
-		switch ($type) {
-			case 'ini':
-				require_once 'Zend/Config/Ini.php';
-				$conf = new Zend_Config_Ini($path); break;
-			case 'xml':
-				require_once 'Zend/Config/Xml.php';
-				$conf = new Zend_Config_Xml($path); break;
-			case 'php':
-				require_once 'Zend/Config.php';
-				$conf = include $path;
-				if (!is_array($conf)) {
-					require_once 'KontorX/Template/Exception.php';
-					throw new KontorX_Template_Exception(sprintf('config file "%s" is not array', $this->_templateConfigFilename));
-				}
-				$conf = new Zend_Config($conf); break;
-			default:
-				require_once 'KontorX/Template/Exception.php';
-				throw new KontorX_Template_Exception(sprintf('undefinded config type "%s"', $type));
-		}
-		
-		return $conf;
-	}
-
 	/**
 	 * @var Zend_Filter_Inflector
 	 */
