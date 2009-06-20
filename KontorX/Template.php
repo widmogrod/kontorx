@@ -302,7 +302,7 @@ class KontorX_Template {
 	public function setLayoutName($name) {
 		$this->_layoutName = basename((string) $name);
 	}
-	
+
 	/**
 	 * @return string
 	 */
