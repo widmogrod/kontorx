@@ -85,7 +85,7 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 	 * @return integer
 	 */
 	public function getDepth() {
-		$level = $this->_data[$this->_level];
+		$level = @$this->_data[$this->_level];
 		return $level == '' ? 0 : substr_count($level, $this->_separator) + 1;
 	}
 	
@@ -150,7 +150,7 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 		$primary = current($this->_primary);
 
 		// aktualny poziom zagnieżdżenia
-		$level = $this->{$this->_level};
+		$level = $this->__get($this->_level);
 		$descendans = explode($this->_separator, $level);
 
 		// TODO Czy zostawić coś takiego?
@@ -191,7 +191,7 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 		}
 
 		// aktualny poziom zagnieżdżenia
-		$level = $this->{$this->_level};
+		$level = $this->__get($this->_level);
 
 		// root nie ma rodziców
 		if ($level == '') {
@@ -229,14 +229,14 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 		}
 
 		// aktualny poziom zagnieżdżenia
-		$level = $this->{$this->_level};
+		$level = $this->__get($this->_level);
 
 		// zabespieczenie gdy dzialamy na root
 		// TODO Jak appendujemy roota to w przyszlosci
 		// dodac mozliwosc dodania kolumny sortujacej!
 		$levelChildrens = ($level == '')
-			? $this->{current($this->_primary)}
-			: $level . $this->_separator . $this->{current($this->_primary)};
+			? $this->__get(current($this->_primary))
+			: $level . $this->_separator . $this->__get(current($this->_primary));
 
 		$select = (null === $select)
 			? $this->select()
@@ -349,13 +349,13 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 		}
 
 		// generowanie nowej wartości dla zagnieżdzenia
-		$level = $parentRow->{$this->_level};
+		$level = $parentRow->__get($this->_level);
 		$level = ($level == '')
 			? $parentRow->{current($this->_primary)}
-			: $level . $this->_separator . $parentRow->{current($this->_primary)};
+			: $level . $this->_separator . $parentRow->__get(current($this->_primary));
 
 		// ustawianie zagniezdzenia
-		$this->{$this->_level} = $level;
+		$this->__set($this->_level, $level);
 		
 		// zerowanie parent row .. zeby nie bylo baboli np. podczas update
 		$this->_parentRow = null;
@@ -375,21 +375,21 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 			$level = '';
 		} else {
 			// generowanie nowej wartości dla zagnieżdzenia
-			$level = $parentRow->{$this->_level};
+			$level = $parentRow->__get($this->_level);
 			$level = ($level == '')
-				? $parentRow->{current($this->_primary)}
-				: $level . $this->_separator . $parentRow->{current($this->_primary)};
+				? $parentRow->__get(current($this->_primary))
+				: $level . $this->_separator . $parentRow->__get(current($this->_primary));
 		}
 
 		// stara wartosc zagniezdzenia
-		$levelOld = $this->{$this->_level};
+		$levelOld = $this->__get($this->_level);
 		// ustawianie zagniezdzenia
-//		$this->{$this->_level} = $level;
+//		$this->__get($this->_level) = $level;
 //
 //		// zabespieczenie gdy dzialamy na root
 //		$level = $levelOld == ''
-//			? $this->{current($this->_primary)}
-//			: $levelOld . $this->_separator . $this->{current($this->_primary)};
+//			? $this->__get(current($this->_primary))
+//			: $levelOld . $this->_separator . $this->__get(current($this->_primary));
 		
 		// update dzieci rodzica gdy zostaje zmienione jego polozenie
 		$table = $this->getTable();
@@ -401,18 +401,18 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 			// Zastąpić to zapytaniem SQL!
 			foreach ($this->findChildrens() as $children) {
 				$childrenLevel = ($levelOld == '')
-					? $level . $this->_separator . $children->{$this->_level}
-					: str_replace($levelOld, $level, $children->{$this->_level});
+					? $level . $this->_separator . $children->__get($this->_level)
+					: str_replace($levelOld, $level, $children->__get($this->_level));
 				// level nie moze zaczynac się od separatora!
 				$childrenLevel = ($childrenLevel{0} == $this->_separator)
 					? substr($childrenLevel, 1)
 					: $childrenLevel;
 
-				$children->{$this->_level} = $childrenLevel;
+				$children->__set($this->_level, $childrenLevel);
 
 				$children->save();
 			}
-			$this->{$this->_level} = $level;
+			$this->__set($this->_level, $level);
 
 			$db->commit();
 		} catch (Zend_Db_Exception $e) {
@@ -433,9 +433,9 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 		$db = $table->getAdapter();
 
 		// zabespieczenie gdy dzialamy na root
-		$level = $this->{$this->_level} == ''
-			? $this->{current($this->_primary)}
-			: $this->{$this->_level} . $this->_separator . $this->{current($this->_primary)};
+		$level = $this->__get($this->_level) == ''
+			? $this->__get(current($this->_primary))
+			: $this->__get($this->_level) . $this->_separator . $this->__get(current($this->_primary));
 
 		$where = $db->quoteInto("$this->_level LIKE ?", $level . '%');
 		$db = $this->getTable()->delete($where);
