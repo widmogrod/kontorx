@@ -93,7 +93,7 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 		switch ($this->_type) {
 			case self::NEWS:
 				$model = new Site_Model_Site();
-				return $model->findAttachments($this->_alias, $this->_type, $this->_limit);
+				return $model->findAttachmentsCache($this->_alias, $this->_type, $this->_limit);
 		}
 
 		// @todo Exception!
