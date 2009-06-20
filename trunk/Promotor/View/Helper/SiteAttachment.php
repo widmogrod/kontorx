@@ -8,7 +8,15 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 	 */
 	protected $_alias;
 	
-	protected $_limit;
+	/**
+	 * @var integer
+	 */
+	protected $_page;
+	
+	/**
+	 * @var integer
+	 */
+	protected $_rowCount;
 	
 	/**
 	 * @var string
@@ -38,11 +46,20 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 	}
 	
 	/**
-	 * @param integer $alias
+	 * @param integer $page
 	 * @return Promotor_View_Helper_SiteAttachment 
 	 */
-	public function setLimit($limit) {
-		$this->_limit = (integer) $limit;
+	public function setPage($page) {
+		$this->_page = (integer) $page;
+		return $this;
+	}
+	
+	/**
+	 * @param integer $rowCount
+	 * @return Promotor_View_Helper_SiteAttachment 
+	 */
+	public function setRowCount($rowCount) {
+		$this->_rowCount = (integer) $rowCount;
 		return $this;
 	}
 
@@ -93,7 +110,7 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 		switch ($this->_type) {
 			case self::NEWS:
 				$model = new Site_Model_Site();
-				return $model->findAttachmentsCache($this->_alias, $this->_type, $this->_limit);
+				return $model->findAttachmentsCache($this->_alias, $this->_type, $this->_rowCount, $this->_page);
 		}
 
 		// @todo Exception!
