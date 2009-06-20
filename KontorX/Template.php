@@ -464,7 +464,7 @@ class KontorX_Template {
 					if (!$file->isDot() && $file->isDir()) {
 						$filename = $file->getFilename();
 						// katalogi tylko alfa-numeryczne
-						if (false !== preg_match('/^([\wd]+)$/', $filename)) {
+						if (1 == preg_match('/^[a-z0-9]+$/i', $filename)) {
 							$filename = ltrim($filename, '.');
 							$this->_findTemplates[$filename] = array(
 								'name' => $filename
@@ -491,18 +491,23 @@ class KontorX_Template {
 		if (!isset($this->_findStyles[$template])) {
 			$this->_findStyles[$template] = array();
 			$source = array('templateName' => $template);
-			$styles = $this->getTemplatePaths(true,
+			$paths = $this->getTemplatePaths(true,
 							$this->getStylesTargetInflector(),
 							$source);
 	
-			foreach ($styles as $path) {
-				$iterator = new DirectoryIterator($path);
+			foreach ($paths as $path) {
+				try {
+					$iterator = new DirectoryIterator($path);
+				} catch (RuntimeException $e) {
+					continue;
+				}
+
 				foreach ($iterator as $file) {
 					/* @var $file DirectoryIterator */
 					if (!$file->isDot() && $file->isDir()) {
 						$filename = $file->getFilename();
 						// katalogi tylko alfa-numeryczne
-						if (false !== preg_match('/^([\wd]+)$/', $filename)) {
+						if (1 == preg_match('/^[a-z0-9]+$/i', $filename)) {
 							$this->_findStyles[$template][$filename] = array(
 								'name' => $filename
 							);
