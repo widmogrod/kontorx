@@ -29,7 +29,7 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
 		return $this->_template;
 	}
 	
-	public function postDispatch() {
+	public function preDispatch() {
     	$this->_init();
     }
 
@@ -68,9 +68,10 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
                 if (isset($options['config']) && is_array($options['config'])) {
                 	if(isset($options['config']['filename'])) {
                 		$template->setStyleConfigFilename($options['config']['filename']);
-                	} else {
-                		$template->setOptions($options['config']);
                 	}
+                	/*else {
+                		$template->setOptions($options['config']);
+                	}*/
                 }
             } else
             if (is_string($action->skin)) {
