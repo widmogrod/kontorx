@@ -1,5 +1,6 @@
 <?php
 class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
+
 	const PARTIAL = 'siteStatic.phtml';
 	
 	/**
@@ -8,7 +9,7 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 	protected $_alias = null;
 	
 	/**
-	 * @param $alias
+	 * @param string $alias
 	 * @return Promotor_View_Helper_SiteStatic
 	 */
 	public function setAlias($alias) {
@@ -16,6 +17,34 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 		return $this;
 	}
 	
+	/**
+	 * @var string
+	 */
+	protected $_aliasPrefix;
+	
+	/**
+	 * @param string $prefix
+	 * @return Promotor_View_Helper_SiteStatic
+	 */
+	public function setAliasPrefix($prefix) {
+		$this->_aliasPrefix = (string) $prefix;
+		return $this;
+	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_aliasSuffix;
+	
+	/**
+	 * @param string $suffix
+	 * @return Promotor_View_Helper_SiteStatic
+	 */
+	public function setAliasSuffix($suffix) {
+		$this->_aliasSuffix = (string) $suffix;
+		return $this;
+	}
+
 	/**
 	 * @param $alias
 	 * @return Promotor_View_Helper_SiteStatic
@@ -54,7 +83,8 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 			$partial = self::PARTIAL;
 		}
 
-		$data = $this->_getData($this->_alias);
+		$alias = $this->_aliasPrefix . $this->_alias . $this->_aliasSuffix;
+		$data = $this->_getData($alias);
 		return $this->view->partial($partial, array('data' => $data));
 	}
 
