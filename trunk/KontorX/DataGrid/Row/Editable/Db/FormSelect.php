@@ -50,6 +50,7 @@ class KontorX_DataGrid_Row_Editable_Db_FormSelect extends KontorX_DataGrid_Row_E
 	}
 
 	protected function _onFetch(array $row, array $rowset) {
+		// pierwszy rekord pusty..
 		if (!isset($rowset[null])) {
 			$rowset[null] = null;
 		}
