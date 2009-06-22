@@ -3,7 +3,7 @@
  * @author gabriel
  *
  */
-class KontorX_Form_Element_Db_Abstract extends Zend_Form_Element_Multi {
+abstract class KontorX_Form_Element_Db_Abstract extends Zend_Form_Element_Multi {
 
 	/**
 	 * @var string
