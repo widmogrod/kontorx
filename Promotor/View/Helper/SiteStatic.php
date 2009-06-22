@@ -46,6 +46,20 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 	}
 
 	/**
+	 * @var string
+	 */
+	protected $_separator = '-';
+	
+	/**
+	 * @param string $separator
+	 * @return Promotor_View_Helper_SiteStatic
+	 */
+	public function setSeparator($separator) {
+		$this->_separator = (string) $separator;
+		return $this;
+	}
+	
+	/**
 	 * @param $alias
 	 * @return Promotor_View_Helper_SiteStatic
 	 */
@@ -83,7 +97,8 @@ class Promotor_View_Helper_SiteStatic extends Zend_View_Helper_Abstract {
 			$partial = self::PARTIAL;
 		}
 
-		$alias = $this->_aliasPrefix . $this->_alias . $this->_aliasSuffix;
+		$alias = $this->_aliasPrefix . $this->_separator . $this->_alias . $this->_separator . $this->_aliasSuffix;
+		$alias = trim($alias, $this->_separator);
 		$data = $this->_getData($alias);
 		return $this->view->partial($partial, array('data' => $data));
 	}
