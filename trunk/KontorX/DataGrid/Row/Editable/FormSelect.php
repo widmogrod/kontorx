@@ -7,7 +7,7 @@ class KontorX_DataGrid_Row_Editable_FormSelect extends KontorX_DataGrid_Row_Edit
 	/**
 	 * @var array
 	 */
-	protected $_multiOptions = null;
+	protected $_multiOptions = array();
 	
 	/**
 	 * @param array $multiOptions
@@ -17,6 +17,10 @@ class KontorX_DataGrid_Row_Editable_FormSelect extends KontorX_DataGrid_Row_Edit
 		$this->_multiOptions = $multiOptions;
 	}
 	
+	public function addMultiOption($key, $value) {
+		$this->_multiOptions[$key] = $value;
+	}
+
 	/**
 	 * @return array
 	 */

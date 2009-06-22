@@ -84,13 +84,14 @@ class KontorX_DataGrid_Row_Url extends KontorX_DataGrid_Row_ViewHelper {
 
 		$view = $this->getView();
 		$href = $view->url($params, $router, false, false);
+		// sprawdzam, czy parsować..
 		if (strstr($href, '{{') !== false) {
 			$href = $this->_parseHref($href);
 		}
 
 		$name = $this->getName();
 		$class = $this->getAttrib('class');
-		
+
 		$format = '<a class="%s" href="%s"><span>%s</span></a>';
 		return sprintf($format, $class, $href, $name);
 	}
