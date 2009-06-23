@@ -146,7 +146,7 @@ class KontorX_View_Helper_JsTree extends KontorX_View_Helper_JsAbstract {
 		);
 		$options = str_replace(array_keys($replace), $replace, $options);
 
-		$script = sprintf('jQuery(function (){jQuery("#%s").tree(%s);});', $this->_id, $options);
+		$script = sprintf('jQuery(function ($){$("#%s").tree(%s);});', $this->_id, $options);
 		
 	    $this->view->getHelper('headScript')
 			->appendScript($script);
