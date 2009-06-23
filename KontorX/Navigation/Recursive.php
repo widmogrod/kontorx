@@ -4,16 +4,26 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	 * @var Zend_Navigation_Container
 	 */
 	private $_navigation = null;
-
-	/**
-	 * @var Zend_Navigation_Page
-	 */
-	private $_currentPage = null;
 	
 	/**
-	 * @var Zend_Navigation_Page
+	 * @var Zend_Navigation_Container
 	 */
-	private $_parentPage = null;
+	protected $_children;
+	
+	/**
+	 * @var Zend_Navigation_Container
+	 */
+	protected $_current;
+	
+	/**
+	 * @var array of @see Zend_Navigation_Container
+	 */
+	protected $_parent = array();
+	
+	/**
+	 * @var integer
+	 */
+	protected $_depth = 0;
 	
 	/**
 	 * @param Traversable $iterator
@@ -54,20 +64,22 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	 * @return Zend_Navigation_Container
 	 */
 	public function create() {
-		$result = $this->_parentPage = $this->getNavigation();
+		$this->_parent[$this->_depth] = $this->_current = $this->getNavigation();
 
 		$this->rewind();
 		while ($this->valid()) {
+			$this->_depth = $this->getDepth();
+
 			$current = $this->current();
 			$current = $this->prepare($current);
 
-			$this->_currentPage = Zend_Navigation_Page::factory($current);
+			$this->_children = Zend_Navigation_Page::factory($current);
 			
-			$this->_parentPage->addPage($this->_currentPage);
+			$this->_current->addPage($this->_children);
 			$this->next();
 		}
 
-		return $result;
+		return $this->_parent[0];
 	}
 
 	/**
@@ -97,10 +109,11 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	}
 	
 	public function beginChildren() {
-		$this->_parentPage = $this->_currentPage;
+		$this->_parent[$this->_depth] = $this->_current;
+		$this->_current = $this->_children;
 	}
 	
 	public function endChildren() {
-		$this->_parentPage = $this->_navigation;
+		$this->_current = $this->_parent[$this->_depth-1];
 	}
 }
