@@ -137,6 +137,15 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
                 $headScript->offsetSetFile(++$i, $file->src);
             }
         }
+        
+		// inlineScript
+        if (isset($options->inlineScript)) {
+            $inlineScript = $view->getHelper('InlineScript');
+            $i = 0;
+            foreach ($options->inlineScript->js as $file) {
+                $inlineScript->offsetSetFile(++$i, $file->src);
+            }
+        }
 
         // link
         if (isset($options->links)) {
