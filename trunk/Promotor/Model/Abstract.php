@@ -237,7 +237,7 @@ class Promotor_Model_Abstract {
             foreach ($params as $key => $value) {
                 if (is_object($value)) {
                     $class = get_class($value);
-                    $result[] = $key . $class . serialize(get_class_vars($class));
+                    $result[] = $key . $class . serialize($value);
                 } else
                 if (is_array($value)) {
                     $result[] = $key . serialize($value);
