@@ -10,40 +10,47 @@ class KontorX_Iterator_Reiterate_IteratorIterator extends RecursiveIteratorItera
 	/**
 	 * @var KontorX_Iterator_Reiterate_Container
 	 */
+	protected $_children;
+	
+	/**
+	 * @var KontorX_Iterator_Reiterate_Container
+	 */
 	protected $_current;
 	
 	/**
-	 * @var KontorX_Iterator_Reiterate_Container
+	 * @var array of @see KontorX_Iterator_Reiterate_Container
 	 */
-	protected $_parent;
+	protected $_parent = array();
 	
 	/**
-	 * @var KontorX_Iterator_Reiterate_Container
+	 * @var integer
 	 */
-	protected $_new;
+	protected $_depth = 0;
 
 	/**
 	 * Enter description here...
 	 * @return KontorX_Iterator_Reiterate_Container
 	 */
 	final public function iterate(KontorX_Iterator_Reiterate_Container $container) {
-		$this->_new = $this->_parent = $container;
+		$this->_parent[$this->_depth] = $this->_current = $container;
 
 		$this->rewind();
 		while ($this->valid()) {
-			$this->_current = $container->getInstance($this->current());
-			$this->_parent->addChildren($this->_current, $this->getDepth());
+			$this->_depth = $this->getDepth();
+			$this->_children = $container->getInstance($this->current());
+			$this->_current->addChildren($this->_children, $this->getDepth());
 			$this->next();
 		}
 
-		return $this->_parent;
+		return $this->_current;
 	}
 
 	public function beginChildren() {
-		$this->_parent = $this->_current;
+		$this->_parent[$this->_depth] = $this->_current;
+		$this->_current = $this->_children;
 	}
 
 	public function endChildren() {
-		$this->_parent = $this->_new;
+		$this->_current = $this->_parent[$this->_depth-1];
 	}
 }
