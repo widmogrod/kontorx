@@ -134,7 +134,7 @@ class KontorX_Template {
 	 */
 	public function getLayout() {
 		if (null === $this->_layout) {
-			$this->_layout = Zend_Layout::getMvcInstance();
+			$this->_layout = Zend_Layout::startMvc();
 		}
 		return $this->_layout;
 	}
@@ -146,7 +146,7 @@ class KontorX_Template {
 		if (class_exists('Zend_Layout',false)) {
 			return $this->getLayout()->isEnabled();
 		}
-		return false;
+		return null !== $this->_layoutName;
 	}
 	
 	/**
