@@ -134,7 +134,7 @@ class KontorX_Template {
 	 */
 	public function getLayout() {
 		if (null === $this->_layout) {
-			$this->_layout = Zend_Layout::startMvc();
+			$this->_layout = Zend_Layout::startMvc(array());
 		}
 		return $this->_layout;
 	}
@@ -300,7 +300,10 @@ class KontorX_Template {
 	 * @return KontorX_Template
 	 */
 	public function setLayoutName($name) {
-		$this->_layoutName = basename((string) $name);
+		if (!$this->_lockLayoutName) {
+			$this->_layoutName = basename((string) $name);
+		}
+		return $this;
 	}
 
 	/**
@@ -308,6 +311,27 @@ class KontorX_Template {
 	 */
 	public function getLayoutName() {
 		return $this->_layoutName;
+	}
+
+	/**
+	 * @var bool
+	 */
+	protected $_lockLayoutName = false;
+
+	/** 
+	 * @param bool $flag
+	 * @return KontorX_Template
+	 */
+	public function lockLayoutName($flag = true) {
+		$this->_lockLayoutName = (bool) $flag;
+		return $this;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function lockedLayoutName() {
+		return $this->_lockLayoutName;
 	}
 	
 	/**
