@@ -88,13 +88,18 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 		$value = urldecode($value);
 		$view = $this->view;
 		switch ($type) {
-			default:	 return "<!-- $value -->";
-			case 'site': return $view->url(array('alias'=>$value),'site');
+			default:
+				trigger_error(sprintf('undefinded parser type "%s" with value "%s"', $type, $value), E_USER_NOTICE);
+				break;
+			case 'site': return $view->url(array('alias'=>$value),'site', true);
 			case 'action':
 				// separator parametrow ;
 				$params = explode(';',$value);
 				if(count($params) < 3) {
-					return '<!-- liczba parametrow jest nieprawidlowa -->';
+					trigger_error(
+						sprintf('parset parameters to fiew for parser type "%s" with value "%s"', $type, $value),
+						E_USER_NOTICE);
+					return;
 				} else {
 					$action 	= array_shift($params);
 					$controoler = array_shift($params);
