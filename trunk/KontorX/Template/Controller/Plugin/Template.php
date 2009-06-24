@@ -100,7 +100,16 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         // title
         if (isset($options->title)) {
             $headTitle = $view->getHelper('HeadTitle');
-            $headTitle->append($options->title);
+            $title = $options->title;
+            $separator = ' ';
+            if (isset($title->title)) {
+            	$title = $title->title;
+            	$separator = isset($title->separator)
+            		? $title->separator : $separator;
+            } 
+
+            $headTitle->append($title);
+            $headTitle->setSeparator($separator);
         }
 
 		// meta
