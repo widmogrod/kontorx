@@ -106,7 +106,7 @@ abstract class KontorX_Db_Table_Abstract extends Zend_Db_Table_Abstract {
             foreach ($params as $key => $value) {
                 if (is_object($value)) {
                     $class = get_class($value);
-                    $result[] = $key . $class . serialize(get_class_vars($class));
+                    $result[] = $key . $class . serialize($value);
                 } else
                 if (is_array($value)) {
                     $result[] = $key . serialize($value);
