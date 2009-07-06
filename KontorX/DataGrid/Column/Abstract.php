@@ -49,23 +49,25 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     }
 
     /**
-     * @var KontorX_DataGrid_Cell_Interface
+     * @var KontorX_DataGrid_Row_Interface
      */
-    private $_cell = null;
+    private $_row = null;
 
     /**
-     * @param KontorX_DataGrid_Cell_Interface $filter
+     * Set filter instance @see KontorX_DataGrid_Row_Interface
+     * @param KontorX_DataGrid_Row_Interface $filter
      */
-    public function setCell(KontorX_DataGrid_Cell_Interface $cell) {
+    public function setRow(KontorX_DataGrid_Row_Interface $row) {
     	$row->setColumnName($this->getColumnName());
-        $this->_cell = $row;
+        $this->_row = $row;
     }
 
     /**
-     * @return KontorX_DataGrid_Cell_Interface
+     * Return filter instance @see KontorX_DataGrid_Filter_Interface
+     * @return KontorX_DataGrid_Row_Interface
      */
-    public function getCell() {
-        return $this->_cell;
+    public function getRow() {
+        return $this->_row;
     }
 
     /**
