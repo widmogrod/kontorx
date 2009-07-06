@@ -6,7 +6,6 @@ class KontorX_DataGrid_Column_Text extends KontorX_DataGrid_Column_Abstract {
         if (null === $displayNone || (false === (bool) $displayNone)) {
             return (string) $this->getName();
         }
-
         return "";
     }
 }
