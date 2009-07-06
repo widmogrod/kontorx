@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Abstract.php';
-class KontorX_DataGrid_Row_Date extends KontorX_DataGrid_Row_Abstract {
+require_once 'KontorX/DataGrid/Cell/Abstract.php';
+class KontorX_DataGrid_Cell_Date extends KontorX_DataGrid_Cell_Abstract {
 
     /**
      * @var Zend_Date

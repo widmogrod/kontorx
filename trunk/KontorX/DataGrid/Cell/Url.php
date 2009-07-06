@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/ViewHelper.php';
-class KontorX_DataGrid_Row_Url extends KontorX_DataGrid_Row_ViewHelper {
+require_once 'KontorX/DataGrid/Cell/ViewHelper.php';
+class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 
 	/**
 	 * @var array

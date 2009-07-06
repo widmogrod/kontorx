@@ -1,9 +1,9 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Editable/Abstract.php';
+require_once 'KontorX/DataGrid/Cell/Editable/Abstract.php';
 /**
  * @author gabriel
  */
-abstract class KontorX_DataGrid_Row_Editable_Db_Adapter extends KontorX_DataGrid_Row_Editable_Abstract {
+abstract class KontorX_DataGrid_Cell_Editable_Db_Adapter extends KontorX_DataGrid_Cell_Editable_Abstract {
 
 	/**
 	 * @var string
