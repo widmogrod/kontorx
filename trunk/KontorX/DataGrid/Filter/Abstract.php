@@ -1,5 +1,5 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Interface.php';
+require_once 'KontorX/DataGrid/Filter/Interface.php';
 abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filter_Interface {
 
     /**
@@ -9,16 +9,7 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
         if (null != $options) {
             $this->setOptions($options);
         }
-
-        $this->_init();
     }
-
-    /**
-     * Initialize
-     *
-     * @return void
-     */
-    protected function _init() {}
 
     /**
      * @var Zend_Config
