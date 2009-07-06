@@ -74,25 +74,24 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
         return (count($this->_pagination) == 2);
     }
 
-    private $_rows = null;
+    private $_cells = null;
 
     /**
-     * Get array set of @see KontorX_DataGrid_Row_Interface
+     * Get array set of @see KontorX_DataGrid_cell_Interface
      * @return array
      */
-    public function getRows() {
-        if (null === $this->_rows) {
+    public function getCells() {
+        if (null === $this->_cells) {
             $result = array();
-            foreach ($this->getColumns() as $columnName => $columnInstance) {
-                $row = $columnInstance->getRow();
-                if (null != $row) {
-                    $result[$columnName] = $row;
+            foreach ($this->_dataGrid->getColumns() as $columnInstance) {
+                $cell = $columnInstance->getCell();
+                if (null != $cell) {
+                    $result[$columnInstance->getColumnName()] = $cell;
                 }
             }
-            $this->_rows = $result;
+            $this->_cells = $result;
         }
-
-        return $this->_rows;
+        return $this->_cells;
     }
 
     const CACHE_PREFIX = 'KontorX_DataGrid_Adapter_';

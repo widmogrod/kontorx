@@ -50,14 +50,12 @@ interface KontorX_DataGrid_Column_Interface {
     public function getFilters();
 
     /**
-     * Set filter instance @see KontorX_DataGrid_Row_Interface
-     * @param KontorX_DataGrid_Row_Interface $filter
+     * @param KontorX_DataGrid_Cell_Interface $cell
      */
-    public function setRow(KontorX_DataGrid_Row_Interface $row);
+    public function setCell(KontorX_DataGrid_Cell_Interface $cell);
 
     /**
-     * Return filter instance @see KontorX_DataGrid_Filter_Interface
-     * @return KontorX_DataGrid_Row_Interface
+     * @return KontorX_DataGrid_Cell_Interface
      */
-    public function getRow();
+    public function getCell();
 }
