@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Editable/Abstract.php';
-class KontorX_DataGrid_Row_Editable_FormSelect extends KontorX_DataGrid_Row_Editable_Abstract {
+require_once 'KontorX/DataGrid/Cell/Editable/Abstract.php';
+class KontorX_DataGrid_Cell_Editable_FormSelect extends KontorX_DataGrid_Cell_Editable_Abstract {
 
 	protected $_helper = 'formSelect';
 

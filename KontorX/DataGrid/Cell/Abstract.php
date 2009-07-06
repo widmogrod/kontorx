@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Interface.php';
-abstract class KontorX_DataGrid_Row_Abstract implements KontorX_DataGrid_Row_Interface {
+require_once 'KontorX/DataGrid/Cell/Interface.php';
+abstract class KontorX_DataGrid_Cell_Abstract implements KontorX_DataGrid_Cell_Interface {
 
     /**
      * @param array $options

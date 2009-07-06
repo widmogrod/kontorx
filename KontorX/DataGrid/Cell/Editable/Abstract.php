@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/ViewHelper.php';
-abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_Row_ViewHelper {
+require_once 'KontorX/DataGrid/Cell/ViewHelper.php';
+abstract class KontorX_DataGrid_Cell_Editable_Abstract extends KontorX_DataGrid_Cell_ViewHelper {
 
 	const SEPARATOR = ':|:';
 	
@@ -101,7 +101,7 @@ abstract class KontorX_DataGrid_Row_Editable_Abstract extends KontorX_DataGrid_R
 		$class = $this->getAttrib('class');
 		$class = $this->_prepareClassAttr($class);
 		$this->setAttrib('class', $class);
-
+		
 		$helper = $this->getHelperName();
 		return $this->getView()->$helper($name, $value, $this->getAttribs());
 	}

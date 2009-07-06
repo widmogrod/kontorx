@@ -1,5 +1,5 @@
 <?php
-interface KontorX_DataGrid_Row_Interface {
+interface KontorX_DataGrid_Cell_Interface {
 	
     /**
      * Return a context as a html/text string

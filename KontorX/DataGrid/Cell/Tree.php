@@ -1,6 +1,6 @@
 <?php
-require_once 'KontorX/DataGrid/Row/Abstract.php';
-class KontorX_DataGrid_Row_Tree extends KontorX_DataGrid_Row_Abstract {
+require_once 'KontorX/DataGrid/Cell/Abstract.php';
+class KontorX_DataGrid_Cell_Tree extends KontorX_DataGrid_Cell_Abstract {
 
 	public function render() {
 		$depth = $multiply = ((int) $this->getData('depth')) + 1;
