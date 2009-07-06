@@ -11,16 +11,16 @@ require_once 'Zend/Config.php';
  * @author 	Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_DataGrid {
-    const DEFAULT_ROW_TYPE = 'Text';
+    const DEFAULT_CELL_TYPE   = 'Text';
     const DEFAULT_FILTER_TYPE = 'Text';
     const DEFAULT_COLUMN_TYPE = 'Text';
-
+    
     /**
-     * Konstruktor
      * @param KontorX_DataGrid_Adapter_Interface $adapter
      */
     private function __construct(KontorX_DataGrid_Adapter_Interface $adapter) {
         $this->_adapter = $adapter;
+        $this->_adapter->setDataGrid($this);
     }
 
     /**
@@ -52,7 +52,7 @@ class KontorX_DataGrid {
             throw new KontorX_DataGrid_Exception("Data type is not suported");
         }
 
-        // $adapter->setData($data);
+        /* @var $instance KontorX_DataGrid */
         $instance = new self($adapter);
 
         if (is_array($options)) {
@@ -63,8 +63,8 @@ class KontorX_DataGrid {
 
         return $instance;
     }
-
-    /**
+    
+	/**
      * @var KontorX_DataGrid_Adapter_Interface
      */
     private $_adapter = null;
@@ -77,12 +77,15 @@ class KontorX_DataGrid {
         return $this->_adapter;
     }
 
+    /**
+     * Types of @see Zend_Loader_PluginLoader
+     */
     const COLUMN = 'column';
-    const ROW = 'row';
+    const CELL 	 = 'cell';
     const FILTER = 'filter';
 
     /**
-     * @var array
+     * @var array of @see Zend_Loader_PluginLoader
      */
     private $_pluginLoader = array();
 
@@ -94,7 +97,7 @@ class KontorX_DataGrid {
     public function setPluginLoader(Zend_Loader_PluginLoader $loader, $type) {
         switch ($type) {
             case self::COLUMN:
-            case self::ROW:
+            case self::CELL:
             case self::FILTER:
                 $this->_pluginLoader[$type] = $loader;
                 break;
@@ -117,9 +120,9 @@ class KontorX_DataGrid {
                     $prefixSegment = 'DataGrid_Column';
                     $pathSegment   = 'DataGrid/Column';
                     break;
-                case self::ROW:
-                    $prefixSegment = 'DataGrid_Row';
-                    $pathSegment   = 'DataGrid/Row';
+                case self::CELL:
+                    $prefixSegment = 'DataGrid_Cell';
+                    $pathSegment   = 'DataGrid/Cell';
                     break;
                 case self::FILTER:
                     $prefixSegment = 'DataGrid_Filter';
@@ -176,6 +179,23 @@ class KontorX_DataGrid {
     public function setOptions(array $options) {
     	if (isset($options['prefixPaths'])) {
     		$this->addPrefixPaths((array) $options['prefixPaths']);
+    		unset($options['prefixPaths']);
+    	}
+    	if (isset($options['pagination'])) {
+    		if (is_array($options['pagination'])) {
+    			if (isset($options['pagination']['pageNumber'])
+    					&& isset($options['pagination']['itemCountPerPage'])) {
+    				$pageNumber		  = $options['pagination']['pageNumber'];
+    				$itemCountPerPage = $options['pagination']['itemCountPerPage'];
+    				$this->setPagination($pageNumber, $itemCountPerPage);
+    			} else
+    			if (isset($options['pagination'][0])
+    					&& isset($options['pagination'][1])) {
+    				@list($pageNumber, $itemCountPerPage) = $options['pagination'];
+    				$this->setPagination($pageNumber, $itemCountPerPage);
+    			}
+    		}
+    		unset($options['pagination']);
     	}
 
         foreach ($options as $name => $value) {
@@ -318,6 +338,32 @@ class KontorX_DataGrid {
     }
 
     /**
+     * @var string
+     */
+    protected $_group = null;
+    
+    /**
+     * @param string $columnName
+     */
+    public function setGroup($columnName) {
+    	$this->_group = (string) $columnName;
+    }
+    
+    /**
+     * @return string
+     */
+	public function getGroup() {
+    	return $this->_group;
+    }
+
+    /**
+     * @return bool
+     */
+	public function isGrouping() {
+    	return null !== $this->_group;
+    }
+
+    /**
      * @var array
      */
     private $_columns = array();
@@ -362,22 +408,28 @@ class KontorX_DataGrid {
         if (!$columnName instanceof KontorX_DataGrid_Column_Interface) {
         	// create column instance
 	        $columnClass = $this->getPluginLoader(self::COLUMN)->load($type);
+	        /* @var $columnInstance KontorX_DataGrid_Column_Interface */
 	        $columnInstance = new $columnClass($columnName, $options);
         } else {
+        	/* @var $columnInstance KontorX_DataGrid_Column_Interface */
         	$columnInstance = $columnName;
+        }
+        
+        // set group column
+        if (array_key_exists('group', $options)) {
+			$columnInstance->setGroup((bool) $options['group']);
         }
 
         // create filter
         if (isset($options['filter'])) {
-        	// TODO Teraz nie muszę przekazywać 'columnName'
             $filter = $this->_createFilter((array) $options['filter']);
             $columnInstance->addFilter($filter);
         }
+
         // create row
-        if (isset($options['row'])) {
-        	// TODO Teraz nie muszę przekazywać 'columnName'
-            $row = $this->_createRow((array) $options['row']);
-            $columnInstance->setRow($row);
+        if (isset($options['cell'])) {
+            $cell = $this->_createCell((array) $options['cell']);
+            $columnInstance->setCell($cell);
         }
 
         $this->_columns[$columnInstance->getColumnName()] = $columnInstance;
@@ -476,11 +528,11 @@ class KontorX_DataGrid {
     }
 
     /**
-     * Create row object @see KontorX_DataGrid_Row_Interface
+     * Create row object @see KontorX_DataGrid_Cell_Interface
      * @param array $options
-     * @return KontorX_DataGrid_Row_Interface
+     * @return KontorX_DataGrid_Cell_Interface
      */
-    private function _createRow($options = null) {
+    private function _createCell($options = null) {
         if (null === $options) {
             $options = array();
         } else
@@ -501,20 +553,20 @@ class KontorX_DataGrid {
         }
 
         if (!isset($type)) {
-            $type = self::DEFAULT_ROW_TYPE;
+            $type = self::DEFAULT_CELL_TYPE;
         }
 
-        // create column instance
-        $rowClass = $this->getPluginLoader(self::ROW)->load($type);
-        $rowInstance = new $rowClass($options);
-        return $rowInstance;
+        // create cell instance
+        $cellClass = $this->getPluginLoader(self::CELL)->load($type);
+        $cellInstance = new $cellClass($options);
+        return $cellInstance;
     }
 
     /**
      * Return array of @see KontorX_DataGrid_Filter_Interface
      * @return array
      */
-    private function _getFilters() {
+    private function getFilters() {
         $result = array();
         foreach ($this->getColumns() as $column) {
             array_push($result, $column->getFilters());
@@ -523,10 +575,10 @@ class KontorX_DataGrid {
     }
 
     /**
-     * Notice filters to prepare adapter
      * @return void
      */
-    private function _noticeFilters(KontorX_DataGrid_Adapter_Interface $adapter) {
+    private function _noticeFilters() {
+    	$adapter = $this->getAdapter();
         foreach ($this->getColumns() as $column) {
             foreach ($column->getFilters() as $filter) {
                 $filter->filter($adapter);
@@ -545,26 +597,20 @@ class KontorX_DataGrid {
      */
     public function getVars() {
         if (null === $this->_vars) {
-            $adapter = $this->getAdapter();
-
             $this->_noticeValues();
-            $this->_noticeFilters($adapter);
+            $this->_noticeFilters();
 
             $this->_orderColumns();
 
             $columns = $this->getColumns();
-            $adapter->setColumns($columns);
-
-            if ($this->_isPagination()) {
-                list($pageNumber, $itemCountPerPage) = $this->getPagination();
-                $adapter->setPagination($pageNumber, $itemCountPerPage);
-            }
+			$filters = $this->getFilters();
+        	$adapter = $this->getAdapter();
 
             $this->_vars = array(
                 'columns' => $columns,
-                'filters' => $this->_getFilters(),
-                'rowset'  => $adapter->fetchData(),
-                'paginator' => ($this->_isPagination() ? $this->_createPaginator() : null),
+                'filters' => $filters,
+                'rowset'  => $adapter,
+                'paginator' => ($this->enabledPagination() ? $this->_createPaginator() : null),
                 'valuesQuery' => urldecode(http_build_query($this->getValues()->toArray()))
             );
         }
@@ -576,81 +622,6 @@ class KontorX_DataGrid {
      */
     public function resetVars() {
         $this->_vars = null;
-    }
-
-    /**
-     * Default name of partial file @see Zend_View_Helper_Partial
-     * @var string
-     */
-    private $_defaultPartial = 'dataGrid.phtml';
-
-    /**
-     * Set name of partial file @see Zend_View_Helper_Partial
-     * @var string
-     */
-    public function setDefaultPartial($partial) {
-        $this->_defaultPartial = (string) $partial;
-    }
-
-    /**
-     * Return name of partial file @see Zend_View_Helper_Partial
-     */
-    public function getDefaultPartial() {
-        return $this->_defaultPartial;
-    }
-
-    /**
-     * @var Zend_View_Interface
-     */
-    private $_view = null;
-
-    /**
-     * Ustawienie widoku
-     * @param Zend_View_Interface $view
-     */
-    public function setView(Zend_View_Interface $view) {
-        $this->_view = $view;
-    }
-
-    /**
-     * Zwraca instancję widoku
-     * @return Zend_View_Interface
-     */
-    public function getView() {
-        if (null === $this->_view) {
-            require_once 'Zend/View.php';
-            $this->_view = new Zend_View();
-        }
-        return $this->_view;
-    }
-
-    /**
-     * Renderowanie
-     * @param Zend_View_Interface $view
-     * @param string $partial
-     * @return string
-     */
-    public function render(Zend_View_Interface $view = null, $partial = null) {
-        if (null != $view) {
-            $this->setView($view);
-        }
-
-        $view = $this->getView();
-
-        if(!$view->getHelperPath('KontorX_View_Helper_')) {
-        	$view->addHelperPath('KontorX/View/Helper', 'KontorX_View_Helper_');
-        }
-
-        // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this, $partial);
-    }
-
-    /**
-     * To string
-     * @return string
-     */
-    public function __toString() {
-        return $this->render();
     }
 
     /**
@@ -676,7 +647,7 @@ class KontorX_DataGrid {
      * Retrun true if pagination is enabled and pagination options are set!
      * @return bool
      */
-    private function _isPagination() {
+    public function enabledPagination() {
         return $this->_enabledPagination && (count($this->_pagination) == 2);
     }
 
@@ -721,19 +692,16 @@ class KontorX_DataGrid {
      */
     public function getPaginator() {
         if (null === $this->_paginator) {
-            require_once 'Zend/Paginator.php';
+			require_once 'Zend/Paginator.php';
 
-            $data = $this->getAdapter()->getData();
-
-            // HACK for new adapter..
-            // TODO move id to KontorX_Paginator
-            // try {} cache (Zend_Paginator_Exception $e) {}
             $adapter = Zend_Paginator::INTERNAL_ADAPTER;
-            if ($data instanceof Zend_Db_Table_Abstract) {
+            $adaptable = $this->getAdapter()->getAdaptable();
+            if ($adaptable instanceof Zend_Db_Table_Abstract) {
+            	// hack, for Zend_Db_Table_Abstract pagination
             	Zend_Paginator::addAdapterPrefixPath('KontorX_Paginator_Adapter','KontorX/Paginator/Adapter/');
             	$adapter = 'DbTable';
             }
-            $this->_paginator = Zend_Paginator::factory($data, $adapter);
+            $this->_paginator = Zend_Paginator::factory($adaptable, $adapter);
         }
         return $this->_paginator;
     }
@@ -750,5 +718,86 @@ class KontorX_DataGrid {
         $paginator->setItemCountPerPage($itemCountPerPage);
 
         return $paginator;
+    }
+    
+	/**
+     * Default name of partial file @see Zend_View_Helper_Partial
+     * @todo dodać partial w zasobach biblioteki!
+     * @var string
+     */
+    private $_defaultPartial = 'dataGrid.phtml';
+
+    /**
+     * Set name of partial file @see Zend_View_Helper_Partial
+     * @var string
+     */
+    public function setDefaultPartial($partial) {
+        $this->_defaultPartial = (string) $partial;
+    }
+
+    /**
+     * Return name of partial file @see Zend_View_Helper_Partial
+     */
+    public function getDefaultPartial() {
+        return $this->_defaultPartial;
+    }
+
+    /**
+     * @var Zend_View_Interface
+     */
+    private $_view = null;
+
+    /**
+     * Ustawienie widoku
+     * @param Zend_View_Interface $view
+     */
+    public function setView(Zend_View_Interface $view) {
+        $this->_view = $view;
+    }
+
+    /**
+	 * @return Zend_View
+	 */
+	public function getView() {
+		if (null === $this->_view) {
+			if (Zend_Registry::isRegistered('Zend_View')) {
+				$this->_view = Zend_Registry::get('Zend_View');
+			} elseif(Zend_Registry::isRegistered('view')) {
+				$this->_view = Zend_Registry::get('view');
+			} else {
+				require_once 'Zend/View.php';
+				$this->_view = new Zend_View();				
+			}
+		}
+		return $this->_view;
+	}
+    
+	/**
+     * Renderowanie
+     * @param Zend_View_Interface $view
+     * @param string $partial
+     * @return string
+     */
+    public function render(Zend_View_Interface $view = null, $partial = null) {
+        if (null != $view) {
+            $this->setView($view);
+        }
+
+        $view = $this->getView();
+
+        if(!$view->getHelperPath('KontorX_View_Helper_')) {
+        	$view->addHelperPath('KontorX/View/Helper', 'KontorX_View_Helper_');
+        }
+
+        // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
+        return $view->dataGrid($this, $partial);
+    }
+
+    /**
+     * To string
+     * @return string
+     */
+    public function __toString() {
+        return $this->render();
     }
 }
