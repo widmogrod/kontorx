@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<interpreters>
+		<!-- Interpreter: wyszukuje dni tygodnia, lub frazę poprzedzoną słowem kluczowym dzień! -->
+		<week type="logic" interpreter="OrLogic">
+			<options>
+				<interpreters>
+					<interprateWeek type="logic" interpreter="AndLogic">
+						<options>
+							<interpreters>
+								<keyword interpreter="InArray">
+									<options>
+										<option>dzień</option>
+									</options>
+								</keyword>
+								<week interpreter="ArrayKeyExsists" name="week">
+									<options>
+										<poniedziałek>1</poniedziałek>
+										<wtorek>2</wtorek>
+										<środa>3</środa>
+										<czwartek>4</czwartek>
+										<piątek>5</piątek>
+										<sobota>6</sobota>
+										<niedziela>7</niedziela>
+									</options>
+								</week>
+							</interpreters>
+						</options>
+					</interprateWeek>
+					<week interpreter="ArrayKeyExsists" name="week">
+						<options>
+							<poniedziałek>1</poniedziałek>
+							<wtorek>2</wtorek>
+							<środa>3</środa>
+							<czwartek>4</czwartek>
+							<piątek>5</piątek>
+							<sobota>6</sobota>
+							<niedziela>7</niedziela>
+						</options>
+					</week>
+				</interpreters>
+			</options>
+		</week>
+		
+		<!-- Interpreter: nazwy ulic, alej poprzedzonych słowem kluczowym! -->
+		<street type="logic" interpreter="AndLogic">
+			<options>
+				<interpreters>
+					<keyword interpreter="InArray">
+						<options>ul</options>
+						<options>ul.</options>
+						<options>ulica</options>
+						<options>al</options>
+						<options>al.</options>
+						<options>aleja</options>
+					</keyword>
+					<street interpreter="ContextToSeparator" name="street" />
+				</interpreters>
+			</options>
+		</street>
+		
+		<!-- Interpreter: nazwy oferty, poprzedzonyej słowem kluczowm! -->
+		<service type="logic" interpreter="AndLogic">
+			<options>
+				<interpreters>
+					<keyword interpreter="InArray">
+						<options>oferta</options>
+						<options>serwis</options>
+					</keyword>
+					<service interpreter="ContextToSeparator" name="service" />
+				</interpreters>
+			</options>
+		</service>
+		
+		<!-- Interpreter: nazwy, nr. dzielnic, poprzedzonyej słowem kluczowm lub nie! -->
+		<district type="logic" interpreter="AndLogic">
+			<options>
+				<interpreters>
+					<keyword interpreter="InArray">
+						<options>dzielnica</options>
+						<options>obszar</options>
+					</keyword>
+					<district interpreter="ArrayKeyValueExsists" name="district">
+						<options>
+							<key>Stare Miasto</key>
+							<value>stare-miasto</value>
+						</options>
+						<options>
+							<key>Kraków Grzegórzki</key>
+							<value>krakow-grzegorzki</value>
+						</options>
+						<options>
+							<key>Prądnik Czerwony</key>
+							<value>proadnik-czerwony</value>
+						</options>
+						<options>
+							<key>Prądnik Biały</key>
+							<value>prodnik-bialy</value>
+						</options>
+						
+						<options>
+							<key>Krowodrza/Łobzów</key>
+							<value>krowodrza-lobzow</value>
+						</options>
+						<options>
+							<key>krowodrza</key>
+							<value>krowodrza-lobzow</value>
+						</options>
+						<options>
+							<key>lobzow</key>
+							<value>krowodrza-lobzow</value>
+						</options>
+						<options>
+							<key>łobzów</key>
+							<value>krowodrza-lobzow</value>
+						</options>
+						
+						<options>
+							<key>Bronowice</key>
+							<value>bronowice</value>
+						</options>
+						<options>
+							<key>Zwierzyniec</key>
+							<value>zwierzyniec</value>
+						</options>
+						<options>
+							<key>Dębniki</key>
+							<value>debniki</value>
+						</options>
+						<options>
+							<key>Łagiewniki-Borek Fałęcki</key>
+							<value>lagiewniki-borek-falecki</value>
+						</options>
+						<options>
+							<key>Swoszowice</key>
+							<value>swoszowice</value>
+						</options>
+						<options>
+							<key>Podgórze Duchackie</key>
+							<value>podgorze-duchackie</value>
+						</options>
+						<options>
+							<key>Bieżanów-Prokocim</key>
+							<value>biezanow-prokocim</value>
+						</options>
+						<options>
+							<key>Podgórze</key>
+							<value>podgorze</value>
+						</options>
+						<options>
+							<key>Czyżyny</key>
+							<value>czyzyny</value>
+						</options>
+						<options>
+							<key>Mistrzejowice</key>
+							<value>mistrzejowice</value>
+						</options>
+						<options>
+							<key>Wzgórza Krzesławickie </key>
+							<value>wzgorza-krzeslawickie</value>
+						</options>
+						<options>
+							<key>Nowa Huta</key>
+							<value>nowa-huta</value>
+						</options>
+					</district>
+				</interpreters>
+			</options>
+		</district>
+		
+		<!-- Interpreter: nazwy, nr. dzielnic, poprzedzonyej słowem kluczowm lub nie! dla testu -->
+		<districtLike type="logic" interpreter="AndLogic">
+			<options>
+				<district2 interpreter="ArrayKeyLikeExsists">
+					<options>
+						<key>Stare Miasto</key>
+						<value>stare-miasto</value>
+					</options>
+					<options>
+						<key>Kraków Grzegórzki</key>
+						<value>krakow-grzegorzki</value>
+					</options>
+					<options>
+						<key>Prądnik Czerwony</key>
+						<value>proadnik-czerwony</value>
+					</options>
+					<options>
+						<key>Prądnik Biały</key>
+						<value>prodnik-bialy</value>
+					</options>
+					
+					<options>
+						<key>Krowodrza/Łobzów</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>krowodrza</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>lobzow</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					<options>
+						<key>łobzów</key>
+						<value>krowodrza-lobzow</value>
+					</options>
+					
+					<options>
+						<key>Bronowice</key>
+						<value>bronowice</value>
+					</options>
+					<options>
+						<key>Zwierzyniec</key>
+						<value>zwierzyniec</value>
+					</options>
+					<options>
+						<key>Dębniki</key>
+						<value>debniki</value>
+					</options>
+					<options>
+						<key>Łagiewniki-Borek Fałęcki</key>
+						<value>lagiewniki-borek-falecki</value>
+					</options>
+					<options>
+						<key>Swoszowice</key>
+						<value>swoszowice</value>
+					</options>
+					<options>
+						<key>Podgórze Duchackie</key>
+						<value>podgorze-duchackie</value>
+					</options>
+					<options>
+						<key>Bieżanów-Prokocim</key>
+						<value>biezanow-prokocim</value>
+					</options>
+					<options>
+						<key>Podgórze</key>
+						<value>podgorze</value>
+					</options>
+					<options>
+						<key>Czyżyny</key>
+						<value>czyzyny</value>
+					</options>
+					<options>
+						<key>Mistrzejowice</key>
+						<value>mistrzejowice</value>
+					</options>
+					<options>
+						<key>Wzgórza Krzesławickie </key>
+						<value>wzgorza-krzeslawickie</value>
+					</options>
+					<options>
+						<key>Nowa Huta</key>
+						<value>nowa-huta</value>
+					</options>
+				</district2>
+			</options>
+		</districtLike>
+
+	</interpreters>
+</root>
