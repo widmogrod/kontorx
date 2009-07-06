@@ -1,5 +1,4 @@
 <?php
-require_once 'KontorX/DataGrid/Cell/Editable/FormSelect.php';
 class Promotor_DataGrid_Cell_Editable_YesNo extends KontorX_DataGrid_Cell_Editable_FormSelect {
 	
 	public function getMultiOptions() {
