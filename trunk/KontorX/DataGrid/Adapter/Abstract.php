@@ -1,10 +1,27 @@
 <?php
 require_once 'KontorX/DataGrid/Adapter/Interface.php';
+/**
+ * @author gabriel
+ */
 abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Adapter_Interface {
+
+	public function fetchData() {
+        if ($this->_cacheEnabled()) {
+            if (false === ($this->_data = self::$_cache->load($this->_getCacheId()))) {
+            	self::$_cache->save($this->_fetchData(), $this->_getCacheId());
+            }
+        } else {
+        	$this->_fetchData();
+        }
+        $this->_count = count($this->_data);
+		return $this->_data;
+	}
+
 	/**
-	 * @var array
+	 * Enter description here...
+	 * @return array
 	 */
-	protected $_fetched;
+	abstract protected function _fetchData();
 
 	/**
      * @var mixed
@@ -55,76 +72,17 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
     public function getCellsetClass() {
     	return $this->_cellsetClass;
     }
-
-    /**
-     * @var array of @see KontorX_DataGrid_Cell_Interface
-     */
-    private $_cells = null;
-
-    /**
-     * Get array set of @see KontorX_DataGrid_Cell_Interface
-     * @return array
-     */
-    public function getCells() {
-        if (null === $this->_cells) {
-            $result = array();
-            foreach ($this->_dataGrid->getColumns() as $columnName => $columnInstance) {
-                $row = $columnInstance->getCell();
-                if (null != $row) {
-                    $result[$columnName] = $row;
-                }
-            }
-            $this->_cells = $result;
-        }
-
-        return $this->_cells;
-    }
-
-    const CACHE_PREFIX = 'KontorX_DataGrid_Adapter_';
-
-    /**
-     * @var Zend_Cache_Core
-     */
-    protected static $_cache = null;
-
-    /**
-     * @param Zend_Cache_Core $cache
-     */
-    public static function setCache(Zend_Cache_Core $cache) {
-        self::$_cache = $cache;
-    }
-
-    /**
-     * @return string
-     */
-    protected function _getCacheId() {
-        return self::CACHE_PREFIX . spl_object_hash($this);
-    }
-
-    /**
-     * @var bool
-     */
-    private $_cacheEnabled = null;
-
-    /**
-     * @param bool $flag
-     */
-    public function setCacheEnable($flag = true) {
-        $this->_cacheEnabled = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function _cacheEnabled() {
-        return (self::$_cache === null || $this->_cacheEnabled === false) ? false : true;
-    }
     
 	/**
 	 * @var array of @see KontorX_DataGrid_Cell_Interface
 	 */
 	protected $_rows = array();
 
+	/**
+	 * @var array
+	 */
+	protected $_data = null;
+	
 	/**
 	 * @var integer
 	 */
@@ -134,12 +92,43 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 	 * @var integer
 	 */
 	protected $_count = 0;
-    
-    
+	
+	/**
+	 * @var KontorX_DataGrid_Cell_Interface
+	 */
+	protected $_groupCell;
+	
 	/**
 	 * @return KontorX_DataGrid_Adapter_Cellset_Interface
 	 */
 	public function current() {
+		if (!isset($this->_rows[$this->_pointer])) {
+			$columns = $this->_dataGrid->getColumns();
+			/* @var $cellset KontorX_DataGrid_Adapter_Cellset_Instance */
+			$cellset = new $this->_cellsetClass;
+
+			/* @var $column KontorX_DataGrid_Column_Interface */
+            foreach ($columns as $column) {
+            	/**
+            	 * @todo Clone issue... <> in group check is equal!
+            	 * $cell = clone $column->getCell(); 
+            	 */
+                /* @var $cell KontorX_DataGrid_Cell_Interface */ 
+                $cell = $column->getCell();
+				$cell->setData($this->_data[$this->_pointer]);
+
+	            if ($column->isGroup()) {
+	            	if ($this->_groupCell != $cell) {
+	            		$this->_groupCell = $cell;
+	            		$cellset->setGroupCell($cell);
+	            	}
+		        } else {
+		        	$cellset->addCell($cell);
+		        }
+            }
+
+            $this->_rows[$this->_pointer] = $cellset;
+		}
 		return $this->_rows[$this->_pointer];
 	}
 
@@ -155,7 +144,7 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 	 * @return void
 	 */
 	public function rewind() {
-		if (true !== $this->_fetched) {
+		if (null === $this->_data) {
 			$this->fetchData();
 		}
 		$this->_pointer = 0;
@@ -181,4 +170,72 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 	public function count() {
 		return $this->_count;
 	}
+    
+    /**
+     * ADDITIONAL HELPER METHODS 
+     */
+
+    /**
+     * @var array of @see KontorX_DataGrid_Cell_Interface
+     */
+    private $_cells = null;
+
+    /**
+     * Get array set of @see KontorX_DataGrid_Cell_Interface
+     * @return array
+     */
+    public function getCells() {
+        if (null === $this->_cells) {
+            $result = array();
+            foreach ($this->_dataGrid->getColumns() as $columnName => $columnInstance) {
+                $row = $columnInstance->getCell();
+                if (null != $row) {
+                    $result[$columnName] = $row;
+                }
+            }
+            $this->_cells = $result;
+        }
+
+        return $this->_cells;
+    }
+
+    /**
+     * @var Zend_Cache_Core
+     */
+    protected static $_cache = null;
+
+    /**
+     * @param Zend_Cache_Core $cache
+     */
+    public static function setCache(Zend_Cache_Core $cache) {
+        self::$_cache = $cache;
+    }
+
+    /**
+     * Zwraca cache id.
+     * @return string
+     */
+    private function _getCacheId() {
+        $result = array(get_class($this), serialize($this));
+        return sha1(implode($result));
+    }
+
+    /**
+     * @var bool
+     */
+    private $_cacheEnabled = null;
+
+    /**
+     * @param bool $flag
+     */
+    public function setCacheEnable($flag = true) {
+        $this->_cacheEnabled = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _cacheEnabled() {
+        return (self::$_cache === null || $this->_cacheEnabled === false) ? false : true;
+    }
 }
