@@ -1,5 +1,5 @@
 <?php
-class KontorX_DataGrid_Row_Editable_JqSortable extends KontorX_DataGrid_Row_Editable_FormText {
+class KontorX_DataGrid_Cell_Editable_JqSortable extends KontorX_DataGrid_Cell_Editable_FormText {
 
 	/**
 	 * @todo sorting
