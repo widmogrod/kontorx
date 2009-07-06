@@ -426,11 +426,9 @@ class KontorX_DataGrid {
             $columnInstance->addFilter($filter);
         }
 
-        // create row
-        if (isset($options['cell'])) {
-            $cell = $this->_createCell((array) $options['cell']);
-            $columnInstance->setCell($cell);
-        }
+        // cell is allways
+		$cell = $this->_createCell((array) @$options['cell']);
+		$columnInstance->setCell($cell);
 
         $this->_columns[$columnInstance->getColumnName()] = $columnInstance;
     }
