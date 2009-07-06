@@ -3,18 +3,26 @@ require_once 'KontorX/DataGrid/Filter/Abstract.php';
 class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 
     /**
+     * Filter accept adapters
+     * - KontorX_DataGrid_Adapter_DbTable
+     * - KontorX_DataGrid_Adapter_DbTableTree
+     * - KontorX_DataGrid_Adapter_DbSelect
+     * 
      * @param KontorX_DataGrid_Adapter_Interface $adapter
      * @return void
      */
     public function filter(KontorX_DataGrid_Adapter_Interface $adapter) {
-        if (!$adapter instanceof KontorX_DataGrid_Adapter_DbTable
-            && !$adapter instanceof KontorX_DataGrid_Adapter_DbTableTree
-            && !$adapter instanceof KontorX_DataGrid_Adapter_DbSelect) {
-            require_once 'KontorX/DataGrid/Exception.php';
-            throw new KontorX_DataGrid_Exception("Wrong filter adapter");
+     	if (!method_exists($adapter, 'getSelect')) {
+        	trigger_error(sprintf('Wrong filter adapter "%s"', get_class($adapter)), E_USER_NOTICE);
+        	return;
         }
 
         $select = $adapter->getSelect();
+        if (!$select instanceof Zend_Db_Select) {
+        	require_once 'KontorX/DataGrid/Exception.php';
+        	throw new KontorX_DataGrid_Exception('');
+        }
+
         $column = $this->getColumnName();
         $text = $this->getValue();
 

@@ -51,23 +51,41 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     /**
      * @var KontorX_DataGrid_Row_Interface
      */
-    private $_row = null;
+    private $_cell = null;
 
     /**
-     * Set filter instance @see KontorX_DataGrid_Row_Interface
-     * @param KontorX_DataGrid_Row_Interface $filter
+     * @param KontorX_DataGrid_Cell_Interface $cell
      */
-    public function setRow(KontorX_DataGrid_Row_Interface $row) {
-    	$row->setColumnName($this->getColumnName());
-        $this->_row = $row;
+    public function setCell(KontorX_DataGrid_Cell_Interface $cell) {
+    	$cell->setColumnName($this->getColumnName());
+        $this->_cell = $cell;
     }
 
     /**
-     * Return filter instance @see KontorX_DataGrid_Filter_Interface
-     * @return KontorX_DataGrid_Row_Interface
+     * @return KontorX_DataGrid_Cell_Interface
      */
-    public function getRow() {
-        return $this->_row;
+    public function getCell() {
+        return $this->_cell;
+    }
+
+    /**
+     * @var bool
+     */
+    protected $_group = false;
+    
+    /**
+     * @param bool $flag
+     * @return void
+     */
+    public function setGroup($flag = true) {
+    	$this->_group = (bool) $flag;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isGroup() {
+    	return $this->_group;
     }
 
     /**
@@ -181,7 +199,7 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     /**
      * @var array
      */
-    private $_protectedMethods = array('Row','Values','Value','ColumnName');
+    private $_protectedMethods = array('Cell','Values','Value','ColumnName');
 
     /**
      * @param array $options

@@ -1,5 +1,5 @@
 <?php
-interface KontorX_DataGrid_Adapter_Interface {
+interface KontorX_DataGrid_Adapter_Interface extends Iterator, Countable {
 
     /**
      * Fetch data rowset ..
@@ -11,18 +11,21 @@ interface KontorX_DataGrid_Adapter_Interface {
      * Return a raw data
      * @return mixed
      */
-    public function getData();
+    public function getAdaptable();
+    
+    /**
+     * @param KontorX_DataGrid $dataGrid
+     */
+    public function setDataGrid(KontorX_DataGrid $dataGrid);
 
     /**
-     * Set array of @see KontorX_DataGrid_Column_Interface objects
-     * @param array $columns
+     * @param string $cellsetClass
+     * @return void
      */
-    public function setColumns(array $columns);
+    public function setCellsetClass($cellsetClass);
 
     /**
-     * Pagination on!!!
-     * @param integer $pageNumber
-     * @param integer $itemCountPerPage
+     * @return string
      */
-    public function setPagination($pageNumber, $itemCountPerPage);
+    public function getCellsetClass();
 }
