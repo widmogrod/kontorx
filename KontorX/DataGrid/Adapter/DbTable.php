@@ -7,7 +7,7 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
      * @param Zend_Db_Table_Abstract $table
      */
     public function __construct(Zend_Db_Table_Abstract $table) {
-        $this->setData($table);
+        $this->setAdaptable($table);
     }
 
     /**
@@ -17,11 +17,10 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 
     /**
      * Zwraca @see Zend_Db_Table_Abstract
-     *
      * @return Zend_Db_Table_Abstract
      */
     public function getTable() {
-        return $this->getData();
+        return $this->_adaptable;
     }
 
     /**
@@ -31,81 +30,32 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
 
     /**
      * Return select statment mini. singletone
-     *
      * @return Zend_Db_Select
      */
     public function getSelect() {
         if (null === $this->_select) {
-            $this->_select = $this->getTable()->select();
+            $this->_select = $this->_adaptable->select();
         }
         return $this->_select;
     }
 
     /**
      * Wyławia szukane kolumny spełniające warunek ..
-     *
-     * @param bool $raw
      * @return array
      */
-    public function fetchData($raw = false) {
+    protected function _fetchData() {
+    	/* @var $select Zend_Db_Table_Abstract */
         $table = $this->getTable();
+        /* @var $select Zend_Db_Select */
         $select = $this->getSelect();
 
-        // czy jest paginacja
-        if ($this->isPagination()) {
-            list($pageNumber, $itemCountPerPage) = $this->getPagination();
-            $select
-            ->limitPage($pageNumber, $itemCountPerPage);
+    	// czy jest paginacja
+        if ($this->_dataGrid->enabledPagination()) {
+            list($pageNumber, $itemCountPerPage) = $this->_dataGrid->getPagination();
+            $select->limitPage($pageNumber, $itemCountPerPage);
         }
-
-        // cache on
-        if ($this->_cacheEnabled()) {
-            if (false !== ($result = self::$_cache->load($this->_getCacheId()))) {
-                return $result;
-            }
-        }
-
-        $columns = $this->getColumns();
-        $rows   = $this->getRows();
-
-        $result = array();
 
         $dataset = $table->fetchAll($select);
-
-	    // hack.. dla potrzebnej funkcjonalności..
-        if (true === $raw) {
-        	return $dataset;
-        }
-
-        foreach ($dataset as $i => $data) {
-            $rawData = $data->toArray();
-            // tworzymy tablice wielowymiarowa rekordow
-            foreach ($columns as $columnName => $columnInstance) {
-                // jest dekorator rekordu @see KontorX_DataGrid_Row_Interface
-                if (count($rows)
-                    && isset($rows[$columnName])
-                    && $rows[$columnName] instanceof KontorX_DataGrid_Row_Interface) {
-                    $cloneRowInstance = clone $rows[$columnName];
-                    $cloneRowInstance->setData($rawData, $columnName);
-                    $result[$i][$columnName] = $cloneRowInstance;
-                }
-                // surowy rekord!
-                else {
-                    $result[$i][$columnName] = isset($rawData[$columnName])
-                    ? $rawData[$columnName] : null;
-                }
-            }
-        }
-
-        // cache save
-        if ($this->_cacheEnabled()) {
-            self::$_cache->save($result, $this->_getCacheId());
-        }
-
-        return $result;
-    }
-    
-	protected function _getCacheId() {
-        return self::CACHE_PREFIX . md5((string)$this->getTable()->getSelect());
+        return $this->_data = $dataset->toArray();
     }
 }
