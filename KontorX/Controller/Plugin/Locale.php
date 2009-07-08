@@ -7,10 +7,11 @@ class KontorX_Controller_Plugin_Locale extends Zend_Controller_Plugin_Abstract {
 		if (null === $locale) {
 			$locale = $this->_getLocale()->getLanguage();
 		} else {
+			Zend_Locale::setDefault($locale);
 			$this->_getLocale()->setLocale($locale);
 		}
 
-		// sprzężone z translacja toutera ;]
+		// sprzężone z translacja routera ;]
 		Zend_Controller_Front::getInstance()->getRouter()->setGlobalParam('locale', $locale);
 	}
 	
