@@ -86,12 +86,22 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 	 */
 	protected function _parse($type, $value) {
 		$value = urldecode($value);
+		/* @var $view Zend_View */
 		$view = $this->view;
+//		$view->addScriptPath(PUBLIC_PATHNAME . PUBLIC_TEMPLATES_DIRNAME . DIRECTORY_SEPARATOR . KX_TEMPLATE_SKIN);
 		switch ($type) {
 			default:
 				trigger_error(sprintf('undefinded parser type "%s" with value "%s"', $type, $value), E_USER_NOTICE);
 				break;
 			case 'site': return $view->url(array('alias'=>$value),'site', true);
+			case 'album':
+				$params = explode(';',$value);
+				$params = $this->_prepareParam((array) $params);
+				$alias = $params[0];
+				unset($params[0]);
+				return $view->galleryAlbum($alias)
+							->render('_partial/galleryAlbum.phtml');
+				return $view->action('display', 'album', 'gallery', $params);
 			case 'action':
 				// separator parametrow ;
 				$params = explode(';',$value);
@@ -126,6 +136,8 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 			if(strpos($value,'=') !== false) {
 				$value = explode('=', $value);
 				$result[$value[0]] = $value[1];
+			} else {
+				$result[] = $value;
 			}
 		}
 		return $result;
