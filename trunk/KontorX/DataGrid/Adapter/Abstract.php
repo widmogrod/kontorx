@@ -109,16 +109,13 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 
 			/* @var $column KontorX_DataGrid_Column_Interface */
             foreach ($columns as $column) {
-            	/**
-            	 * @todo Clone issue... <> in group check is equal!
-            	 * $cell = clone $column->getCell(); 
-            	 */
                 /* @var $cell KontorX_DataGrid_Cell_Interface */ 
-                $cell = $column->getCell();
+                $cell = clone $column->getCell();
 				$cell->setData($this->_data[$this->_pointer]);
 
 	            if ($column->isGroup()) {
-	            	if ($this->_groupCell != $cell) {
+	            	// compare string
+	            	if ((string) $this->_groupCell != (string) $cell) {
 	            		$this->_groupCell = $cell;
 	            		$cellset->setGroupCell($cell);
 	            	}
