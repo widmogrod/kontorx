@@ -99,9 +99,8 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 				$params = $this->_prepareParam((array) $params);
 				$alias = $params[0];
 				unset($params[0]);
-				return $view->galleryAlbum($alias)
-							->render('_partial/galleryAlbum.phtml');
-				return $view->action('display', 'album', 'gallery', $params);
+				return $view->galleryAlbum($alias)->render('_partial/galleryAlbum.phtml');
+//				return $view->action('display', 'album', 'gallery', $params);
 			case 'action':
 				// separator parametrow ;
 				$params = explode(';',$value);
