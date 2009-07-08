@@ -9,14 +9,7 @@ abstract class KontorX_DataGrid_Cell_Abstract implements KontorX_DataGrid_Cell_I
         if (null != $options) {
             $this->setOptions($options);
         }
-        
-        $this->_init();
     }
-    
-    /**
-     * @return void
-     */
-    protected function _init() {}
 
     /**
      * @var string
