@@ -1,5 +1,5 @@
 #summary DataGrid example
-#labels Phase-Deploy,Featured
+#labels Phase-Deploy,Deprecated
 
 = Introduction =
 
