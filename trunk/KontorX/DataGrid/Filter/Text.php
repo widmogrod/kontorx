@@ -28,7 +28,7 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 
         if (strlen($text)) {
         	$where = sprintf("%s LIKE ?", $this->_prepareColumnName($column, $select));
-            $adapter->getSelect()->where($where, sprintf('%%%s%%',$text));
+            $select->where($where, sprintf('%%%s%%',$text));
         }
     }
 
@@ -38,8 +38,13 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
      * @return string
      */
     protected function _prepareColumnName($column, $select) {
+    	if (null !== ($correlationName = $this->getAttrib('correlationName'))) {
+    		return sprintf('`%s`.`%s`', $correlationName, $column);
+    	}
+
     	foreach ($select->getPart(Zend_Db_Select::COLUMNS) as $cols) {
         	list($correlationName, $col, $alias) = $cols;
+        	
         	if ($column == $alias) {
         		return sprintf('`%s`.`%s`', $correlationName, $col);
         	}
