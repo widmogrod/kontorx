@@ -213,7 +213,7 @@ class Promotor_Model_Abstract {
         // identyfikator cache
         $cacheId = $this->_getResultCacheId($method, $params);
 
-        $tags = array(get_class($this),$method);
+        $tags = array(get_class($this), $method);
 
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
