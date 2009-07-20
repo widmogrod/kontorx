@@ -18,7 +18,7 @@ class KontorX_View_Helper_AbsoluteUrl implements Zend_View_Helper_Interface {
 	
 	public function setView(Zend_View_Interface $view) {
 		$this->view = $view;
-		$this->_baseUrl = $view->baseUrl();
+		$this->_baseUrl = $view->getHelper('baseUrl')->getBaseUrl();
 	}
 	
 	/**
