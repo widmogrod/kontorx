@@ -1,8 +1,31 @@
 <?php
-require_once 'Zend/View/Helper/Abstract.php';
-class KontorX_View_Helper_AbsoluteUrl extends Zend_View_Helper_Abstract {
-	public function AbsoluteUrl(array $params, $router = null) {
-		// TODO http or https ..
-		return 'http://' . getenv('SERVER_NAME') . $this->view->url($params, $router);
+require_once 'Zend/View/Helper/Interface.php';
+
+/**
+ * @author gabriel
+ */
+class KontorX_View_Helper_AbsoluteUrl implements Zend_View_Helper_Interface {
+	
+	/**
+	 * @var Zend_View_Interface
+	 */
+	public $view;
+	
+	/**
+	 * @var string
+	 */
+	protected $_baseUrl;
+	
+	public function setView(Zend_View_Interface $view) {
+		$this->view = $view;
+		$this->_baseUrl = $view->baseUrl();
+	}
+	
+	/**
+	 * @param array $params
+	 * @param string $router
+	 */
+	public function absoluteUrl(array $params, $router = null) {
+		return $this->_baseUrl . $this->view->url($params, $router);
 	}
 }
