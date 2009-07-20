@@ -6,6 +6,6 @@ class KontorX_View_Helper_HeadBase extends Zend_View_Helper_Abstract {
 	public function headBase() {
 		return sprintf(
 			'<base href="%s"/>',
-			$this->view->baseUrl());
+				$this->view->baseUrl());
 	}
 }
