@@ -77,15 +77,17 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 	 */
 	protected function _initLayoutPath(Zend_Layout $layout) {
 		$template = $this->getTemplate();
+		/* @var Zend_View_Interface */
 		$view = $template->getView();
-		foreach ($template->getTemplatePaths(true) as $path) {
+		$paths = $template->getTemplatePaths(true);
+		$paths = array_diff($paths, $view->getScriptPaths());
+		foreach ($paths as $path) {
 			if (method_exists($view, 'addScriptPath')) {
                 $view->addScriptPath($path);
             } else {
                 $view->setScriptPath($path);
             }
 		}
-
 		return $this;
 	}
 	
@@ -96,6 +98,11 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 	protected function _initViewHelpers(Zend_Config $options) {
 		$template = $this->getTemplate();
 		$view = $template->getView();
+
+		// doctype
+		if (isset($options->doctype)) {
+			$view->doctype($options->doctype);
+		}
 
         // title
         if (isset($options->title)) {
