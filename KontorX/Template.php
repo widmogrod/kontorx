@@ -435,7 +435,7 @@ class KontorX_Template {
 				'config filename "%s" do not exsists in template paths',
 				$this->_styleConfigFilename));
 		}
-		
+
 		// definiowanie GLOBAL..
 		if (!defined('KX_TEMPLATE_SKIN')) {
 			$skinpath = str_replace($this->getTemplatePaths(),
