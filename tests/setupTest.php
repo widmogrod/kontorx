@@ -4,7 +4,7 @@ ini_set('display_errors',1);
 ini_set('display_startup_error',1);
 
 set_include_path(implode(PATH_SEPARATOR, array(
-	'/usr/share/php/Zend/1.8.1/',
+	'/usr/share/php/Zend/1.8.2/',
 	'/usr/share/php/',
 	dirname(__FILE__) . '/../'
 )));
