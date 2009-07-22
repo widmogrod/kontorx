@@ -1,4 +1,5 @@
 <?php
+require_once 'KontorX/View/Helper/JsAbstract.php';
 /**
  * Implementation jsTree @link http://www.jstree.com/ version 0.9.8
  * @author gabriel

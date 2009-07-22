@@ -29,6 +29,16 @@ class KontorX_View_Helper_JsAbstract extends Zend_View_Helper_Abstract {
 		$this->_jsOptions = $options;
 		return $this;
 	}
+	
+	/**
+	 * @param string $key 
+	 * @param string $value
+	 * @return KontorX_View_Helper_JsAbstract
+	 */
+	public function setJsOption($key, $value) {
+		$this->_jsOptions[$key] = $value;
+		return $this;
+	}
 
 	/**
 	 * @param array $array1
