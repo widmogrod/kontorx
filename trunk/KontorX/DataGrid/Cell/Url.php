@@ -45,15 +45,15 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 	 * @return string
 	 */
 	public function getName() {
-//		if (null === $this->_name) {
+		if (null === $this->_name) {
 			$columnName = $this->getColumnName();
 			if (null === ($this->_name = $this->getData($columnName))) {
 				$this->_name = $columnName;
 			}
-//		}
+		}
 		return $this->_name;
 	}
-
+	
 	/**
 	 * @return array
 	 */
