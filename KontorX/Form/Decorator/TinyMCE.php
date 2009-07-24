@@ -28,7 +28,9 @@ class KontorX_Form_Decorator_TinyMCE extends Zend_Form_Decorator_Abstract {
 			'skin' => 'o2k7',
 			'skin_variant' => 'black',
 			'width' => '100%',
-		
+
+			'language' => 'pl',
+
 			'plugins' => 'safari,style,layer,table,save,advimage,advlink,inlinepopups,preview,media,searchreplace,contextmenu,paste,fullscreen,visualchars,nonbreaking,xhtmlxtras,filemanager',
 			'theme_advanced_buttons1' => 'save,newdocument,|,bold,italic,underline,strikethrough,sub,sup,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
 			'theme_advanced_buttons2' => 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,filemanager,image,media,|,cleanup,removeformat,|,code,preview',
