@@ -30,11 +30,15 @@ class KontorX_Form_Decorator_TinyMCE extends Zend_Form_Decorator_Abstract {
 			'width' => '100%',
 
 			'language' => 'pl',
+//			'document_base_url' => $view->baseUrl(),
+			'content_css' => $view->baseUrl() . '/css/promotor/tinymce.css',
 
 			'plugins' => 'safari,style,layer,table,save,advimage,advlink,inlinepopups,preview,media,searchreplace,contextmenu,paste,fullscreen,visualchars,nonbreaking,xhtmlxtras,filemanager',
-			'theme_advanced_buttons1' => 'save,newdocument,|,bold,italic,underline,strikethrough,sub,sup,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-			'theme_advanced_buttons2' => 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,filemanager,image,media,|,cleanup,removeformat,|,code,preview',
-			'theme_advanced_buttons3' => 'tablecontrols,|,insertlayer,moveforward,movebackward,absolute,|,styleprops,|,visualchars,nonbreaking,visualaid,charmap,|,fullscreen',
+		
+			'theme_advanced_buttons1' => 'save,newdocument,|,cut,copy,paste,pastetext,pasteword,|,search,replace,|,undo,redo,|,bold,italic,underline,strikethrough,|,sub,sup,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,outdent,indent,blockquote',
+			'theme_advanced_buttons2' => 'cleanup,removeformat,|,styleselect,formatselect,fontselect,fontsizeselect,|,link,unlink,anchor,filemanager,image,media',
+			'theme_advanced_buttons3' => 'tablecontrols,|,insertlayer,moveforward,movebackward,absolute,|,styleprops,|,visualchars,nonbreaking,visualaid,charmap,|,code,preview,|,fullscreen',
+
 			'theme_advanced_toolbar_location' => 'top',
 			'theme_advanced_toolbar_align' => 'left',
 			'theme_advanced_statusbar_location' => 'bottom',
