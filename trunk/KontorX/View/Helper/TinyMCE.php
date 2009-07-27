@@ -20,8 +20,13 @@ class KontorX_View_Helper_TinyMCE extends KontorX_View_Helper_JsAbstract {
 		'skin' => null,
 		'skin_variant' => null,
 	
+		'language' => null,
+	
 		'width' => null,
 		'height' => null,
+	
+		'document_base_url' => null,
+		'content_css' => null,
 
 		'plugins' => null,
 		'editor_selector' => null, 
@@ -33,7 +38,7 @@ class KontorX_View_Helper_TinyMCE extends KontorX_View_Helper_JsAbstract {
 		'theme_advanced_toolbar_align' => null,
 		'theme_advanced_statusbar_location' => null,
 		'theme_advanced_resizing' => null,
-		'content_css' => null,
+
 		'template_external_list_url' => null,
 		'external_link_list_url' => null,
 		'external_image_list_url' => null,
