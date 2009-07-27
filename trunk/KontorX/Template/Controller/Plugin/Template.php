@@ -122,6 +122,8 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 		// meta
         if (isset($options->meta)
         		&& isset($options->meta->name)) {
+        			
+            /* @var $headMeta Zend_View_Helper_HeadMeta */
             $headMeta = $view->getHelper('HeadMeta');
 
             $meta = array();
@@ -143,28 +145,46 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             		&& isset($options->meta->name->description)) {
                 $headMeta->setName('description', $options->meta->name->description);
             }
+
+            if (isset($options->meta->httpEquiv)
+            		&& $options->meta->httpEquiv instanceof Zend_Config) {
+	            foreach ($options->meta->httpEquiv->toArray() as $obj) {
+	            	$headMeta->setHttpEquiv($obj->key,
+	            							$obj->content,
+	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : null);
+	            }
+            }
         }
 
         // script
         if (isset($options->script)) {
+        	/* @var $headScript Zend_View_Helper_HeadScript */
             $headScript = $view->getHelper('HeadScript');
             $i = 0;
             foreach ($options->script->js as $file) {
-                $headScript->offsetSetFile(++$i, $file->src);
+                $headScript->offsetSetFile(++$i,
+            								$file->src,
+            								isset($file->type) ? $file->type : null,
+            								isset($file->attribs) ? $file->attribs->toArray() : array());
             }
         }
         
 		// inlineScript
         if (isset($options->inlineScript)) {
+        	/* @var $inlineScript Zend_View_Helper_InlineScript */
             $inlineScript = $view->getHelper('InlineScript');
             $i = 0;
             foreach ($options->inlineScript->js as $file) {
-                $inlineScript->offsetSetFile(++$i, $file->src);
+            	$inlineScript->offsetSetFile(++$i,
+            								$file->src,
+            								isset($file->type) ? $file->type : null,
+            								isset($file->attribs) ? $file->attribs->toArray() : array());
             }
         }
 
         // link
         if (isset($options->links)) {
+        	/* @var $headLink Zend_View_Helper_HeadLink */
         	$headLink = $view->getHelper('HeadLink');
             foreach ($options->links->css->toArray() as $file) {
                 if (!isset($file['rel'])) {
@@ -176,5 +196,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
                 $headLink->headLink($file);
             }
         }
+        
+        
 	}
 }
