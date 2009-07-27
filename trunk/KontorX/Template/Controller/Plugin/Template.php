@@ -148,10 +148,10 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 
             if (isset($options->meta->httpEquiv)
             		&& $options->meta->httpEquiv instanceof Zend_Config) {
-	            foreach ($options->meta->httpEquiv->toArray() as $obj) {
+	            foreach ($options->meta->httpEquiv as $obj) {
 	            	$headMeta->setHttpEquiv($obj->key,
 	            							$obj->content,
-	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : null);
+	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : array());
 	            }
             }
         }
