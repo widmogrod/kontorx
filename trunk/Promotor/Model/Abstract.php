@@ -179,6 +179,35 @@ class Promotor_Model_Abstract {
         return $this->_resultCache;
     }
 
+	/**
+     * @param string|Zend_Cache_Core $cache
+     * @return Promotor_Model_Abstract
+     */
+    public function setResultCache($cache) {
+    	if (is_string($cache)) {
+    		/* @var $registry Zend_Registry */
+    		$registry = Zend_Registry::getInstance();
+    		if (isset($registry[$cache])) {
+    			$cache = $registry[$cache];
+    		}
+    	}
+
+    	if (!$cache instanceof Zend_Cache_Core) {
+    		throw new Promotor_Model_Exception('Zend_Cache_Core is not set');
+    	}
+
+    	$this->_resultCache = $cache;
+    	return $this;
+    }
+
+    /**
+     * @return Promotor_Model_Abstract
+     */
+    public function clearResultCache() {
+    	$this->_resultCache = null;
+    	return $this;
+    }
+    
     /**
      * Tablica zdefiniowanych przez użytkownika method, które będą keszowane
      * @var array
