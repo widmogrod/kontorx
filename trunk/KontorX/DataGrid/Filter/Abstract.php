@@ -89,7 +89,27 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
     public function getName() {
         return $this->_name;
     }
+    
+    /**
+     * @var KontorX_DataGrid_Column_Interface
+     */
+    protected $_column;
+    
+    /**
+     * @param KontorX_DataGrid_Column_Interface $column
+     * @return void
+     */
+    public function setColumn(KontorX_DataGrid_Column_Interface $column) {
+    	$this->_column = $column;
+    }
 
+    /**
+     * @return KontorX_DataGrid_Column_Interface
+     */
+    public function getColumn() {
+    	return $this->_column;
+    }
+    
     /**
      * @var string
      */
