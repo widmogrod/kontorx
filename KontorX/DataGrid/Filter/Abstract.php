@@ -54,19 +54,17 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
 
     /**
      * Get filter value
-     * @param string $key
+     * @param mixed $default
      * @return mixed
      */
-    public function getValue($key = null) {
-        if (null === $key) {
-            $key = $this->getClassName();
-        }
+    public function getValue($default = null) {
+		$key = $this->getClassName();
         $values = $this->_values->filter;
         $column = $this->getColumnName();
         if (isset($values->$column)) {
             return @$values->$column->$key;
         }
-        return null;
+        return $default;
     }
 
     /**
