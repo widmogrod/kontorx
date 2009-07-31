@@ -6,9 +6,6 @@ require_once 'KontorX/Db/Table/Tree/Row/Interface.php';
  * KontorX_Db_Table_Tree_Row_Abstract
  *
  * @category	KontorX
- * @package		KontorX_Db
- * @subpackage	Table
- * @version		0.3.1
  */
 abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row implements KontorX_Db_Table_Tree_Row_Interface {
 	/**
@@ -37,10 +34,16 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
      *
      * @return array
      */
-    public function __sleep()
-    {
-        return parent::__sleep() + array('_level','_separator');
-    }
+    public function __sleep() {
+		return array_merge(
+			parent::__sleep(),
+			array(
+				'_table', // FIX For serialization.. 
+				'_level',
+				'_separator',
+			)
+		);
+	}
 
     /**
      * Setup to do on wakeup.
