@@ -1,5 +1,5 @@
 <?php
-require 'KontorX/Db/Table/Row.php';
+require_once 'KontorX/Db/Table/Row.php';
 require_once 'KontorX/Db/Table/Tree/Row/Interface.php';
 
 /**
