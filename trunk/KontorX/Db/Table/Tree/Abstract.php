@@ -58,4 +58,8 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
     public function getSeparator() {
             return $this->_separator;
     }
+
+	public function __sleep() {
+		return array('_level', '_separator');
+	}
 }
