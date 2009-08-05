@@ -1,3 +1,3 @@
 <?php
-require_once 'KontorX/Exception.php';
-class KontorX_Odf_Exception extends KontorX_Exception {}
+require_once 'Zend/Exception.php';
+class KontorX_Opf_Exception extends Zend_Exception {}

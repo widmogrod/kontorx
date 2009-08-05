@@ -12,6 +12,7 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
 
         $select = $adapter->getSelect();
         $column = $this->getColumnName();
+
         // set default order type
         $order = $this->getValue($this->getAttrib('order'));
 

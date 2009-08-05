@@ -48,15 +48,15 @@ abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstra
 			// przesun wskaznik
 			$rowset->next();
 
-			$result .= '<li>' . $this->_data($current);
+			$result .= '<li>' . $this->_data($current) . "\n";
 
 			// koniec iteracji
 			if (!$rowset->valid()) {
 				// zamykamy tag
-				$result .= '</li>';
-				// ostatnie zaglebienie jest wieksze od 1 to domykamy
+				$result .= '</li>' . "\n";
+				// ostatnie zaglebienie jest wieksze od 1 to domykam'y
 				if ($currentDepth > 1) {
-					$result .= str_repeat('</ul></li>', $currentDepth-1);
+					$result .= str_repeat('</ul></li>' . "\n", $currentDepth-1);
 				}
 				return $result;
 			}
@@ -69,7 +69,7 @@ abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstra
 				// domykamy tagi przed renderowaniem zagniezdzenia
 				if ($currentDepth > $nextDepth) {
 					// poziom zagniezdzenia nastepnego rekordu jest mniejszy od aktualnego
-					$result .= str_repeat('</li></ul>',$currentDepth-$nextDepth);
+					$result .= str_repeat('</li></ul>' . "\n", $currentDepth-$nextDepth);
 				} else {
 					// TODO nie powinno byc tak ze poziom skacze nagle o dwa w dól
 					// ale gdy by cos to dodac str_repeat .. ??
@@ -82,7 +82,9 @@ abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstra
 				// domykamy tagi po renderowaniem zagniezdzenia
 				if ($currentDepth > $nextDepth) {
 					// poziom zagniezdzenia nastepnego rekordu jest mniejszy od aktualnego
-					$result .= str_repeat('</ul></li>', $currentDepth-$nextDepth);
+					$result .= str_repeat('</ul></li>' . "\n", $currentDepth-$nextDepth);
+				} else {
+					$result .= '</ul>';
 				}
 			} else {
 				// ten samo poziom zagniezdzenia

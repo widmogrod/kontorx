@@ -40,11 +40,12 @@ class KontorX_DataGrid_Cell_Date extends KontorX_DataGrid_Cell_Abstract {
         }
 
         $date = $this->_getDate();
-
-        if (!$date->isDate($value)) {
-            require_once 'KontorX/DataGrid/Exception.php';
-            throw new KontorX_DataGrid_Exception(sprintf("Value '%s' is not date format", $value));
-        }
+        
+// Zend_Data - not working ... :./
+//        if (!$date->isDate($value)) {
+//        	trigger_error(sprintf("Value '%s' is not date format", $value), E_USER_WARNING);
+//        	return $value;
+//        }
 
         if (null === @$attribs['conditions']['condition']['0']) {
             $attribs['conditions']['condition'] = array($attribs['conditions']['condition']);

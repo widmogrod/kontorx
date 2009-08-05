@@ -3,6 +3,8 @@ require_once 'Zend/Controller/Plugin/Abstract.php';
 
 /**
  * KontorX_Controller_Plugin_System
+ *
+ * @version 0.2.0
  * @author widmogrod
  */
 class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
@@ -23,9 +25,12 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
     );
 
     /**
+     * Konstruktor
+     *
      * @param Zend_Config $config
      */
     public function __construct(Zend_Config $config) {
+        // ustawienie domyslenej konfiguracji!
         $this->setConfig($config);
     }
 
@@ -293,18 +298,17 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         $templatePaths = $view->getScriptPaths();
 
         // ustawienia nazwy layoutu
-        if ($this->hasLayoutName()) {
-        	$layoutName = $this->getLayoutName();
-        } else
-        if(null === ($layoutName = $layout->getLayout())) {
-        	$layoutName = $config[self::TEMPLATE]['layout'];
-        }
+        $layoutName = $this->hasLayoutName()
+        ? $this->getLayoutName()
+        : $config[self::TEMPLATE]['layout'];
+
+        $layout->setLayout($layoutName);
 
         $layoutSection = $this->hasLayoutSectionName()
-	        ? $this->getLayoutSectionName()
-	        : $layoutName;
+        ? $this->getLayoutSectionName()
+        : $layoutName;
 
-	    // szukanie konfiguracji
+        // szukanie konfiguracji
         $templateConfig 		= null;
         $templateConfigType 	= $config[self::TEMPLATE]['config']['type'];
         $templateConfigFilename = $config[self::TEMPLATE]['config']['filename'];
@@ -312,19 +316,21 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             $templateConfigPath = $templatePath . '/' . $templateConfigFilename;
             if (is_readable($templateConfigPath)) {
                 $templateConfig = new Zend_Config_Ini($templateConfigPath, null, true);
-                if (!isset($templateConfig->$layoutSection)) {
-                	$templateConfig = $templateConfig->default;
-                } else {
+                if (isset($templateConfig->$layoutSection)
+                		&& $templateConfig->$layoutSection instanceof Zend_Config) {
                 	$templateConfig = $templateConfig->$layoutSection;
-                }
+                }                
                 break;
             }
         }
 
-        if (!$templateConfig instanceof Zend_Config) {
+        if (null === $templateConfig) {
             // nie ma konfiguracji layoutu
             return;
         }
+
+		// hack, for new version
+		$options = $templateConfig;
 
         // ustawianie nowego pliku layoutu gdy nie był wcześniej ustawiony "ręcznie"
         // z poziomu kodu
@@ -332,50 +338,92 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         if (!$this->isLockLayoutName() && null !== $templateConfig->layout) {
             $layout->setLayout($templateConfig->layout);
         }
-        // title
-        if (isset($templateConfig->title)) {
-            $headTitle = $view->headTitle();
-            // @todo pozwolić konfiguracji ustawić separator
-            $headTitle->setSeparator(' - ');
-            $headTitle->prepend($templateConfig->title);
-        }
-        // meta
-        if (isset($templateConfig->meta)
-        		&& isset($templateConfig->meta->name)) {
-            $headMeta = $view->getHelper('HeadMeta');
 
+		// doctype
+		if (isset($options->doctype)) {
+			$view->doctype($options->doctype);
+		}
+
+        // title
+		if (isset($options->title)) {
+            $headTitle = $view->getHelper('HeadTitle');
+            $title = $options->title;
+            $separator = ' ';
+            if (isset($title->title)) {
+            	$title = $title->title;
+            	$separator = isset($title->separator)
+            		? $title->separator : $separator;
+            } 
+
+            $headTitle->append($title);
+            $headTitle->setSeparator($separator);
+        }
+
+        // meta
+        if (isset($templateConfig->meta)) {
+            // sprawdzanie czy są już ustawione meta dane
+            // TODO czy podwojne metadane przeszkadzają??
+            // bo wlasnie po to jest sprawdzanies
             $meta = array();
+            $headMeta = $view->headMeta();
             foreach ($headMeta->getContainer() as $key) {
             	if (isset($key->name)) {
             		if ($key->name == 'keywords') {
-						$meta['keywords'] = true;
-					} else if ($key->name == 'description') {
-						$meta['description'] = true;
-					}
+	                    $meta['keywords'] = true;
+	                } else
+	                if ($key->name == 'description') {
+	                    $meta['description'] = true;
+	                }
             	}
             }
 
-            if (!isset($meta['keywords'])
-            		&& isset($templateConfig->meta->name->keywords)) {
-                $headMeta->setName('keywords', $templateConfig->meta->name->keywords);
+            if (!isset($meta['keywords'])) {
+                $headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
             }
-            if (!isset($meta['description']) 
-            		&& isset($templateConfig->meta->name->description)) {
-                $headMeta->setName('description', $templateConfig->meta->name->description);
+            if (!isset($meta['description'])) {
+                $headMeta->appendName('description', $templateConfig->meta->name->description);
+            }
+            
+        	if (isset($options->meta->httpEquiv)
+            		&& $options->meta->httpEquiv instanceof Zend_Config) {
+	            foreach ($options->meta->httpEquiv as $obj) {
+	            	$headMeta->setHttpEquiv($obj->key,
+	            							$obj->content,
+	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : array());
+	            }
             }
         }
-        // script
-        if (isset($templateConfig->script)) {
+
+    	// script
+        if (isset($options->script)) {
+        	/* @var $headScript Zend_View_Helper_HeadScript */
             $headScript = $view->getHelper('HeadScript');
             $i = 0;
-            foreach ($templateConfig->script->js as $file) {
-                $headScript->offsetSetFile(++$i, $file->src);
+            foreach ($options->script->js as $file) {
+                $headScript->offsetSetFile(++$i,
+            								$file->src,
+            								isset($file->type) ? $file->type : null,
+            								isset($file->attribs) ? $file->attribs->toArray() : array());
             }
         }
+        
+		// inlineScript
+        if (isset($options->inlineScript)) {
+        	/* @var $inlineScript Zend_View_Helper_InlineScript */
+            $inlineScript = $view->getHelper('InlineScript');
+            $i = 0;
+            foreach ($options->inlineScript->js as $file) {
+            	$inlineScript->offsetSetFile(++$i,
+            								$file->src,
+            								isset($file->type) ? $file->type : null,
+            								isset($file->attribs) ? $file->attribs->toArray() : array());
+            }
+        }
+
         // link
-        if (isset($templateConfig->links)) {
+        if (isset($options->links)) {
         	$headLink = $view->getHelper('HeadLink');
-            foreach ($templateConfig->links->css->toArray() as $file) {
+            foreach ($options->links->css->toArray() as $file) {
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }

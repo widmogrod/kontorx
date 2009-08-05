@@ -3,27 +3,15 @@ require_once 'Zend/Form.php';
 
 /**
  * KontorX_Form_Config
+ *
+ * @package 	KontorX_Form
+ * @version 	0.1.4
+ * @license		GNU GPL
+ * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Form_Config extends Zend_Form {
 
-	/**
-	 * @var array
-	 */
-	protected $_instanceOptions;
-	
-	/**
-	 * @param mixed $instanceOptions
-	 */
-	public function setInstanceOptions($instanceOptions) {
-		$this->_instanceOptions = $instanceOptions;
-	}
-	
-	/**
-	 * @return mixed
-	 */
-	public function getInstanceOptions() {
-		return $this->_instanceOptions;
-	}
+	protected $_instanceOptions = null;
 	
     /**
      * Konstruktor
@@ -33,10 +21,11 @@ class KontorX_Form_Config extends Zend_Form {
      */
     public function __construct(Zend_Config $model, $options = null) {
         $this->setConfigModel($model);
-        $this->setInstanceOptions($options);
-        $this->setIsArray(true);
         
+        $this->_instanceOptions = $options;
         parent::__construct($options);
+        
+        $this->setIsArray(true);
 
         // go! ..
         $this->setupFormFromConfigModel();
@@ -76,7 +65,7 @@ class KontorX_Form_Config extends Zend_Form {
      * @return KontorX_Form_Config
      */
     protected function _initSubFormContainer(Zend_Config $config) {
-    	$form = new self($config, $this->getInstanceOptions());
+    	$form = new self($config, $this->_instanceOptions);
         $form->addDecorator('DtDdWrapper');
         $form->addDecorator('Fieldset');
         $form->removeDecorator('Form');

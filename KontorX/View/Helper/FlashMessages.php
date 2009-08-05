@@ -9,17 +9,24 @@ class KontorX_View_Helper_FlashMessages extends Zend_View_Helper_Abstract {
 	/**
 	 * @var array
 	 */
-	protected static $_messages;
+	protected $_messages = array();
+
+	public function __construct() {
+		require_once 'Zend/Controller/Action/HelperBroker.php';
+		if (!Zend_Controller_Action_HelperBroker::hasHelper('flashMessenger')) {
+			require_once 'Zend/Controller/Action/Helper/FlashMessenger.php';
+			$flashMessenger = new Zend_Controller_Action_Helper_FlashMessenger();
+			Zend_Controller_Action_HelperBroker::addHelper($flashMessenger);
+		} else {
+			$flashMessenger = Zend_Controller_Action_HelperBroker::getExistingHelper('flashMessenger');
+		}
+		$this->_messages = $flashMessenger->getMessages();
+	}
 
 	/**
 	 * @return array
 	 */
 	public function flashMessages() {
-		if (null === self::$_messages) {
-			require_once 'Zend/Controller/Action/HelperBroker.php';
-			$flashMessenger = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger');
-			self::$_messages = $flashMessenger->getMessages();
-		}
-		return self::$_messages;
+		return $this->_messages;
 	}
 }

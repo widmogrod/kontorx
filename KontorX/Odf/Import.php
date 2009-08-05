@@ -1,219 +1,192 @@
 <?php
-/**
- * @author gabriel
- *
- */
 class KontorX_Odf_Import {
 
-	/** Typy plików zapisywanych */
-	const PICTURE = 'PICTURE';
-	
-	/** Obsługiwane typy ODF */
-	const TYPE_ODT = 'ODT';
-
-	/**
-	 * @var array
-	 */
-	protected $_templateType = array(
-		self::TYPE_ODT => 'xsl/odt.xsl'
-	);
-	
-	/**
-	 * @param string $file
-	 * @return void
-	 * @throws KontorX_Opf_Exception
-	 */
-	public function __construct($file) {
-		if (!class_exists('ZipArchive')) {
-			require_once 'KontorX/Odf/Exception.php';
-			throw new KontorX_Odf_Exception('php extension "ZipArchive" do not exsists');
+	public function __construct($fileName) {
+		if (!is_readable($fileName) && !is_file($fileName)) {
+			$message = "File `$fileName` do not exsists or is not readable";
+			require_once 'KontorX/Opf/Exception.php';
+			throw new KontorX_Opf_Exception($message);
 		}
 
-		$zip = new ZipArchive();
-		if (!$zip->open($file)) {
-			require_once 'KontorX/Odf/Exception.php';
-			throw new KontorX_Odf_Exception(sprintf('cannot open file "%s"', $file));
-		}
+		// TODO Operacje gzipowania
+
+		// odczytywanie plku
+		$document = file_get_contents($fileName);
 		
-		$type = pathinfo($file, PATHINFO_EXTENSION);
-		$this->setType($type);
+		// parsowanie dokumentu
+		$dom = new DOMDocument();
+		$dom->loadXML($document);
+
+		$automaticStyles = $dom->getElementsByTagNameNS('urn:oasis:names:tc:opendocument:xmlns:office:1.0','automatic-styles');
+		$office 		 = $dom->getElementsByTagNameNS('urn:oasis:names:tc:opendocument:xmlns:office:1.0','*');
+		$section 		 = $dom->getElementsByTagNameNS('urn:oasis:names:tc:opendocument:xmlns:text:1.0', 'section');
+		$name 		 	 = $dom->getElementsByTagNameNS('urn:oasis:names:tc:opendocument:xmlns:text:1.0', 'name');
+		$text 		 	 = $dom->getElementsByTagNameNS('urn:oasis:names:tc:opendocument:xmlns:text:1.0', '*');
+		$text_name	 	 = $dom->getElementsByTagName('text');
 		
-		if (false === ($stream = $zip->getStream('content.xml'))) {
-			require_once 'KontorX/Odf/Exception.php';
-			throw new KontorX_Odf_Exception('file "content.xml" do not exsists, probably not "ODF" file format');
+		
+//		print '<pre>';
+//		if (null !== $automaticStyles) {
+//			$this->_debugNodeList($automaticStyles);
+//		}
+//		print '<hr/>';
+//		if (null !== $office) {
+//			$this->_debugNodeList($office);
+//		}
+//		print '<hr/>';
+//		if (null !== $section) {
+//			$this->_debugNodeList($section);
+//		}
+//		print '<hr/>';
+//		if (null !== $name) {
+//			$this->_debugNodeList($name);
+//		}
+//		print '<hr/>';
+		if (null !== $text) {
+			foreach ($text as $key => $node) {
+				$this->_handleInlineNode($node, $key);
+			}
+//			$this->_debugNodeList($text);
 		}
+//		print '<hr/>';
+//		if (null !== $text_name) {
+//			$this->_debugNodeList($text_name);
+//		}
+//		print '<hr/>';
+	}
 
-		// odczytaj xml do transformacji
-		$stat = $zip->statName('content.xml');
-		$content = $this->_readContent($stream, $stat);
-		$this->_setContentXml($content);
+	public function __toString() {
+		var_dump(array_keys($this->_response));
+		ksort($this->_response);
+		return implode("\n", $this->_response);
+	}
+	
+	protected function _debugNodeList(DOMNodeList $nodeList) {
+		foreach ($nodeList as $node) {
+			Zend_Debug::dump("$node->nodeValue : $node->localName : $node->prefix : $node->namespaceURI");
+//			Zend_Debug::dump($node->nodeValue,'$node->nodeValue');
+//			Zend_Debug::dump($node->nodeName,'$node->nodeName');
+//			Zend_Debug::dump($node->nodeType,'$node->nodeType');
+//			foreach ($node->attributes as $key => $val) {
+//				Zend_Debug::dump("$key => $val->name : $val->value",'$node->attributes');
+//			}
+//			Zend_Debug::dump($node->ownerDocument,'$node->ownerDocument');
+//			Zend_Debug::dump($node->namespaceURI,'$node->namespaceURI');
+//			Zend_Debug::dump($node->prefix,'$node->prefix');
+//			Zend_Debug::dump($node->localName,'$node->localName');
+			
+//			Zend_Debug::dump($node->baseURI,'$node->baseURI');
+//			Zend_Debug::dump($node->textContent,'$node->textContent');
+//			Zend_Debug::dump('---------------------');
+		}
+	}
 
-	    // szukaj grafik
-		for ($i = 0; $i < $zip->numFiles; $i++) {
-			$stat = $zip->statIndex($i);
-			// jest grafika
-			if ((false !== strstr($stat['name'], 'Pictures/'))) {
-				$stream = $zip->getStream($stat['name']);
-				$content = $this->_readContent($stream, $stat);
-				$this->_addFileContent(str_replace('Pictures/','',$stat['name']), $content, self::PICTURE);
+	protected $_response = array();
+	
+	protected $_store = array();
+	
+	protected $_parentDepth = null;
+	protected $_parent = null;
+	
+	protected function _handleInlineNode(DOMNode $node, $nodeDepth, DOMNode $parent = null, $parentDepth = null) {
+		// powinno zostać spawdzone zagnieżdzenie
+		if ($node->hasChildNodes()) {
+//			$this->_parentDepth = $parentDepth;
+
+			// dzięki temu jeżeli mamy do czynienia
+			// z tekstem typu <b>to<u>jest</u> tekst</b>
+			// $node->textContent bedzie zawieral to + jest + tekst
+			// a nie to jest tekst
+			if (null === $parent) {
+				foreach ($node->childNodes as $key => $child) {
+					$this->_handleInlineNode($child, $key, $node, $nodeDepth);
+				}
+			}
+		} else {
+			$this->_handleNode($node, $nodeDepth, $parent, $parentDepth);
+		}
+	}
+
+	protected function _handleNode(DOMNode $node, $nodeDepth, DOMNode $parent = null, $parentDepth = null) {
+		$key = "$nodeDepth:$parentDepth";
+		if (null === $parent) {
+			$content = $this->_handleNodeCommon($node, $node->textContent);
+		} else {
+			$content = null;
+
+			$prevParent		 = $this->_parent;
+			$prevParentDepth = $this->_parentDepth;
+			
+			$this->_parent		= $parent;
+			$this->_parentDepth = $parentDepth;
+
+			// ten sam poziom zagniezdzenia
+			if ($parentDepth === $prevParentDepth) {
+				if (!isset($this->_store[$parentDepth])) {
+					$this->_store[$parentDepth] = array();
+				}
+				$this->_store[$parentDepth][] = $this->_handleNodeCommon($node,  $node->textContent);
+			}
+			// zagnieżdżenie się zmienia -> zamukamy tagi!
+			else {
+				if (!isset($this->_store[$prevParentDepth])) {
+					$content = $this->_handleNodeCommon($parent, $node->textContent);
+				} else
+				if ($this->_store[$prevParentDepth] === null) {
+					$content = $this->_handleNodeCommon($parent, $node->textContent);
+				} else {
+					$store = implode($this->_store[$prevParentDepth]);
+
+					unset($this->_store[$prevParentDepth]);
+					
+					$content = $this->_handleNodeCommon($prevParent, $store);
+				}
 			}
 		}
-	}
-	
-	/**
-	 * @param string $type
-	 * @return string
-	 */
-	public function getTemplatePath($type) {
-		if (!isset($this->_templateType[$type])) {
-			require_once 'KontorX/Odf/Exception.php';
-			throw new KontorX_Odf_Exception(sprintf('import template type "%s" is not supported', $type));
-		}
-		
-		return dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->_templateType[$type];
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function import() {
-		$type = $this->getType();
-		$template = $this->getTemplatePath($type);
-
-		$xls = new DOMDocument();
-		$xls->load($template);
-
-		$xslt = new XSLTProcessor();
-		$xslt->importStylesheet($xls);
-		
-		$contentXml = $this->getContentXml();
-		$contentXml = $this->_prepareContentXml($contentXml);
-		
-		$xml = new DOMDocument();
-		$xml->loadXML($contentXml);
-
-		return html_entity_decode($xslt->transformToXML($xml));
+		$this->_response[] = $content;
 	}
 
-	/**
-	 * @param string $xml
-	 * @return string
-	 */
-	protected function _prepareContentXml($xml) {
-		return preg_replace('#<draw:image xlink:href="Pictures/([a-z .A-Z_0-9]*)" (.*?)/>#es', "\$this->_makeImage('$1')", $xml);
-	}
+	protected function _handleNodeCommon(DOMNode $node, $content = null, $singleTag = null, &$tag = null) {
+		switch ($node->localName) {
+			case 'sequence-decls':
+				$tag = 'ol';
+				break;
 
-	/**
-	 * @var string
-	 */
-	protected $_imagePath = null;
-	
-	/**
-	 * @param string $path
-	 * @return void
-	 */
-	public function setImagePath($path) {
-		$this->_imagePath = (string) trim($path, DIRECTORY_SEPARATOR);
-	}
+			case 'sequence-decl':
+				// display-outline-level
+				$tag = 'li';
+				break;
 
-	/**
-	 * @return unknown_type
-	 */
-	public function getImagePath() {
-		return $this->_imagePath;
-	}
+			case 'h':
+				// style-name : Heading_20_1"
+				$tag = 'h1';
+				break;
 
-	/**
-	 * @param string $img
-	 * @return string
-	 */
-	protected function _makeImage($img) {
-		return sprintf('&lt;img src="/%s/%s" border="0" /&gt;', $this->_imagePath, $img);
-	}
+			case 'p':
+				// P1
+				$tag = 'p';
+				break;
 
-	/**
-	 * @var string
-	 */
-	protected $_type = null;
-	
-	/**
-	 * @param string $type
-	 * @return void
-	 */
-	public function setType($type) {
-		$this->_type = strtoupper((string) $type);
-	}
+			case 'span':
+				// T1
+				$tag = 'span';
+				break;
 
-	/**
-	 * @return string
-	 */
-	public function getType() {
-		return $this->_type;
-	}
-	
-	/**
-	 * @var string
-	 */
-	protected $_contentXml = null;
-	
-	/**
-	 * @param string $xml
-	 * @return void
-	 */
-	protected function _setContentXml($xml) {
-		$this->_contentXml = (string) $xml;
-	}
+			case 'list':
+				$tag = 'ul';
+				// L1
+				break;
 
-	/**
-	 * @return string
-	 */
-	public function getContentXml() {
-		return $this->_contentXml;
-	}
-	
-	/**
-	 * @var array
-	 */
-	protected $_files = array(
-		self::PICTURE => array()
-	);
-	
-	/**
-	 * @param string $name
-	 * @param string $content
-	 * @param string $type
-	 * @return void
-	 */
-	protected function _addFileContent($name, $content, $type) {
-		if (!isset($this->_files[$type])) {
-			require_once 'KontorX/Odf/Exception.php';
-			throw new KontorX_Odf_Exception(sprintf('file content type "%s" is not suported',$type));
-		}
-		$this->_files[$type][] = array($name, $content);
-	}
+			case 'list-item':
+				$tag = 'li';
+				break;
 
-	/**
-	 * @param string $type
-	 * @return array
-	 */
-	public function getFilesContent($type) {
-		return isset($this->_files[$type]) ? $this->_files[$type] : null;
-	}
-	
-	/**
-	 * @param resource $stream
-	 * @param array $stat
-	 * @return string|false
-	 */
-	protected function _readContent($stream, array $stat) {
-		if (!is_resource($stream)) {
-			return false;
+			default:
+				return $content;
 		}
 
-		$contentData = null;
-		while (!feof($stream)) {
-	        $contentData .= fread($stream, $stat['size']);
-	    }
-	    return $contentData;
+		return (true === $singleTag)
+			? "<$tag>"
+			: "<$tag>$content</$tag>";
 	}
 }

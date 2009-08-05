@@ -1,23 +1,11 @@
 <?php
+require_once 'Zend/Controller/Plugin/Abstract.php';
 class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
 
-	/**
-	 * @var KontorX_Controller_Plugin_Debug
-	 */
-	private static $_instance;
+    private function __construct() {}
 
-    /**
-     * @return void
-     */
-    public function __construct() {
-    	if (null !== self::$_instance) {
-    		throw new Zend_Controller_Exception('Only one instance of plugin is allowed');
-    	}
-    }
+    private static $_instance = null;
 
-    /**
-     * @return KontorX_Controller_Plugin_Debug
-     */
     public static function getInstance() {
         if (null === self::$_instance) {
             self::$_instance = new self();
@@ -81,12 +69,12 @@ class KontorX_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract {
 
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
         $this->_log('preDispatch');
-        $this->_log($request->getParams());
+//        $this->_log($request->getParams());
     }
 
     public function postDispatch(Zend_Controller_Request_Abstract $request) {
         $this->_log('postDispatch');
-        $this->_log($request->getParams());
+//        $this->_log($request->getParams());
     }
 
     public function dispatchLoopShutdown() {
