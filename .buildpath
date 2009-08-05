@@ -3,5 +3,5 @@
 	<buildpathentry kind="src" path=""/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 	<buildpathentry external="true" kind="lib" path="/usr/share/php/simpletest"/>
-	<buildpathentry external="true" kind="lib" path="/usr/share/php/Zend/1.8.4"/>
+	<buildpathentry external="true" kind="lib" path="/usr/share/php/Zend/1.9.0"/>
 </buildpath>
