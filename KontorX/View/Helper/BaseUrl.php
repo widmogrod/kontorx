@@ -58,11 +58,4 @@ class KontorX_View_Helper_BaseUrl extends Zend_View_Helper_Abstract {
     	}
     	return $this->_baseUrl;
     }
-
-    /**
-     * @return KontorX_View_Helper_BaseUrl
-     */
-    public function direct() {
-    	return $this;
-    }
 }

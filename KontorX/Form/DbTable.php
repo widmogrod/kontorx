@@ -168,11 +168,8 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
                 $refColumns         = (string) $referenceOptions['refColumns'];
                 $refColumnsAsName   = (string) @$referenceOptions['refColumnsAsName'];
                 $refClassName       = (string) $referenceOptions['refTableClass'];
-                
-                if (!class_exists($refClassName)) {
-                	require_once 'Zend/Loader.php';
-                	Zend_Loader::loadClass($refClassName);
-                }
+                require_once 'Zend/Loader.php';
+                Zend_Loader::loadClass($refClassName);
                 $refClass = new $refClassName();
 
                 $foreign = array(null => null); // pierwsze pole powinno byc zawsze puste!

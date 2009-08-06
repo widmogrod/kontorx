@@ -17,12 +17,6 @@ interface KontorX_DataGrid_Filter_Interface {
      * @return string
      */
     public function getClassName();
-
-    /**
-     * @param KontorX_DataGrid_Column_Interface $column
-     * @return void
-     */
-    public function setColumn(KontorX_DataGrid_Column_Interface $column);
     
     /**
      * Set column displayed name

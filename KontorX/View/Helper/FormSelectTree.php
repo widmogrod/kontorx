@@ -5,7 +5,6 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 	public function formSelectTree($name, $value = null, $attribs = null,
 		$options = null, $listsep = "<br />\n")
 	{
-		$result = array();
 		$rowset = $options;
 		if (is_array($options)
 				&& isset($options['rowset'])) {
@@ -20,27 +19,26 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 		if (true === @$attribs['repeatSeparator']) {
 			$this->setRepeatSeparator($attribs['repeatSeparator']);
 		}
+		
+		if ($rowset instanceof RecursiveIterator) {
+			$options = $this->_setupOptionsFromRecursiveIterator($rowset, $options);
+		} else {
+			$options = $this->_setupOptionsFromArray($options);
+		}
 
 		// dodaje pierwszy element jako pusty
 		if (true === @$attribs['firstNull']) {
-			$result[null] = null;
+			array_unshift($options, array(null=>null));
 		}
 
-		if ($rowset instanceof RecursiveIterator) {
-			$result = $this->_setupOptionsFromRecursiveIterator($rowset, $options, $result);
-		} else {
-			$result = $this->_setupOptionsFromArray($options, $result);
-		}
-
-		return $this->formSelect($name, $value, $attribs, $result, $listsep);
+		return $this->formSelect($name, $value, $attribs, $options, $listsep);
 	}
 	
 	/**
 	 * @param array $options
-	 * @param array $result
 	 * @return array
 	 */
-	protected function _setupOptionsFromArray($options, array $result = array()) {
+	protected function _setupOptionsFromArray($options) {
 		if (!array_key_exists('labelCol',$options)) {
 			$message = "Options attribute 'labelCol' is not set";
 			trigger_error($message, E_USER_WARNING);
@@ -54,6 +52,8 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 		$depthCol = isset($options['depthCol'])
 			? (string) $options['depthCol'] : 'depth';
 
+		$result = array();
+		
 		foreach ($options as $key => $current) {
 			$depth = $current[$depthCol];
 			$label .= strip_tags($current[$labelCol]);
@@ -69,10 +69,9 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 	/**
 	 * @param RecursiveIterator $rowset
 	 * @param array $options
-	 * @param array $result
 	 * @return array
 	 */
-	protected function _setupOptionsFromRecursiveIterator(RecursiveIterator $rowset, $options, array $result = array()) {
+	protected function _setupOptionsFromRecursiveIterator(RecursiveIterator $rowset, $options) {
 		if (!array_key_exists('labelCol',$options)) {
 			$message = "Options attribute 'labelCol' is not set";
 			trigger_error($message, E_USER_WARNING);
@@ -85,7 +84,7 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 			? (string) $options['valueCol'] : null;
 
 		// tworzenie opcji
-		$result = array();
+		$options = array();
 
 		$recursice = new RecursiveIteratorIterator($rowset, RecursiveIteratorIterator::SELF_FIRST);
 		$recursice->rewind();
@@ -97,16 +96,16 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 			if (is_object($current)) {
 				$label = strip_tags($current->{$labelCol});
 				if (null === $valueCol) {
-					$result[] = $label;
+					$options[] = $label;
 				} else {
-					$result[$current->{$valueCol}] = $this->_getLabelDepth($label, $depth);
+					$options[$current->{$valueCol}] = $this->_getLabelDepth($label, $depth);
 				}
 			} elseif (is_array($current)){
 				$label = strip_tags($current[$labelCol]);
 				if (null === $valueCol) {
-					$result[] = $label;
+					$options[] = $label;
 				} else {
-					$result[$current[$valueCol]] = $this->_getLabelDepth($label, $depth);
+					$options[$current[$valueCol]] = $this->_getLabelDepth($label, $depth);
 				}
 			} else {
 				continue;
@@ -114,7 +113,7 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 
 			$recursice->next();
 		}
-		return $result;
+		return $options;
 	}
 	
 	/**

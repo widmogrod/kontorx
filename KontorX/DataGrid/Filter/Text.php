@@ -23,8 +23,7 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
         	throw new KontorX_DataGrid_Exception('');
         }
 
-        // allow map filter column
-        $column = $this->getAttrib('mappedColumn', $this->getColumnName());
+        $column = $this->getColumnName();
         $text = $this->getValue();
 
         if (strlen($text)) {

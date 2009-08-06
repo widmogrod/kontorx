@@ -36,7 +36,6 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @param KontorX_DataGrid_Filter_Interface $filter
      */
     public function addFilter(KontorX_DataGrid_Filter_Interface $filter) {
-    	$filter->setColumn($this);
     	$filter->setColumnName($this->getColumnName());
         $this->_filters[] = $filter;
     }
