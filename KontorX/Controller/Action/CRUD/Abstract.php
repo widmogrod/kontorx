@@ -708,6 +708,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         // tworzenie komunikatu
         $message = 'Rekord nie został usunięty';
         $this->_helper->flashMessenger->addMessage($message);
+        $this->_helper->flashMessenger->addMessage($e->getMessage() . "\n" . $e->getTraceAsString());
         $this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
     }
 
