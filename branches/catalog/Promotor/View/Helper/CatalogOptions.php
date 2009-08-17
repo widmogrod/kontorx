@@ -58,7 +58,7 @@ class Promotor_View_Helper_CatalogOptions extends Zend_View_Helper_Abstract {
 			? $this->_partial
 			: (string) $partial;
 
-		$model = new Catalog_Model_Service();
+		$model = new Catalog_Model_Options();
 		$data = $model->findAllCache($this->_page, $this->_rowCount);
 
 		return $this->view->partial($partial, array('rowset' => $data));
