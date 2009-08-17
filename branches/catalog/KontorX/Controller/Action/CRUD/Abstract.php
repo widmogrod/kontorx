@@ -30,6 +30,21 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 	 * @var Zend_Db_Table_Abstract
 	 */
     protected $_model = null;
+    
+    /**
+	 * @var string
+	 */
+	protected $_addPostObservableName;
+	
+	/**
+	 * @var string
+	 */
+	protected $_editPostObservableName;
+	
+	/**
+	 * @var string
+	 */
+	protected $_deletePostObservableName;
 
 	/**
 	 * @Overwrite
@@ -217,6 +232,23 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 
         try {
             $row = $this->_addInsert($form);
+            
+        	// uduchamianie powiadomień
+			if (null !== $this->_addPostObservableName) {
+				$manager = Promotor_Observable_Manager::getInstance();
+				$list = $manager->notify(
+					$this->_addPostObservableName,
+					$row
+				);
+
+				/* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
+				$flashMessenger = $this->_helper->getHelper('FlashMessenger');
+				foreach ($list->getMessages() as $observerName => $messages) {
+					$message = sprintf('%s=%s', implode('<br />', $messages), $observerName);
+					$flashMessenger->addMessage($message);
+				}
+			}
+            
             $this->_addOnSuccess($form, $row);
         } catch (Zend_Db_Table_Row_Exception $e) {
             $this->_addOnException($e, $form);
@@ -412,6 +444,23 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 
         try {
             $this->_editUpdate($form, $row);
+            
+        	// uduchamianie powiadomień
+			if (null !== $this->_editPostObservableName) {
+				$manager = Promotor_Observable_Manager::getInstance();
+				$list = $manager->notify(
+					$this->_editPostObservableName,
+					$row
+				);
+
+				/* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
+				$flashMessenger = $this->_helper->getHelper('FlashMessenger');
+				foreach ($list->getMessages() as $observerName => $messages) {
+					$message = sprintf('%s=%s', implode('<br />', $messages), $observerName);
+					$flashMessenger->addMessage($message);
+				}
+			}
+            
             $this->_editOnSuccess($form, $row);
         } catch (Zend_Db_Table_Row_Exception $e) {
             $this->_editOnException($e, $form);
@@ -637,6 +686,23 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 
         try {
             $this->_deleteDelete($row);
+            
+        	// uduchamianie powiadomień
+			if (null !== $this->_deletePostObservableName) {
+				$manager = Promotor_Observable_Manager::getInstance();
+				$list = $manager->notify(
+					$this->_deletePostObservableName,
+					$row
+				);
+
+				/* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
+				$flashMessenger = $this->_helper->getHelper('FlashMessenger');
+				foreach ($list->getMessages() as $observerName => $messages) {
+					$message = sprintf('%s=%s', implode('<br />', $messages), $observerName);
+					$flashMessenger->addMessage($message);
+				}
+			}
+            
             $this->_deleteOnSuccess($row);
         } catch (Zend_Db_Table_Row_Exception $e) {
             $this->_deleteOnException($e);
