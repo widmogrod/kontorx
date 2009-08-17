@@ -11,22 +11,39 @@ class KontorX_View_Helper_FlashMessages extends Zend_View_Helper_Abstract {
 	 */
 	protected $_messages = array();
 
-	public function __construct() {
-		require_once 'Zend/Controller/Action/HelperBroker.php';
-		if (!Zend_Controller_Action_HelperBroker::hasHelper('flashMessenger')) {
-			require_once 'Zend/Controller/Action/Helper/FlashMessenger.php';
-			$flashMessenger = new Zend_Controller_Action_Helper_FlashMessenger();
-			Zend_Controller_Action_HelperBroker::addHelper($flashMessenger);
-		} else {
-			$flashMessenger = Zend_Controller_Action_HelperBroker::getExistingHelper('flashMessenger');
-		}
-		$this->_messages = $flashMessenger->getMessages();
+	/**
+	 * @var Zend_Controller_Action_Helper_FlashMessenger
+	 */
+	protected $_flashMessanger;
+	
+	/**
+	 * @return array
+	 */
+	public function flashMessages() {
+		return $this->getFlashMessenger()->getMessages();
 	}
 
 	/**
 	 * @return array
 	 */
-	public function flashMessages() {
-		return $this->_messages;
+	public function direct() {
+		return $this->getFlashMessenger()->getMessages();
+	}
+
+	/**
+	 * @return Zend_Controller_Action_Helper_FlashMessenger
+	 */
+	public function getFlashMessenger() {
+		if (null === $this->_flashMessanger) {
+			require_once 'Zend/Controller/Action/HelperBroker.php';
+			if (!Zend_Controller_Action_HelperBroker::hasHelper('flashMessenger')) {
+				require_once 'Zend/Controller/Action/Helper/FlashMessenger.php';
+				$this->_flashMessanger = new Zend_Controller_Action_Helper_FlashMessenger();
+				Zend_Controller_Action_HelperBroker::addHelper($this->_flashMessanger);
+			} else {
+				$this->_flashMessanger = Zend_Controller_Action_HelperBroker::getExistingHelper('flashMessenger');
+			}
+		}
+		return $this->_flashMessanger;
 	}
 }
