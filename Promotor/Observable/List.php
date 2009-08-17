@@ -103,7 +103,7 @@ class Promotor_Observable_List implements Promotor_Observable_Interface {
 			}
 			return $retult;
 		} elseif ($observer instanceof Promotor_Observable_Observer_Abstract) {
-			$observer->getName();
+			$observer = $observer->getName();
 		}
 
 		return isset(self::$_loadedObservers[$observer])
