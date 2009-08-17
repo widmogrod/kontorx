@@ -24,7 +24,13 @@ class Promotor_Model_Abstract {
 	 */
 	public function getDbTable() {
 		if (null === $this->_dbTable) {
+			if (!class_exists($this->_dbTableClass)) {
+				require_once 'Zend/Loader.php';
+				Zend_Loader::loadClass($this->_dbTableClass);
+			}
+
 			$this->_dbTable = new $this->_dbTableClass();
+
 			if (!$this->_dbTable instanceof Zend_Db_Table_Abstract) {
 				throw new Promotor_Model_Exception(sprintf('table class "%s" is not istantce of Zend_Db_Table_Abstract', $this->_dbTableClass));
 			}
