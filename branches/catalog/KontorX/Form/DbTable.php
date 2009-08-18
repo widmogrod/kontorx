@@ -44,7 +44,7 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
 
         // Wszyzstkie opcje <> 'elements'
         $optionsForConstruct = (isset($options['elements']))
-            ? array_diff_key($options, array_flip(array('elements')))
+            ? array_diff_key($options, array_flip(array('elements','displayGroups')))
             : $options;
 
         parent::__construct($optionsForConstruct);
@@ -63,6 +63,10 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
         }
 
         $this->_setupFormFromTable($table, $options);
+
+        if (isset($options['displayGroups'])) {
+        	$this->setDisplayGroups((array) $options['displayGroups']);
+        }
         
         if ($this->_hasSubFormsGrouping()) {
         	$this->_createSubFormsGrouping();
