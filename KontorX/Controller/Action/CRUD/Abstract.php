@@ -283,7 +283,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         $form->setMethod('post');
 
         // To taki dodatek odemnie ;)
-        $form->addElement('submit','Dodaj',array('class' =>'action add','ignore' => true,'accesskey'=>'S'));
+//        $form->addElement('submit','Dodaj',array('class' =>'action add','ignore' => true,'accesskey'=>'S'));
+        $form->addElement('SubmitButton','action', array('ignore' => true,'label'=>'Dodaj'));
 
         return $form;
     }
@@ -494,7 +495,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         $form->setMethod('post');
 
         // To taki dodatek odemnie ;)
-        $form->addElement('submit','Edytuj',array('class' =>'action edit','ignore' => true,'accesskey'=>'S'));
+//        $form->addElement('submit','Edytuj',array('class' =>'action edit','ignore' => true,'accesskey'=>'S'));
+        $form->addElement('SubmitButton','action', array('ignore' => true,'label'=>'Edytuj'));
 
         return $form;
     }
