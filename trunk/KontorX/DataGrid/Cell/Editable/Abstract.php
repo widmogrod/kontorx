@@ -93,9 +93,10 @@ abstract class KontorX_DataGrid_Cell_Editable_Abstract extends KontorX_DataGrid_
 
 		$columnName = $this->getColumnName();
 		$prefix = $this->getPrefix();
+		$valueName = $this->getAttrib('valueName', $columnName);
 
 		$name = sprintf('%s[%s][%s]', $prefix, $primaryKey, $columnName);
-		$value = $this->getData($columnName);
+		$value = $this->getData($valueName);
 
 		// ustawienie attrybutu 'class' dla elementu widoku.
 		$class = $this->getAttrib('class');
