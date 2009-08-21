@@ -49,6 +49,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		$form = new $this->_formAddClass();
 		
+		/* @var $scaffold KontorX_Controller_Action_Helper_Scaffold */
 		$scaffold = $this->_helper->getHelper('scaffold');
 		$scaffold->setDbTable($dbTable)
 				 ->setForm($form)
@@ -63,6 +64,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 		
 		$status = $scaffold->getStatus();
+		$result = $scaffold->getResult();
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
 			$flashMessenger->addMessage($status);
 			
@@ -83,6 +85,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('add');
 		} else {
 			$flashMessenger->addMessage($status);
+			$flashMessenger->addMessage($result->getMessage());
+//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+
 			$this->view->form = $form;
 		}
 	}
@@ -130,6 +135,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
+			$flashMessenger->addMessage($result->getMessage());
+//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+
 			$this->view->form = $form;
 		}
 	}
@@ -153,6 +161,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 			
 		$status = $scaffold->getStatus();
+		$result = $scaffold->getResult();
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
 			$flashMessenger->addMessage($status);
 			
@@ -177,6 +186,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
+			$flashMessenger->addMessage($result->getMessage());
+//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+
 			$this->view->form = $form;
 		}
 	}
