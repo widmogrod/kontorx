@@ -322,6 +322,7 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 		} catch(Zend_Db_Table_Exception $e) {
 			$this->_setResult($e);
 			$this->_setStatus(self::NO_EXSISTS);
+			return;
 		}	
 			
 
