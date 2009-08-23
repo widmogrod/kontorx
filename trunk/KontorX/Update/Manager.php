@@ -23,7 +23,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 * Aktualizuje
 	 * @var void
 	 */
-	const FORCE_UPDATE = 'FORCE_UPDATE';
+	const FORCE = 'FORCE';
 
 	/**
 	 * @param Zend_Config|array|string $options
@@ -84,7 +84,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 			require_once 'KontorX/Update/Exception.php';
 			throw new KontorX_Update_Exception(sprintf('update path "%s" do not exsists', $path));
 		}
-		$this->_updatePath = (string) $path;
+		$this->_updatePath = (string) rtrim($path,'\\/') . '/';
 		return $this;
 	}
 
@@ -123,7 +123,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 */
 	public function getRegexpFilenamePattern() {
 		$prefix = $this->getRegexpFilenamePrefix();
-		return sprintf('/^%s(\d)+/', preg_quote($prefix, '/'));
+		return sprintf('/^%s([0-9]+)\.[\w_]+/', preg_quote($prefix, '/'));
 	}
 
 	/**
@@ -131,7 +131,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 */
 	public function getLastUpdate() {
 		$pathname = $this->getUpdatePath();
-		$pathname .= DIRECTORY_SEPARATOR . self::FILENAME_INFO;
+		$pathname .= self::FILENAME_INFO;
 
 		if (!is_file($pathname)) {
 			return -1;
@@ -149,7 +149,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 */
 	protected function _saveInfo($updateId) {
 		$pathname = $this->getUpdatePath();
-		$pathname .= DIRECTORY_SEPARATOR . self::FILENAME_INFO;
+		$pathname .= self::FILENAME_INFO;
 
 		if (!@file_put_contents($pathname, (int) $updateId)) {
 			$message = function_exists('error_get_last')
@@ -159,6 +159,8 @@ class KontorX_Update_Manager extends ArrayIterator {
 			require_once 'KontorX/Update/Exception.php';
 			throw new KontorX_Update_Exception($message);
 		}
+		
+		@chmod($pathname, 0777);
 	}
 
 	/**
@@ -174,8 +176,6 @@ class KontorX_Update_Manager extends ArrayIterator {
 		if (null === $this->_updateFileList) {
 			$this->_updateFileList = array();
 
-			$lastUpdate = $this->getLastUpdate();
-			
 			$path = $this->getUpdatePath();
 			$iterator = new DirectoryIterator($path);
 			$pattern = $this->getRegexpFilenamePattern();
@@ -185,14 +185,12 @@ class KontorX_Update_Manager extends ArrayIterator {
 					$matches = array();
 
 					// dopasuj nazwę pliku do wymaganego formatu
-					if (false !== preg_match($pattern, $subject, $matches)) {
-						$key = isset($matches[1])
+					if (preg_match($pattern, $subject, $matches)) {
+						$key = array_key_exists(1, $matches)
 							? (int) $matches[1]
 							: -1;
 
-						if ($key > $lastUpdate) {
-							$this->_updateFileList[$key] = $subject;
-						}
+						$this->_updateFileList[$key] = $subject;
 					}
 				}
 				
@@ -216,12 +214,12 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 * @throws KontorX_Update_Exception
 	 */
 	protected function _loadUpdates() {
-		if ($this->_loaded) {
+		if (!$this->_loaded) {
 			$path = $this->getUpdatePath();
 	
 			$list = $this->getUpdateFileList();
 			foreach ($list as $idx => $filename) {
-				$pathname  = $path . DIRECTORY_SEPARATOR . $filename;
+				$pathname  = $path . $filename;
 				$extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 	
 				switch ($extension) {
@@ -244,6 +242,8 @@ class KontorX_Update_Manager extends ArrayIterator {
 				// dodaj update
 				$this->offsetSet($idx, $instance);
 			}
+			
+			$this->ksort();
 		}
 		$this->_loaded = true;
 	}
@@ -253,24 +253,50 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 * @return void
 	 */
 	public function update($flag = null) {
-		$this->ksort();
+		// załaduj aktualizacje
+		$this->_loadUpdates();
+
+		// pobierz id ostatniej aktualizacji
+		$updateId = $this->getLastUpdate();
+		$lastUpdateId = $updateId;
+
 		$this->rewind();
 		while ($this->valid()) {
-			/* @var $update KontorX_Update_Interface */
-			$update = $this->current();
-
-			// update
-			$update->up();
-
-			if (self::FAILURE === $update->getStatus()) {
-				if (self::FORCE_UPDATE !== $flag) {
-					return false;
+			// aktualizuj od ostatniej aktualizacji
+			if ($this->key() > $updateId) {
+				/* @var $update KontorX_Update_Interface */
+				$update = $this->current();
+	
+				try {
+					// update
+					$update->up();
+					$status = $update->getStatus();
+				} catch (Exception $e) {
+					// update failure
+					$status = self::FAILURE;
+					// forsowanie aktualizacji wyłączone..
+					if (self::FORCE !== $flag) {
+						$this->_saveInfo($lastUpdateId);
+						throw $e;
+					}
 				}
+
+				if (self::FAILURE === $status) {
+					if (self::FORCE !== $flag) {
+						// zapisz informacje o ostatniej aktualizacji
+						$this->_saveInfo($lastUpdateId);
+						return false;
+					}
+				}
+
+				$lastUpdateId = (int) $this->key();
 			}
+
+			$this->next();
 		}
 
 		// zapisz informacje o ostatniej aktualizacji
-		$this->_saveInfo($this->key());
+		$this->_saveInfo($lastUpdateId);
 
 		return true;
 	}
@@ -280,37 +306,64 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 * @return void
 	 */
 	public function downgrade($flag = null) {
-		$this->uksort(array($this, '_cmp'));
-		$this->rewind();		
+		// załaduj aktualizacje
+		$this->_loadUpdates();
 
-		while ($this->valid()) {
-			/* @var $update KontorX_Update_Interface */
-			$update = $this->current();
+		// pobierz id ostatniej aktualizacji
+		$updateId = $this->getLastUpdate();
+		$lastUpdateId = $updateId;
 
-			$update->down();
+		$this->rewind();
 
-			if (self::FAILURE === $update->getStatus()) {
-				if (self::FORCE_UPDATE !== $flag) {
-					return false;
+		require_once 'KontorX/Iterator/Reverse.php';
+		$iterator = new KontorX_Iterator_Reverse($this);
+		
+		while ($iterator->valid()) {
+			/**
+			 * Cofnij aktualizacje od ostatniej aktualizacji. 
+			 * <= bo cofam od ostatniegj aktulizacji
+			 */
+			if ($iterator->key() <= $updateId) {
+				$lastUpdateId = (int) $iterator->key();
+
+				/* @var $update KontorX_Update_Interface */
+				$update = $iterator->current();
+	
+				try {
+					// update
+					$update->down();
+					$status = $update->getStatus();
+				} catch (Exception $e) {
+					// update failure
+					$status = self::FAILURE;
+					// forsowanie dezaktualizacji wyłączone..
+					if (self::FORCE !== $flag) {
+						$this->_saveInfo($lastUpdateId);
+						throw $e;
+					}
+				}
+
+				if (self::FAILURE === $status) {
+					if (self::FORCE !== $flag) {
+						// zapisz informacje o ostatniej dezaktualizacji
+						$this->_saveInfo($lastUpdateId);
+						return false;
+					}
 				}
 			}
+
+			$iterator->next();
 		}
-		
-		// zapisz informacje o ostatniej dezaktualizacji
-		$this->_saveInfo($this->key());
+
+		/**
+		 * @todo może ($lastUpdateId - 1) bo jest to aktualizacj wstecz..
+		 * zrozumieni kryje się w metodzie {@see getUpdateFileList()}
+		 */
+
+		// Zapisz informacje o ostatniej dezaktualizacji
+		$this->_saveInfo($lastUpdateId);
 	}
 
-	/**
-	 * @param int $a
-	 * @param int $b
-	 * @return void
-	 */
-	private function _cmp($a, $b) {
-		if ($a < $b) return 1;
-		if ($a > $b) return -1;
-		return 0;
-	}
-	
 	/**
 	 * @param bool $grouped
 	 * @return array
@@ -375,6 +428,7 @@ class KontorX_Update_Manager extends ArrayIterator {
                     throw new KontorX_Update_Exception(sprintf('Invalid type "%s" provided to getPluginLoader()', $type));
             }
 
+            require_once 'Zend/Loader/PluginLoader.php';
             $this->_pluginLoader[$type] = new Zend_Loader_PluginLoader(array(
                 "KontorX_$prefixSegment" => "KontorX/$pathSegment"
             ));
