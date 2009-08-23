@@ -58,7 +58,7 @@ class KontorX_Iterator_Reverse implements OuterIterator, Countable {
 	}
 
 	public function current () {
-		return @$this->_data[$this->_pointer]['current'];
+		return $this->_data[$this->_pointer]['current'];
 	}
 
 	public function next () {
@@ -66,7 +66,7 @@ class KontorX_Iterator_Reverse implements OuterIterator, Countable {
 	}
 
 	public function key () {
-		return @$this->_data[$this->_pointer]['key'];
+		return $this->_data[$this->_pointer]['key'];
 	}
 
 	public function valid () {
