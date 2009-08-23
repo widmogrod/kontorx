@@ -143,6 +143,15 @@ class KontorX_Update_Manager extends ArrayIterator {
 	}
 
 	/**
+	 * Zwraca najnowszą aktualizację
+	 * @return int
+	 */
+	public function getNewestUpdate() {
+		$list = $this->getUpdateFileList();
+		return count($list) ? max(array_keys($list)) : 0;
+	}
+	
+	/**
 	 * @param integer $updateId
 	 * @return void
 	 * @throws KontorX_Update_Exception
