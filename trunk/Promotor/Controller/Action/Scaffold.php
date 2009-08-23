@@ -85,8 +85,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('add');
 		} else {
 			$flashMessenger->addMessage($status);
-			$flashMessenger->addMessage($result->getMessage());
-//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+			if ($result instanceof Exception) {
+				$flashMessenger->addMessage($result->getMessage());
+			}
 
 			$this->view->form = $form;
 		}
@@ -135,8 +136,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
-			$flashMessenger->addMessage($result->getMessage());
-//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+			if ($result instanceof Exception) {
+				$flashMessenger->addMessage($result->getMessage());
+			}
 
 			$this->view->form = $form;
 		}
@@ -186,8 +188,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
-			$flashMessenger->addMessage($result->getMessage());
-//			array_map(array($flashMessenger, 'addMessage'), $result->getTrace());
+			if ($result instanceof Exception) {
+				$flashMessenger->addMessage($result->getMessage());
+			}
 
 			$this->view->form = $form;
 		}
