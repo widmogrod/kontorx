@@ -13,8 +13,8 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 	);
 
 	protected $_sql = array(
-		self::ADD_COLUMN => 'ALTER TABLE `:@table` ADD `:name` :@type :@null',
-		self::REMOVE_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN `:name`'
+		self::ADD_COLUMN => 'ALTER TABLE `:@table` ADD :name :@type :@null',
+		self::REMOVE_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN :name'
 	);
 
 	/**
