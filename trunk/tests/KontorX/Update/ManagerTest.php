@@ -13,6 +13,16 @@ class KontorX_Update_ManagerTest extends UnitTestCase {
 	protected $_updatePath;
 	
 	public function setUp() {
+		require_once 'Zend/Db.php';
+		$db = Zend_Db::factory('pdo_mysql',array(
+			'dbname' =>'test',
+			'username' => 'root',
+			'password' => ''
+		));
+		
+		require_once 'Zend/Db/Table/Abstract.php';
+		Zend_Db_Table_Abstract::setDefaultAdapter($db);
+
 		$this->_updatePath = dirname(__FILE__) . '/test_updates/';
 	}
 	
@@ -47,8 +57,33 @@ class KontorX_Update_ManagerTest extends UnitTestCase {
 		);
 
 		$result = $manager->getUpdateFileList();
-		
+		$this->dump($result);
 		$this->assertEqual($expected, $result, 'Lista aktualizacji niepoprawna');
+	}
+
+	public function testUpdate() {
+		$manager = new KontorX_Update_Manager($this->_updatePath);
+		$result = $manager->update();
+		$this->assertTrue($result, 'Aktualizacja nie została wykonana');
+	}
+
+	/**
+	 * Dezaktualizacja nie może zostać wykonana bo
+	 * pliki r0.sql i r1.sql nie są downgradowane!
+	 * @return void
+	 */
+	public function testDowngradeFalse() {
+		$manager = new KontorX_Update_Manager($this->_updatePath);
+		$result = $manager->downgrade();
+		
+		$this->dump($result);
+		$this->assertFalse($result, 'Dezaktualizacja została wykonana!');
+	}
+	
+	public function testDowngradeTrue() {
+		$manager = new KontorX_Update_Manager($this->_updatePath);
+		$result = $manager->downgrade(KontorX_Update_Manager::FORCE);
+		$this->assertTrue($result, 'Dezaktualizacja nie została wykonana');
 	}
 }
 
