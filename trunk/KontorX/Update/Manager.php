@@ -41,6 +41,17 @@ class KontorX_Update_Manager extends ArrayIterator {
 		} elseif (!is_array($options)) {
 			$options = array();
 		}
+		
+		/**
+		 * katalog z updatemi jest wymagany!
+		 * ale można też zrobić żeby nie był i np. dodawać ręcznie updaty
+		 * w szczególnych przypadkach taka opcja może być bardzo przydatna
+		 * ale dopuki nie napotkałem takiego zjawiska.. nic nie zmieniam
+		 */
+		if (!isset($options['updatePath'])) {
+			require_once 'KontorX/Update/Exception.php';
+			throw new KontorX_Update_Exception('path to updates is not set');
+		}
 
 		$this->setOptions($options);
 	}
@@ -66,27 +77,21 @@ class KontorX_Update_Manager extends ArrayIterator {
 	/**
 	 * @param string $path
 	 * @return KontorX_Update_Manager
+	 * @throws KontorX_Update_Exception
 	 */
 	public function setUpdatePath($path) {
+		if (!is_dir($path)) {
+			require_once 'KontorX/Update/Exception.php';
+			throw new KontorX_Update_Exception(sprintf('update path "%s" do not exsists', $path));
+		}
 		$this->_updatePath = (string) $path;
 		return $this;
 	}
 
 	/**
-	 * @param bool $throwException
 	 * @return string
-	 * @throws KontorX_Update_Exception
 	 */
-	public function getUpdatePath($throwException = true) {
-		if (!is_dir($this->_updatePath)) {
-			if (!$throwException) {
-				return false;
-			}
-
-			require_once 'KontorX/Update/Exception.php';
-			throw new KontorX_Update_Exception(sprintf('update path "%s" do not exsists', $this->_updatePath));
-		}
-
+	public function getUpdatePath() {
 		return $this->_updatePath;
 	}
 	
@@ -140,6 +145,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	/**
 	 * @param integer $updateId
 	 * @return void
+	 * @throws KontorX_Update_Exception
 	 */
 	protected function _saveInfo($updateId) {
 		$pathname = $this->getUpdatePath();
@@ -180,7 +186,10 @@ class KontorX_Update_Manager extends ArrayIterator {
 
 					// dopasuj nazwę pliku do wymaganego formatu
 					if (false !== preg_match($pattern, $subject, $matches)) {
-						$key = (int) $matches[1];
+						$key = isset($matches[1])
+							? (int) $matches[1]
+							: -1;
+
 						if ($key > $lastUpdate) {
 							$this->_updateFileList[$key] = $subject;
 						}
@@ -204,6 +213,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 	/**
 	 * Ładuje wszystkie znalezione obiekty 'KontorX_Update_Interface'
 	 * @return void
+	 * @throws KontorX_Update_Exception
 	 */
 	protected function _loadUpdates() {
 		if ($this->_loaded) {
@@ -332,6 +342,8 @@ class KontorX_Update_Manager extends ArrayIterator {
      * Set @see Zend_Loader_PluginLoader
      * @param Zend_Loader_PluginLoader $loader
      * @param string $type
+     * @return void
+     * @throws KontorX_Update_Exception
      */
     public function setPluginLoader(Zend_Loader_PluginLoader $loader, $type) {
         switch ($type) {
@@ -349,6 +361,7 @@ class KontorX_Update_Manager extends ArrayIterator {
      *
      * @param string $type
      * @return Zend_Loader_PluginLoader
+     * @throws KontorX_Update_Exception
      */
     public function getPluginLoader($type = null) {
         if (!isset($this->_pluginLoader[$type])) {
@@ -358,8 +371,8 @@ class KontorX_Update_Manager extends ArrayIterator {
                     $pathSegment   = 'Update/File';
                     break;
                 default:
-                    require_once 'KontorX/DataGrid/Exception.php';
-                    throw new KontorX_DataGrid_Exception(sprintf('Invalid type "%s" provided to getPluginLoader()', $type));
+                    require_once 'KontorX/Update/Exception.php';
+                    throw new KontorX_Update_Exception(sprintf('Invalid type "%s" provided to getPluginLoader()', $type));
             }
 
             $this->_pluginLoader[$type] = new Zend_Loader_PluginLoader(array(

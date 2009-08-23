@@ -1,5 +1,7 @@
 <?php
+require_once 'KontorX/Update/Manager.php';
 require_once 'KontorX/Update/Interface.php';
+
 abstract class KontorX_Update_Abstract implements KontorX_Update_Interface {
 
 	/**

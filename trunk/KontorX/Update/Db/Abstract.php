@@ -29,11 +29,11 @@ abstract class KontorX_Update_Db_Abstract extends KontorX_Update_Abstract {
 		try {
 			$stmt = $adapter->prepare($sql);
 			$result = $stmt->execute($params);
-			$this->_setStatus(self::SUCCESS);
+			$this->_setStatus($result ? self::SUCCESS : self::FAILURE);
 			return $result;
 		} catch (Exception $e) {
 			$this->_addException($e);
-			$this->_setStatus(self::SUCCESS);
+			$this->_setStatus(self::FAILURE);
 		}
 	}
 
