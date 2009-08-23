@@ -139,7 +139,9 @@ class KontorX_Update_Manager extends ArrayIterator {
 
 		return (false === ($lastUpdate = @file_get_contents($pathname)))
 			? -1
-			: $lastUpdate;
+			: (is_numeric($lastUpdate)
+				? (int) $lastUpdate
+				: -1);
 	}
 
 	/**
