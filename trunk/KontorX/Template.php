@@ -153,16 +153,22 @@ class KontorX_Template {
 	 * @return bool
 	 */
 	public function isStartedLayout() {
-		if ($this->_disableTemplate) {
-			return false;
-		}
-
 		/**
 		 * @todo Nie jest to jednoznacze że jest zainicjowany @see Zend_Layout? 
 		 */
+		$layoutStarted = false;
 		if (class_exists('Zend_Layout',false)) {
-			return $this->getLayout()->isEnabled();
+			$layoutStarted = $this->getLayout()->isEnabled();
 		}
+
+		if (true === $this->_disableTemplate) {
+			if ($layoutStarted) {
+				$this->getLayout()->disableLayout();
+			}
+
+			return false;
+		}
+
 		return null !== $this->_layoutName;
 	}
 	
