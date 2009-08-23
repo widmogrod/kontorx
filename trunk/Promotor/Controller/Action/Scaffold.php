@@ -112,6 +112,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 			
 		$status = $scaffold->getStatus();
+		$result = $scaffold->getResult();
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
 			$flashMessenger->addMessage($status);
 
