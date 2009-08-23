@@ -138,8 +138,25 @@ class KontorX_Template {
 		}
 		return $this->_layout;
 	}
+
+	protected $_disableTemplate = false;
 	
+	/**
+	 * @param bool $flag
+	 * @return void
+	 */
+	public function disableTemplate($flag = true) {
+		$this->_disableTemplate = (bool) $flag;
+	}
+	
+	/**
+	 * @return bool
+	 */
 	public function isStartedLayout() {
+		if ($this->_disableTemplate) {
+			return false;
+		}
+
 		/**
 		 * @todo Nie jest to jednoznacze że jest zainicjowany @see Zend_Layout? 
 		 */
