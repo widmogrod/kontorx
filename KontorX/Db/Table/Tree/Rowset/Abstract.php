@@ -41,16 +41,6 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		);
 	}
 
-	public function __sleep() {
-		return array_merge(
-			parent::__sleep(),
-			array(
-				'_table', // FIX For serialization.. 
-				'_level',
-				'_separator')
-		);
-	}
-
 	public function init() {
 		if (null === $this->_level) {
 			require_once 'KontorX/Db/Table/Tree/Rowset/Exception.php';
