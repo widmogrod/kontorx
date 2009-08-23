@@ -139,7 +139,7 @@ class KontorX_Template {
 		return $this->_layout;
 	}
 
-	protected $_disableTemplate = false;
+	protected $_disableTemplate = null;
 	
 	/**
 	 * @param bool $flag
@@ -156,20 +156,22 @@ class KontorX_Template {
 		/**
 		 * @todo Nie jest to jednoznacze że jest zainicjowany @see Zend_Layout? 
 		 */
-		$layoutStarted = false;
+		$layoutEnabled = true;
 		if (class_exists('Zend_Layout',false)) {
-			$layoutStarted = $this->getLayout()->isEnabled();
+			$layoutEnabled = $this->getLayout()->isEnabled();
 		}
 
 		if (true === $this->_disableTemplate) {
-			if ($layoutStarted) {
+			if ($layoutEnabled) {
 				$this->getLayout()->disableLayout();
 			}
 
 			return false;
+		} elseif (!$layoutEnabled) {
+			return false;
+		} else {
+			return null !== $this->_layoutName;	
 		}
-
-		return null !== $this->_layoutName;
 	}
 	
 	/**
