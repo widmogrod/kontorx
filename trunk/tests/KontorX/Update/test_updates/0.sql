@@ -1,0 +1,1 @@
+--- Fauszywy plik!.. wymagany do testów.. Update_Manager ma go nie odnaleść!

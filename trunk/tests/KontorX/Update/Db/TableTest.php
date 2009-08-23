@@ -25,6 +25,9 @@ class KontorX_Update_Db_MysqlTable extends KontorX_Update_Db_Mysql_Table {
 
 class KontorX_Update_Db_MysqlTableTest extends UnitTestCase {
 	
+	/**
+	 * @var KontorX_Update_Db_MysqlTable
+	 */
 	public $table;
 	
 	public function setUp() {
@@ -42,7 +45,7 @@ class KontorX_Update_Db_MysqlTableTest extends UnitTestCase {
 	}
 
 	public function tearDown() {
-		
+		$this->table = null;
 	}
 
 	public function testAddColumn() {
