@@ -35,7 +35,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 		}
 
 		$template = $this->getTemplate();
-		if (!$template->isStartedLayout()) {
+		if (false === $template->isStartedLayout()) {
 			return;
 		}
 
