@@ -214,7 +214,9 @@ class KontorX_Update_Manager extends ArrayIterator {
 	 * @throws KontorX_Update_Exception
 	 */
 	protected function _loadUpdates() {
-		if (!$this->_loaded) {
+		if (false === $this->_loaded) {
+			$this->_loaded = true;
+
 			$path = $this->getUpdatePath();
 	
 			$list = $this->getUpdateFileList();
@@ -225,7 +227,10 @@ class KontorX_Update_Manager extends ArrayIterator {
 				switch ($extension) {
 					case 'php':
 						// w pliku php.. musi się odwołać do managera i dodac objekt update!
-						$instance = include_once $pathname;
+						// TODO Przy tworzeniu wielu instancji jest "buba"
+						// bo jest fatal error!
+						$instance = require $pathname;
+
 						if (!$instance instanceof KontorX_Update_Interface) {
 							require_once 'KontorX/Update/Exception.php';
 	            			throw new KontorX_Update_Exception(
@@ -245,7 +250,6 @@ class KontorX_Update_Manager extends ArrayIterator {
 			
 			$this->ksort();
 		}
-		$this->_loaded = true;
 	}
 
 	/**
