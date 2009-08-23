@@ -153,7 +153,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 
 		if (!@file_put_contents($pathname, (int) $updateId)) {
 			$message = function_exists('error_get_last')
-				? error_get_last()
+				? implode(PHP_EOL, error_get_last())
 				: sprintf('can\'t save last update info to file "%s"', $pathname);
 
 			require_once 'KontorX/Update/Exception.php';
