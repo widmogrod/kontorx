@@ -23,6 +23,7 @@ class KontorX_Update_ManagerTest extends UnitTestCase {
 	public function testInitNoUpdatePath() {
 		try {
 			$manager = new KontorX_Update_Manager();
+			$this->assertNoErrors('Nie przekazano ścieżko - brak KontorX_Update_Exception');
 		} catch (Exception $e) {
 			$this->assertIsA($e, 'KontorX_Update_Exception', 'Niewłaściwy wyjatek');
 		}
@@ -31,6 +32,7 @@ class KontorX_Update_ManagerTest extends UnitTestCase {
 	public function testInitUpdatePathNoExsists() {
 		try {
 			$manager = new KontorX_Update_Manager('/no-exsists-path/');
+			$this->assertNoErrors('Ścieżka nie powinna istnieć, brak KontorX_Update_Exception');
 		} catch (Exception $e) {
 			$this->assertIsA($e, 'KontorX_Update_Exception', 'Niewłaściwy wyjatek');
 		}

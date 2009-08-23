@@ -49,17 +49,47 @@ class KontorX_Update_Db_MysqlTableTest extends UnitTestCase {
 	}
 
 	public function testAddColumn() {
-		$result = $this->table->addColumn('col1',array(
+		$this->table->addColumn('col1',array(
 			'type' => 'TEXT',
 			'null' => 'NOT NULL',
 		));
 		
-		$this->assertTrue($result, 'kolumna nie została utworzona');
+		$this->assertEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::SUCCESS, 
+				'kolumna nie została utworzona');
+
+		$this->assertNotEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::FAILURE, 
+				'niewłaściwy status.. wynika że kolumna została utworzona');
+
+		$this->assertEqual(
+				$this->table->getMessages(),
+				array(),
+				sprintf('Nie powinno być wiadomości!: %s',
+						array_map(array($this, 'dump'), $this->table->getMessages())));
     }
     
 	public function testRemoveColumn() {
 		$result = $this->table->removeColumn('col1');
-		$this->assertTrue($result, 'kolumna nie została usunięta');
+		$this->assertTrue($result, '');
+		
+		$this->assertEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::SUCCESS, 
+				'kolumna nie została usunięta');
+
+		$this->assertNotEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::FAILURE, 
+				'niewłaściwy status..');
+
+		$this->assertEqual(
+				$this->table->getMessages(),
+				array(),
+				sprintf('Nie powinno być wiadomości!: %s',
+						array_map(array($this, 'dump'), $this->table->getMessages())));
     }
 
 	public function testRemoveColumnNonExsist() {
