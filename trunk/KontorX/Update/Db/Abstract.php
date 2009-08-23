@@ -1,7 +1,6 @@
 <?php
-require_once 'KontorX/Update/Interface.php';
-abstract class KontorX_Update_Db_Abstract
-	implements KontorX_Update_Interface {
+require_once 'KontorX/Update/Abstract.php';
+abstract class KontorX_Update_Db_Abstract extends KontorX_Update_Abstract {
 
 	/**
 	 * @var Zend_Db_Adapter_Abstract
@@ -25,11 +24,17 @@ abstract class KontorX_Update_Db_Abstract
 	 */
 	protected function _execute($sql, $params = array()) {
 		$adapter = $this->getAdapter();
-
 		$sql = $this->_bindNoQuoted($sql, $params);
 
-		$stmt = $adapter->prepare($sql);
-		return $stmt->execute($params);
+		try {
+			$stmt = $adapter->prepare($sql);
+			$result = $stmt->execute($params);
+			$this->_setStatus(self::SUCCESS);
+			return $result;
+		} catch (Exception $e) {
+			$this->_addException($e);
+			$this->_setStatus(self::SUCCESS);
+		}
 	}
 
 	/**
