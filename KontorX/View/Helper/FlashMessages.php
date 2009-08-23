@@ -20,14 +20,27 @@ class KontorX_View_Helper_FlashMessages extends Zend_View_Helper_Abstract {
 	 * @return array
 	 */
 	public function flashMessages() {
-		return $this->getFlashMessenger()->getMessages();
+		return $this->direct();
 	}
 
 	/**
 	 * @return array
 	 */
 	public function direct() {
-		return $this->getFlashMessenger()->getMessages();
+		$fm = $this->getFlashMessenger();
+
+		$result = array();
+		if (is_array($messages = $fm->getMessages())) {
+			$result += $messages;
+			$fm->clearMessages();
+		}
+
+		if ($fm->hasCurrentMessages()) {
+			$result += $fm->getCurrentMessages();
+			$fm->clearCurrentMessages();
+		}
+
+		return $result;
 	}
 
 	/**
@@ -36,7 +49,7 @@ class KontorX_View_Helper_FlashMessages extends Zend_View_Helper_Abstract {
 	public function getFlashMessenger() {
 		if (null === $this->_flashMessanger) {
 			require_once 'Zend/Controller/Action/HelperBroker.php';
-			if (!Zend_Controller_Action_HelperBroker::hasHelper('flashMessenger')) {
+			if (!Zend_Controller_Action_HelperBroker::getStaticHelper('flashMessenger')) {
 				require_once 'Zend/Controller/Action/Helper/FlashMessenger.php';
 				$this->_flashMessanger = new Zend_Controller_Action_Helper_FlashMessenger();
 				Zend_Controller_Action_HelperBroker::addHelper($this->_flashMessanger);
