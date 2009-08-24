@@ -390,7 +390,9 @@ class KontorX_Update_Manager extends ArrayIterator {
 			if ($grouped) {
 				$messages[$updateId] = $update->getMessages();
 			} else {
-				array_map('array_push', $messages, $update->getMessages());
+				foreach ($update->getMessages() as $message) {
+					$messages[] = $message;
+				}
 			}
 		}
 		return $messages;
