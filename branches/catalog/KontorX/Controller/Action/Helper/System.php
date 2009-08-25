@@ -31,10 +31,19 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
                     $plugin->setLayoutName($dynamicName);
                 }
 
-                // template name
+            	// template name
                 if (isset($options['template'])) {
                     $plugin->setTemplateName($options['template']);
                 }
+                
+	            // template name
+                if (array_key_exists('disableTemplate', $options)) {
+                	$options['disableTemplate']
+                		? Zend_Layout::getMvcInstance()->disableLayout()
+                		: Zend_Layout::getMvcInstance()->enableLayout();
+                }
+                
+                
 
                 // czy zablokować zmiane layout z poziomu konfiguracji szablonu
                 if (isset($options['lock'])) {
