@@ -11,7 +11,7 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
             	self::$_cache->save($this->_fetchData(), $this->_getCacheId());
             }
         } else {
-        	$this->_fetchData();
+        	$this->_data = $this->_fetchData();
         }
         $this->_count = count($this->_data);
 		return $this->_data;
