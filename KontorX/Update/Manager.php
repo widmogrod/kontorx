@@ -162,7 +162,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 		$pathname = $this->getUpdatePath();
 		$pathname .= self::FILENAME_INFO;
 
-		if (!@file_put_contents($pathname, (int) $updateId)) {
+		if (false === @file_put_contents($pathname, (int) $updateId)) {
 			$message = function_exists('error_get_last')
 				? implode(PHP_EOL, error_get_last())
 				: sprintf('can\'t save last update info to file "%s"', $pathname);
