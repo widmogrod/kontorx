@@ -5,31 +5,28 @@ class Promotor_View_Helper_CatalogDistrictNavigation extends Zend_View_Helper_Na
 	 * @return void
 	 */
 	public function catalogDistrictNavigation() {
-		$container = $this->_getContainer();
-		$this->setContainer($container);
 		return $this;
 	}
 
 	/**
-	 * @var Zend_Navigation
+	 * @var Zend_Navigation_Container
 	 */
-	private $_cont;
+	protected $_container;
 
 	/**
-	 * @return Zend_Navigation
+	 * @return Zend_Navigation_Container
 	 */
-	public function _getContainer() {
-		if (null === $this->_cont) {
+	public function getContainer() {
+		if (null === $this->_container) {
 			$model = new Catalog_Model_District();
 			$visitor = new Promotor_Navigation_Recursive_Visitor_CatalogDistrict();
 
 			$rowset = $model->findAllCache();
 
-			$iterator = new KontorX_Navigation_Recursive($rowset);
-			$iterator->accept($visitor);
-			$this->_cont = $iterator->create();
-			$this->_cont = $iterator->getNavigation(); 
+			$navigation = new KontorX_Navigation_Recursive($rowset);
+			$navigation->accept(new Promotor_Navigation_Recursive_Visitor_CatalogDistrict());
+			$this->_container = $navigation->create();
 		}
-		return $this->_cont;
+		return $this->_container;
 	}
 }
