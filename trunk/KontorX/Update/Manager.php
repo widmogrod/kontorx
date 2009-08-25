@@ -171,7 +171,7 @@ class KontorX_Update_Manager extends ArrayIterator {
 			throw new KontorX_Update_Exception($message);
 		}
 		
-		@chmod($pathname, 0777);
+		@chmod($pathname, 0666);
 	}
 
 	/**
