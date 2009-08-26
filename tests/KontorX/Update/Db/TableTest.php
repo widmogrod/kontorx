@@ -13,7 +13,7 @@ class KontorX_Update_Db_MysqlTable extends KontorX_Update_Db_Mysql_Table {
 	public function up() {
 		
 	}
-	
+
 	/**
 	 * Downgrade
 	 * @return void
