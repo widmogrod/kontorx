@@ -8,22 +8,33 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 	protected $table;
 	
 	protected $_sqlOptions = array(
-		self::ADD_COLUMN => array('table','name','type','null'),
+		self::ADD_COLUMN => array('table','name','type','null','after'),
 		self::REMOVE_COLUMN => array('table','name')
 	);
 
+	/**
+	 * @var unknown_type
+	 */
 	protected $_sql = array(
-		self::ADD_COLUMN => 'ALTER TABLE `:@table` ADD :name :@type :@null',
-		self::REMOVE_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN :name'
+		self::ADD_COLUMN => 'ALTER TABLE `:@table` ADD :@name :@type :@null :@after',
+		self::REMOVE_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN :@name'
 	);
 
 	/**
+	 * Zmienna mapuje parametry zapytania (@see _sqlOptions)
+	 * na wartości, które będą zamieniane bez quotowania! 
+	 * 
+	 * Wartości bez quotowania zostały występują w zapytaniu z prefiksem ":@"
+	 * Watości z quotowaniem są z prefiksem ":"
+	 * 
 	 * @var array
 	 */
 	protected $_bindNoQuoted = array(
 		'table' => ':@table',
 		'type' => ':@type',
 		'null' => ':@null',
+		'after' => ':@after',
+		'name' => ':@name',
 		'comment' => ':@comment'
 	);
 
@@ -39,7 +50,7 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 	 * @param array $options
 	 * @return bool
 	 */
-	public function addColumn($name, array $options) {
+	public function addColumn($name, array $options = array()) {
 		$options['name'] = $name;
 		$options = $this->_getOptions(self::ADD_COLUMN, $options);
 		return $this->_execute($this->_sql[self::ADD_COLUMN], $options);
@@ -50,7 +61,7 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 	 * @param array $options
 	 */
 	public function removeColumn($name) {
-		$options['name'] = $name;
+		$options = array('name' => $name);
 		$options = $this->_getOptions(self::REMOVE_COLUMN, $options);
 		return $this->_execute($this->_sql[self::REMOVE_COLUMN], $options);
 	}
