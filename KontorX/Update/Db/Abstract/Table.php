@@ -3,21 +3,30 @@ require_once 'KontorX/Update/Db/Abstract.php';
 abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstract {
 
 	const ADD_COLUMN = 'ADD_COLUMN';
-	const REMOVE_COLUMN = 'REMOVE_COLUMN';
+	const DROP_COLUMN = 'DROP_COLUMN';
+	const ADD_INDEX = 'ADD_INDEX';
+	const DROP_INDEX = 'DROP_INDEX';
 
 	protected $table;
 	
+	/**
+	 * @var array
+	 */
 	protected $_sqlOptions = array(
 		self::ADD_COLUMN => array('table','name','type','null','after'),
-		self::REMOVE_COLUMN => array('table','name')
+		self::DROP_COLUMN => array('table','name'),
+		self::ADD_INDEX => array('table','name','columns'),
+		self::DROP_INDEX => array('table','name')
 	);
 
 	/**
-	 * @var unknown_type
+	 * @var array
 	 */
 	protected $_sql = array(
 		self::ADD_COLUMN => 'ALTER TABLE `:@table` ADD :@name :@type :@null :@after',
-		self::REMOVE_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN :@name'
+		self::DROP_COLUMN => 'ALTER TABLE `:@table` DROP COLUMN :@name',
+		self::ADD_INDEX => 'ALTER TABLE `:@table` ADD INDEX `:@name`(:@columns);',
+		self::DROP_INDEX => 'ALTER TABLE `:@table` DROP INDEX `:@name`;'
 	);
 
 	/**
@@ -35,7 +44,8 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 		'null' => ':@null',
 		'after' => ':@after',
 		'name' => ':@name',
-		'comment' => ':@comment'
+		'comment' => ':@comment',
+		'columns' => ':@columns'
 	);
 
 	/**
@@ -62,7 +72,30 @@ abstract class KontorX_Update_Db_Abstract_Table extends KontorX_Update_Db_Abstra
 	 */
 	public function removeColumn($name) {
 		$options = array('name' => $name);
-		$options = $this->_getOptions(self::REMOVE_COLUMN, $options);
-		return $this->_execute($this->_sql[self::REMOVE_COLUMN], $options);
+		$options = $this->_getOptions(self::DROP_COLUMN, $options);
+		return $this->_execute($this->_sql[self::DROP_COLUMN], $options);
+	}
+	
+	/**
+	 * @param string $name
+	 * @param array $options
+	 * @return bool
+	 */
+	public function addIndex($name, array $options = array()) {
+		$options['name'] = $name;
+		$options = $this->_getOptions(self::ADD_INDEX, $options);
+		$options['columns'] = sprintf('`%s`', implode('`,`', (array)$options['columns']));
+		return $this->_execute($this->_sql[self::ADD_INDEX], $options);
+	}
+
+	/**
+	 * @param string $name
+	 * @param array $options
+	 * @return bool
+	 */
+	public function removeIndex($name, array $options = array()) {
+		$options['name'] = $name;
+		$options = $this->_getOptions(self::DROP_INDEX, $options);
+		return $this->_execute($this->_sql[self::DROP_INDEX], $options);
 	}
 }
