@@ -99,6 +99,50 @@ class KontorX_Update_Db_MysqlTableTest extends UnitTestCase {
 		} catch (Zend_Db_Select_Exception $e) {
 		}
     }
+    
+	public function testAddIndex() {
+		$result = $this->table->addIndex('test_index', array(
+			'columns' => array('id')
+		));
+		
+		$this->assertTrue($result, '');
+		
+		$this->assertEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::SUCCESS, 
+				'index nie została dodany');
+
+		$this->assertNotEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::FAILURE, 
+				'niewłaściwy status..');
+
+		$this->assertEqual(
+				$this->table->getMessages(),
+				array(),
+				sprintf('Nie powinno być wiadomości!: %s',
+						array_map(array($this, 'dump'), $this->table->getMessages())));
+    }
+
+	public function testRemoveIndex() {
+		$this->table->removeIndex('test_index');
+		
+		$this->assertEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::SUCCESS, 
+				'index nie została usunięta');
+
+		$this->assertNotEqual(
+				$this->table->getStatus(), 
+				KontorX_Update_Db_MysqlTable::FAILURE, 
+				'niewłaściwy status..');
+
+		$this->assertEqual(
+				$this->table->getMessages(),
+				array(),
+				sprintf('Nie powinno być wiadomości!: %s',
+						array_map(array($this, 'dump'), $this->table->getMessages())));
+    }
 }
 
 $r = new KontorX_Update_Db_MysqlTableTest();
