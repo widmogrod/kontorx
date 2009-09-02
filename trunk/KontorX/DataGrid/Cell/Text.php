@@ -7,6 +7,7 @@ class KontorX_DataGrid_Cell_Text extends KontorX_DataGrid_Cell_Abstract {
      * @return string
      */
     public function render() {
-        return ''.$this->getData($this->getColumnName());
+    	$name = $this->getAttrib('mappedColumn', $this->getColumnName());
+        return '' . $this->getData($name);
     }
 }

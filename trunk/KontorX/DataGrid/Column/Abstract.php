@@ -58,6 +58,7 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @param KontorX_DataGrid_Cell_Interface $cell
      */
     public function setCell(KontorX_DataGrid_Cell_Interface $cell) {
+    	$cell->setColumn($this);
     	$cell->setColumnName($this->getColumnName());
         $this->_cell = $cell;
     }
