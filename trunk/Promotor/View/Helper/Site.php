@@ -54,6 +54,26 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 	 * @var array
 	 */
 	protected $_plugin = array();
+	
+	/**
+	 * @param string $name
+	 * @param array $options
+	 * @return unknown_type
+	 */
+	public function get($name, array $options = null) {
+		if (!isset($this->_plugin[$name])) {
+			$class = $this->getPluginLoader()->load($name);
+
+			// patch na array 1st param
+			if (count($options) == 1) {
+				$options = (array) $options[0];
+			}
+
+			$this->_plugin[$name] = new $class($this);
+		}
+		$this->_plugin[$name]->setOptions($options);
+		return $this->_plugin[$name];
+	}
 
 	/**
 	 * @param string $name
@@ -61,28 +81,14 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 	 * @return Site_Model_Site
 	 */
 	public function __call($name, array $params = null) {
-		if (!isset($this->_plugin[$name])) {
-			$class = $this->getPluginLoader()->load($name);
-
-			// patch na array 1st param
-			if (count($params) == 1) {
-				$params = (array) $params[0];
-			}
-
-			$this->_plugin[$name] = new $class($this, $params);
-		}
-		return $this->_plugin[$name];
+		return $this->get($name, $params);
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param array $params
 	 */
 	public function __get($name) {
-		if (!isset($this->_plugin[$name])) {
-			$class = $this->getPluginLoader()->load($name);
-			$this->_plugin[$name] = new $class($this);
-		}
-		return $this->_plugin[$name];
+		return $this->get($name);
 	}
 }

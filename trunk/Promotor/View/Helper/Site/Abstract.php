@@ -19,6 +19,7 @@ abstract class Promotor_View_Helper_Site_Abstract {
 
 	/**
 	 * @param array $options 
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setOptions(array $options) {
 		foreach ($options as $key => $value) {
@@ -27,6 +28,7 @@ abstract class Promotor_View_Helper_Site_Abstract {
 				$this->$method($value);
 			}
 		}
+		return $this;
 	}
 
 	/**
