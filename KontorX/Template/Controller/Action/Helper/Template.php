@@ -64,7 +64,7 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
                     $template->setStyleName($options['style']);
                 }
 
-                if (array_key_exists('disableTemplate', $options)) {
+                if (array_key_exists('disableTemplate', (array) $options)) {
                 	$template->disableTemplate($options['disableTemplate']);
                 }
                 
