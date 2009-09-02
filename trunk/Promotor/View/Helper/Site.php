@@ -58,19 +58,20 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 	/**
 	 * @param string $name
 	 * @param array $options
-	 * @return unknown_type
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function get($name, array $options = null) {
 		if (!isset($this->_plugin[$name])) {
 			$class = $this->getPluginLoader()->load($name);
 
-			// patch na array 1st param
-			if (count($options) == 1) {
-				$options = (array) $options[0];
-			}
-
 			$this->_plugin[$name] = new $class($this);
 		}
+		
+		// patch na array 1st param
+		if (count($options) == 1) {
+			$options = (array) $options[0];
+		}
+
 		$this->_plugin[$name]->setOptions($options);
 		return $this->_plugin[$name];
 	}

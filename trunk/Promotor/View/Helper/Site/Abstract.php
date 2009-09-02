@@ -22,6 +22,7 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setOptions(array $options) {
+		var_dump($options);
 		foreach ($options as $key => $value) {
 			$method = 'set' . ucfirst($key);
 			if (method_exists($this, $method)) {
