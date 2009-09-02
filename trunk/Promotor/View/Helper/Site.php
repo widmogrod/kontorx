@@ -36,7 +36,7 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 	public function setPluginLoader(Zend_Loader_PluginLoader $loader) {
 		$this->_pluginLoader = $loader;
 	}
-	
+
 	/**
 	 * @return Zend_Loader_PluginLoader
 	 */
