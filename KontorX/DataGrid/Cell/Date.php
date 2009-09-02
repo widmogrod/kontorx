@@ -42,8 +42,12 @@ class KontorX_DataGrid_Cell_Date extends KontorX_DataGrid_Cell_Abstract {
         $date = $this->_getDate();
 
         if (!$date->isDate($value)) {
-            require_once 'KontorX/DataGrid/Exception.php';
-            throw new KontorX_DataGrid_Exception(sprintf("Value '%s' is not date format", $value));
+        	if (!($value = strtotime($value))) {
+        		trigger_error(sprintf("Value '%s' is not date format", $value), E_USER_WARNING);
+            	return '';
+        	} else {
+        		$value = $date->setTimestamp($value)->getDate();
+        	}
         }
 
         if (null === @$attribs['conditions']['condition']['0']) {
