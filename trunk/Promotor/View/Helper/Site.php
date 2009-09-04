@@ -72,7 +72,10 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 			$options = (array) $options[0];
 		}
 
-		$this->_plugin[$name]->setOptions($options);
+		if (null !== $options) {
+			$this->_plugin[$name]->setOptions($options);
+		}
+		
 		return $this->_plugin[$name];
 	}
 
