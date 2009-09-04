@@ -15,8 +15,16 @@ abstract class Promotor_View_Helper_Site_Abstract {
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
+		
+		// initialize helper
+		$this->init();
 	}
 
+	/**
+	 * @return void
+	 */
+	public function init() {}
+	
 	/**
 	 * @param array $options 
 	 * @return Promotor_View_Helper_Site_Abstract
