@@ -21,9 +21,11 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	}
 
 	/**
-	 * @return void
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
-	public function init() {}
+	public function init() {
+		return $this;
+	}
 	
 	/**
 	 * @param array $options 

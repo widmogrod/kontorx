@@ -76,7 +76,7 @@ class Promotor_View_Helper_Site extends Zend_View_Helper_Abstract {
 			$this->_plugin[$name]->setOptions($options);
 		}
 		
-		return $this->_plugin[$name];
+		return $this->_plugin[$name]->init();
 	}
 
 	/**

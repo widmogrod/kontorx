@@ -1,6 +1,10 @@
 <?php
 class Promotor_View_Helper_Site_Navigation extends Promotor_View_Helper_Site_Abstract {
 
+	public function init() {
+		return $this->render();
+	}
+	
 	/**
 	 * @var string
 	 */
