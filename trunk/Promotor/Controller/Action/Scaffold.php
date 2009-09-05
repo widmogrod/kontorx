@@ -8,22 +8,22 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	/**
 	 * @var string
 	 */
-	protected $_modelClass = '';
+	protected $_modelClass;
 
 	/**
 	 * @var string
 	 */
-	protected $_formAddClass = '';
+	protected $_formAddClass;
 
 	/**
 	 * @var string
 	 */
-	protected $_formEditClass = '';
+	protected $_formEditClass;
 
 	/**
 	 * @var string
 	 */
-	protected $_formRemoveClass = '';
+	protected $_formRemoveClass;
 	
 	/**
 	 * @var string
@@ -39,6 +39,55 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @var string
 	 */
 	protected $_deletePostObservableName;
+
+	/**
+	 * @param string $suffix
+	 * @return void
+	 */
+	protected function _noticeObserver($suffix = null) {
+		$params = func_get_args();
+		// gdy więcej niż 1 parametr przekazany do methody
+		if (count($params) > 1) {
+			// pietwszy parametr to suffix! 
+			$suffix = array_shift($params);
+		} else {
+			// zerowanie parametrów
+			$params = array();
+		}
+
+		$rq = $this->getRequest();
+
+		$name = $rq->getModuleName() . '_' .
+				$rq->getControllerName() . '_' .
+				$rq->getActionName();
+
+		if (null !== $suffix) {
+			$name .= '_' . trim($suffix,'_'); 
+		}
+				
+		$name = strtolower($name);
+		array_unshift($params, $name); 
+
+		$manager = Promotor_Observable_Manager::getInstance();
+		try {
+			// notify observers
+			$list = call_user_func_array(array($manager,'notify'), $params);
+			$this->_addMessages($list->getMessages());
+		} catch (KontorX_Observable_Exception $e) {
+			$this->_addMessages($e->getMessage());
+		}
+	}
+
+	/**
+	 * @param array $messages
+	 * @return void
+	 */
+	protected function _addMessages(array $messages) {
+//		var_dump($messages);
+		/* @var $falshMessages Zend_Controller_Action_Helper_FlashMessenger */
+		$falshMessages = $this->_helper->getHelper('flashMessenger');
+		array_walk_recursive($messages, array($falshMessages, 'addMessage'));
+	}
 
 	/**
 	 * @return void
@@ -80,6 +129,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					// TODO ...
 					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
 				}
+			} else {
+				$this->_noticeObserver('post', $scaffold->getRowPK());
 			}
 
 			$this->_helper->redirector->goTo('add');
@@ -128,13 +179,15 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					// TODO ...
 					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
 				}
+			} else {
+				$this->_noticeObserver('post', $scaffold->getRowPK());
 			}
-
-			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
+			$this->view->form = $form;
+//			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
 		} else
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::NO_EXSISTS) {
 			$flashMessenger->addMessage($status);
-			$this->_helper->redirector->goTo('list');
+//			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
@@ -180,6 +233,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					// TODO ...
 					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
 				}
+			} else {
+				$this->_noticeObserver('post', $scaffold->getRowPK());
 			}
 			
 			$this->_helper->redirector->goTo('list');
