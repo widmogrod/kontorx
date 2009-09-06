@@ -83,7 +83,6 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @return void
 	 */
 	protected function _addMessages(array $messages) {
-//		var_dump($messages);
 		/* @var $falshMessages Zend_Controller_Action_Helper_FlashMessenger */
 		$falshMessages = $this->_helper->getHelper('flashMessenger');
 		array_walk_recursive($messages, array($falshMessages, 'addMessage'));
@@ -183,11 +182,11 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				$this->_noticeObserver('post', $scaffold->getRowPK());
 			}
 			$this->view->form = $form;
-//			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
+			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
 		} else
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::NO_EXSISTS) {
 			$flashMessenger->addMessage($status);
-//			$this->_helper->redirector->goTo('list');
+			$this->_helper->redirector->goTo('list');
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
