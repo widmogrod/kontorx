@@ -253,6 +253,7 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 
 		try {
 			$result = $row->save();
+			$this->setRowPK($result);
 			$this->_setResult($result);
 			$this->_setStatus(self::SUCCESS);
 		} catch(Zend_Db_Table_Exception $e) {
