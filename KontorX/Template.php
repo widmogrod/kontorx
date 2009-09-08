@@ -473,10 +473,10 @@ class KontorX_Template {
 		switch ($type) {
 			case 'ini':
 				require_once 'Zend/Config/Ini.php';
-				$conf = new Zend_Config_Ini($path); break;
+				$conf = new Zend_Config_Ini($path, null, true); break;
 			case 'xml':
 				require_once 'Zend/Config/Xml.php';
-				$conf = new Zend_Config_Xml($path); break;
+				$conf = new Zend_Config_Xml($path, null, true); break;
 			case 'php':
 				$conf = include $path;
 				if (!is_array($conf)) {
@@ -484,7 +484,7 @@ class KontorX_Template {
 					throw new KontorX_Template_Exception(sprintf('config file "%s" is not array', $this->_templateConfigFilename));
 				}
 				require_once 'Zend/Config.php';
-				$conf = new Zend_Config($conf); break;
+				$conf = new Zend_Config($conf, true); break;
 			default:
 				require_once 'KontorX/Template/Exception.php';
 				throw new KontorX_Template_Exception(sprintf('undefinded config type "%s"', $type));
