@@ -122,7 +122,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 		// meta
         if (isset($options->meta)
         		&& isset($options->meta->name)) {
-        			
+
             /* @var $headMeta Zend_View_Helper_HeadMeta */
             $headMeta = $view->getHelper('HeadMeta');
 
@@ -138,12 +138,14 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             }
 
             if (!isset($meta['keywords'])
-            		&& isset($options->meta->name->keywords)) {
+            			&& isset($options->meta->name->keywords)) {
                 $headMeta->setName('keywords', $options->meta->name->keywords);
+                unset($options->meta->name->keywords);
             }
             if (!isset($meta['description']) 
-            		&& isset($options->meta->name->description)) {
+            			&& isset($options->meta->name->description)) {
                 $headMeta->setName('description', $options->meta->name->description);
+                unset($options->meta->name->description);
             }
 
             if (isset($options->meta->httpEquiv)
@@ -152,6 +154,13 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 	            	$headMeta->setHttpEquiv($obj->key,
 	            							$obj->content,
 	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : array());
+	            }
+	            
+	            unset($options->meta->httpEquiv);
+            }
+            if ($options->meta->name instanceof Zend_Config) {
+	            foreach ($options->meta->name as $name => $value) {
+	            	$headMeta->setName($name, $value);
 	            }
             }
         }
