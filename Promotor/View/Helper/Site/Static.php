@@ -27,7 +27,7 @@ class Promotor_View_Helper_Site_Static extends Promotor_View_Helper_Site_Abstrac
 
 		/* @var $model Site_Model_Site */
 		$model = $this->_site->getModel();
-		if (!$row = $model->findOne($this->getIdentification())) {
+		if (!$row = $model->findOneCache($this->getIdentification())) {
 			return '';
 		}
 
