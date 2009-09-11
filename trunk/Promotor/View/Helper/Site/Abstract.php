@@ -65,9 +65,11 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	
 	/**
 	 * @param integer $id
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setId($id) {
 		$this->_id = (int) $id;
+		return $this;
 	}
 
 	/**
@@ -77,9 +79,11 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	
 	/**
 	 * @param string $alias
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setAlias($alias) {
 		$this->_alias = $alias;
+		return $this;
 	}
 	
 	/**
@@ -89,10 +93,11 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	
 	/**
 	 * @param KontorX_Db_Table_Tree_Row_Abstract $row
-	 * @return unknown_type
+	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setRow($row) {
 		$this->_row = $row;
+		return $this;
 	}
 
 	/**
