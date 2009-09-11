@@ -2,13 +2,13 @@
 class Promotor_View_Helper_Site_Navigation extends Promotor_View_Helper_Site_Abstract {
 
 	public function init() {
-		return $this->render();
+		return $this;
 	}
 	
 	/**
 	 * @var string
 	 */
-	protected $_proxy;
+	protected $_proxy = 'menu';
 	
 	/**
 	 * @param string $proxy
@@ -36,15 +36,42 @@ class Promotor_View_Helper_Site_Navigation extends Promotor_View_Helper_Site_Abs
 	}
 
 	/**
-	 * @param string $partial
-	 * @return string  
+	 * @var Zend_View_Helper_Navigation_Helper
 	 */
-	public function render($proxy = null) {
+	protected $_getViewHelperNavigation;
+	
+	/**
+	 * @param string $proxy
+	 * @return Zend_View_Helper_Navigation_Helper
+	 */
+	public function getViewHelperNavigation($proxy = null) {
 		if (null !== $proxy) {
 			$this->setDefaultProxy($proxy);
 		}
 
 		$navigation = $this->getNavigation();
-		return $this->_site->view->getHelper('navigation')->navigation($navigation);
+		/* @var $viewHelperNavigation Zend_View_Helper_Navigation */
+		$viewHelperNavigation = $this->_site->view->getHelper('navigation');
+
+		return $viewHelperNavigation->findHelper($this->_proxy)
+									->setContainer($navigation);
+	}
+	
+	/**
+	 * @param string $partial
+	 * @return Zend_View_Helper_Navigation_Helper  
+	 */
+	public function render($proxy = null) {
+		return $this->getViewHelperNavigation($proxy);
+	}
+
+	/**
+	 * @param string $name
+	 * @param array $params
+	 * @return mixed
+	 */
+	public function __call($name, array $params = null) {
+		$helper = $this->getViewHelperNavigation();
+		return call_user_func_array(array($helper, $name), $params);
 	}
 }
