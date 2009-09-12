@@ -2,6 +2,7 @@
 class KontorX_Image_Resizer {
 
     const RESIZE_MAX = 'MAX';
+    const RESIZE_MIN = 'MIN';
     const RESIZE_CROP = 'CROP';
     const RESIZE_DEFAULT = 'DEFAULT';
 
@@ -9,7 +10,10 @@ class KontorX_Image_Resizer {
      * @var array
      */
     protected $_avalibleTypes = array(
-        self::RESIZE_MAX, self::RESIZE_CROP, self::RESIZE_DEFAULT
+        self::RESIZE_MAX,
+        self::RESIZE_MIN, 
+        self::RESIZE_CROP, 
+        self::RESIZE_DEFAULT
     );
 
     /**
@@ -60,7 +64,7 @@ class KontorX_Image_Resizer {
      * @return void
      */
     public function setOffsetWidth($width) {
-        $this->_offsetWidth = (int) $width;
+        $this->_offsetWidth = $width;
     }
 
     /**
@@ -80,7 +84,7 @@ class KontorX_Image_Resizer {
      * @return void
      */
     public function setOffsetHeight($height) {
-        $this->_offsetHeight = (int) $height;
+        $this->_offsetHeight = $height;
     }
 
     /**
@@ -247,6 +251,10 @@ class KontorX_Image_Resizer {
     	$this->_multiTypesOptions = array_merge($this->_multiTypesOptions, $multiTypes);
     }
 
+    /**
+     * @param string $type
+     * @return void
+     */
     protected function _setupMultiTypesOptions($type = null) {
         if (null === $type) {
             if (null === ($type = $this->getMultiType())) {
@@ -371,6 +379,21 @@ class KontorX_Image_Resizer {
                     $image->resizeToMaxHeight($this->getHeight());
                 } else {
                     $message = "Width or height or both are required for resizing to max";
+                    require_once 'KontorX/Image/Exception.php';
+                    throw new KontorX_Image_Exception($message);
+                }
+                break;
+            case self::RESIZE_MIN:
+                if (is_int($this->getWidth()) && is_int($this->getHeight())) {
+                    $image->resizeToMin($this->getWidth(), $this->getHeight());
+                } else
+                if (is_int($this->getWidth())) {
+                    $image->resizeToMinWidth($this->getWidth());
+                } else
+                if (is_int($this->getHeight())) {
+                    $image->resizeToMinHeight($this->getHeight());
+                } else {
+                    $message = "Width or height or both are required for resizing to min";
                     require_once 'KontorX/Image/Exception.php';
                     throw new KontorX_Image_Exception($message);
                 }

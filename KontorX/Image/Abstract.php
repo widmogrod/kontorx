@@ -69,6 +69,21 @@ abstract class KontorX_Image_Abstract {
     }
 
     /**
+     * @return resource
+     * @throws KontorX_Image_Exception
+     */
+    protected function _getImage() {
+   		// sprawdz czy zaladowano grafike
+        if (!is_resource($this->_image)) {
+            $message = 'Image not loaded';
+            require_once 'KontorX/Image/Exception.php';
+            throw new KontorX_Image_Exception($message);
+        }
+
+    	return $this->_image;
+    }
+    
+    /**
      * Zwraca typ pliku graficznego
      * @return 	integer
      */
@@ -90,13 +105,6 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function resize($width, $height) {
-        // sprawdz czy zaladowano grafike
-        if (!is_resource($this->_image)) {
-            $message = 'Image not loaded';
-            require_once 'KontorX/Image/Exception.php';
-            throw new KontorX_Image_Exception($message);
-        }
-
         // utworz nowy obrazek
         if (!is_resource($newImage = $this->_imagecreate($width, $height))) {
             $message = 'Image not created';
@@ -106,7 +114,7 @@ abstract class KontorX_Image_Abstract {
 
         // zmien rozmiar obrazka
         $result = imageCopyResampled($newImage, $this->_image, 0, 0, 0, 0, $width, $height, $this->_width, $this->_height);
-
+        
         if(!$result) {
             $message = 'Image not resampled';
             require_once 'KontorX/Image/Exception.php';
@@ -130,22 +138,22 @@ abstract class KontorX_Image_Abstract {
     public function resizeToMax($width, $height) {
         // nie przekroczono wartosci maksymalnej
         if ($width > $this->_width) {
-            $iNewWidth = $this->_width;
-            $iNewHeight = $this->_height;
+            $newWidht = $this->_width;
+            $newHeight = $this->_height;
         }
         // wartosc maksymalna zostala przekroczona
         else {
-            $iNewWidth = $width;
-            $iNewHeight = round($width / $this->_width * $this->_height);
+            $newWidht = $width;
+            $newHeight = round($width / $this->_width * $this->_height);
         }
 
         // przekroczono wartosc maksymalną
-        if ($height < $iNewHeight) {
-            $iNewHeight = $height;
-            $iNewWidth = round($height / $this->_height * $this->_width);
+        if ($height < $newHeight) {
+            $newHeight = $height;
+            $newWidht = round($height / $this->_height * $this->_width);
         }
 
-        return $this->resize($iNewWidth, $iNewHeight);
+        return $this->resize($newWidht, $newHeight);
     }
 
     /**
@@ -201,7 +209,69 @@ abstract class KontorX_Image_Abstract {
 
         return $this->resize($width, $height);
     }
+    
+	/**
+     * @param integer $width
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMin($width, $height) {
+        // nie przekroczono wartosci minimalnej
+        if ($width < $this->_width) {
+            $newWidht = $this->_width;
+            $newHeight = $this->_height;
+        }
+        // wartosc minimalna zostala przekroczona
+        else {
+            $newWidht = $width;
+            $newHeight = round($width / $this->_width * $this->_height);
+        }
 
+        // przekroczono wartosc minimalną
+        if ($height > $newHeight) {
+            $newHeight = $height;
+            $newWidht = round($height / $this->_height * $this->_width);
+        }
+
+        return $this->resize($newWidht, $newHeight);
+    }
+
+	/**
+     * @param integer $width
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMinWidth($width) {
+        // nie przekroczono wartosci minimalnej
+        if ($width < $this->_width) {
+            $width = $this->_width;
+            $height = $this->_height;
+        }
+        // wartosc minimalna zostala przekroczona
+        else {
+            $height = round($width / $this->_width * $this->_height);
+        }
+
+        return $this->resize($width, $height);
+    }
+
+    /**
+     * @param integer $height
+     * @return KontorX_Image_Abstract
+     */
+    public function resizeToMinHeight($height) {
+        // nie przekroczono wartosci minimalnej
+        if ($height < $this->_height) {
+            $width = $this->_width;
+            $height = $this->_height;
+        }
+        // wartosc minimalna zostala przekroczona
+        else {
+            $width = round($height / $this->_height * $this->_width);
+        }
+
+        return $this->resize($width, $height);
+    }
+    
     /**
      * @param integer $offsetWidth
      * @param integer $offsetHeight
@@ -210,19 +280,24 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function crop($offsetWidth, $offsetHeight, $width, $height) {
-        // sprawdz czy zaladowano grafike
-        if (!is_resource($this->_image)) {
-            $message = 'Image not loaded';
-            require_once 'KontorX/Image/Exception.php';
-            throw new KontorX_Image_Exception($message);
-        }
-
         // utworz nowy obrazek
         if (!is_resource($newImage = $this->_imagecreate($width, $height))) {
             $message = 'Image not created';
             throw new KontorX_Image_Exception($message);
         }
 
+
+        // if offset is % then calculate offset width
+    	if (substr($offsetWidth,-1) == '%') {
+    		$offsetWidth = substr($offsetWidth, 0, -1) / 100;
+    		$offsetWidth = ($offsetWidth * $this->_width) - ($offsetWidth * $width) ;
+        }
+        // if offset is % then calculate offset height
+    	if (substr($offsetHeight,-1) == '%') {
+    		$offsetHeight = substr($offsetHeight, 0, -1) / 100;
+    		$offsetHeight = ($offsetHeight * $this->_height) - ($offsetHeight * $height) ;
+        }
+        
         // zmien rozmiar obrazka
         $result = imageCopy($newImage, $this->_image, 0, 0, $offsetWidth, $offsetHeight, $width, $height);
 
