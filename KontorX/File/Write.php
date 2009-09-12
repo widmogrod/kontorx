@@ -35,6 +35,19 @@ class KontorX_File_Write {
      * @return KontorX_File_Write
      */
     public function setOptions(array $options) {
+    	if (isset($options['chmod'])) {
+    		if (is_array($options['chmod'])) {
+    			if (isset($options['chmod'][self::CHMOD_DIR])) {
+    				$this->setChmod($options['chmod'][self::CHMOD_DIR], self::CHMOD_DIR);
+    			}
+
+    			if (isset($options['chmod'][self::CHMOD_FILE])) {
+    				$this->setChmod($options['chmod'][self::CHMOD_FILE], self::CHMOD_FILE);
+    			}
+    		}
+    		unset($options['chmod']);
+    	}
+
         foreach ($options as $name => $value) {
             $method = 'set'.ucfirst($name);
             if (method_exists($this, $method)) {
@@ -218,6 +231,8 @@ class KontorX_File_Write {
                 require_once 'KontorX/File/Exception.php';
                 throw new KontorX_File_Exception($message);
             }
+            
+            @chmod($pathname, $this->getChmod(self::CHMOD_DIR));
         }
 
         if (($newFile = is_file($fullpath))) {
@@ -243,8 +258,6 @@ class KontorX_File_Write {
             throw new KontorX_File_Exception($message);
         }
 
-        if ($newFile) {
-            @chmod($fullpath, $this->getChmod(self::CHMOD_FILE));
-        }
+		@chmod($fullpath, $this->getChmod(self::CHMOD_FILE));
     }
 }
