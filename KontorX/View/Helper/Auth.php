@@ -45,6 +45,18 @@ class KontorX_View_Helper_Auth extends Zend_View_Helper_Abstract {
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function getRole() {
+		if (class_exists('KontorX_Controller_Action_Helper_Acl', false)) {
+			require_once 'KontorX/Controller/Action/Helper/Acl.php';
+		}
+
+		return $this->getIndentity('role',
+			KontorX_Controller_Action_Helper_Acl::DEFAULT_ROLE_ID);
+	}
+	
+	/**
 	 * @param string $key
 	 * @param string $default
 	 * @return mixed

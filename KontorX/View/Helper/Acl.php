@@ -25,12 +25,12 @@ class KontorX_View_Helper_Acl extends Zend_View_Helper_Abstract {
 	}
 	
 	/**
-	 * @var Zend_Auth
+	 * @var Zend_Acl
 	 */
 	protected $_acl;
 
 	/**
-	 * @return Zend_Auth
+	 * @return Zend_Acl
 	 */
 	public function getAcl() {
 		if (null === $this->_acl) {
@@ -40,7 +40,7 @@ class KontorX_View_Helper_Acl extends Zend_View_Helper_Abstract {
 	}
 
 	/**
-	 * @return KontorX_View_Helper_Auth
+	 * @return KontorX_View_Helper_Acl
 	 */
 	public function acl() {
 		return $this;

@@ -98,9 +98,12 @@ class KontorX_Application_Resource_Acl extends Zend_Application_Resource_Resourc
 				}
 			}
 
-			// add role
-			$roleInstance = new $roleClass($roleName);
-			$this->_acl->addRole($roleInstance, $roleParents);
+			
+			if (!$this->_acl->hasRole($roleName)) {
+				// add role
+				$roleInstance = new $roleClass($roleName);
+				$this->_acl->addRole($roleInstance, $roleParents);
+			}
 
 			// resource - default
 			$resourceName = null;
