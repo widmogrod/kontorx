@@ -469,6 +469,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
             $this->_editOnException($e, $form);
         } catch (Zend_Db_Statement_Exception $e) {
             $this->_editOnException($e, $form);
+        } catch(Exception $e) {
+        	$this->_editOnException($e, $form);
         }
     }
 
