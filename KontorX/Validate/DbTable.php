@@ -195,6 +195,7 @@ class KontorX_Validate_DbTable extends Zend_Validate_Abstract {
 
         $table = $this->getTable();
         $where = $table->select()->where($where, $value);
+
         $row = $table->fetchRow($where);
 
         if (null !== $row) {
