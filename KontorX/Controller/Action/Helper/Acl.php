@@ -197,13 +197,18 @@ class KontorX_Controller_Action_Helper_Acl extends Zend_Controller_Action_Helper
 	 */
 	public function getAcl() {
 		if (null === $this->_acl) {
-			$front = $this->getFrontController();
-			if (null !== ($bootstrap = $front->getParam('bootstrap'))) {
-				if ($bootstrap->hasResource('Acl')) {
-					return $this->_acl = $bootstrap->getResource('Acl');
+			/* @var $bootstrap Zend_Application_Bootstrap_Bootstrap */
+			$bootstrap = $this->getFrontController()->getParam('bootstrap');
+			if ($bootstrap->hasResource('Acl')) {
+				$this->_acl = $bootstrap->getResource('Acl');
+			} else {
+				if (Zend_Registry::isRegistered('Zend_Acl')) {
+					$this->_acl = Zend_Registry::get('Zend_Acl');			
+				} else {
+					require_once 'Zend/Controller/Action/Exception.php';
+					throw new Zend_Controller_Action_Exception('Acl resource is not set');
 				}
 			}
-			$this->_acl = Zend_Registry::get('Zend_Acl');
 		}
 		return $this->_acl;
 	}
