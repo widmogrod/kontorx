@@ -84,7 +84,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 */
 	protected function _addMessages($messages) {
 		/* @var $falshMessages Zend_Controller_Action_Helper_FlashMessenger */
-		$falshMessages = $this->_helper->getHelper('flashMessenger');
+		$flashMessenger = $this->_helper->getHelper('flashMessenger');
 
 		foreach ((array) $messages as $key => $message) {
 			if (is_array($message)) {
