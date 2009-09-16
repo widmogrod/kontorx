@@ -2,6 +2,8 @@
 class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 
 	const NEWS = 'news';
+	const IMAGE = 'image';
+	const MEDIA = 'media';
 
 	/**
 	 * @var string
@@ -109,8 +111,11 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 	protected function _getData() {
 		switch ($this->_type) {
 			case self::NEWS:
+			case self::IMAGE:
+			case self::MEDIA:
 				$model = new Site_Model_Site();
-				return $model->findAttachmentsCache($this->_alias, $this->_type, $this->_rowCount, $this->_page);
+				$rowset = $model->findAttachments($this->_alias, $this->_type, $this->_rowCount, $this->_page);
+				return array($this->_type => array('rowset' => $rowset));
 		}
 
 		// @todo Exception!
