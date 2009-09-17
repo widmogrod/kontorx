@@ -32,10 +32,10 @@ class Promotor_View_Helper_GalleryPreview extends Zend_View_Helper_Abstract {
 			$model = new Gallery_Model_Gallery();
 
 			$data = (null === $primaryKey)
-				? $model->fetchAllImagesGroupAlbumCache()
-				: $model->fetchAllImagesGroupAlbumByIdCache($primaryKey);
+				? $model->fetchAllInlineCache()
+				: $model->fetchAllInlineCache($primaryKey);
 				
-			$this->_data[$primaryKey] = $data;
+			$this->_data[$primaryKey] = array('rowset' => $data);
 		}
 		return $this->_data[$primaryKey];
 	}
