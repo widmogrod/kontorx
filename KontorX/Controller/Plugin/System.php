@@ -360,7 +360,7 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         }
 
         // meta
-        if (isset($templateConfig->meta)) {
+        if (isset($options->meta)) {
             // sprawdzanie czy są już ustawione meta dane
             // TODO czy podwojne metadane przeszkadzają??
             // bo wlasnie po to jest sprawdzanies
@@ -378,10 +378,10 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             }
 
             if (!isset($meta['keywords'])) {
-                $headMeta->appendName('keywords', $templateConfig->meta->name->keywords);
+                $headMeta->appendName('keywords', $options->meta->name->keywords);
             }
             if (!isset($meta['description'])) {
-                $headMeta->appendName('description', $templateConfig->meta->name->description);
+                $headMeta->appendName('description', $options->meta->name->description);
             }
             
         	if (isset($options->meta->httpEquiv)
@@ -390,6 +390,17 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 	            	$headMeta->setHttpEquiv($obj->key,
 	            							$obj->content,
 	            							isset($obj->modifiers) ? $obj->modifiers->toArray() : array());
+	            }
+	            
+	            unset($options->meta->httpEquiv);
+            }
+
+            if (isset($options->meta->name)
+            		&& $options->meta->name instanceof Zend_Config) {
+	            foreach ($options->meta->name as $name => $value) {
+	            	if (!$value instanceof Zend_Config) {
+	            		$headMeta->setName($name, $value);
+	            	}
 	            }
             }
         }
