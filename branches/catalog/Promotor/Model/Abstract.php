@@ -246,8 +246,12 @@ class Promotor_Model_Abstract {
 
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
-            $result = call_user_func_array(array($this, $method), $params);
-            $resultCache->save($result, $cacheId, $tags);
+        	try {
+        		$result = call_user_func_array(array($this, $method), $params);
+        		$resultCache->save($result, $cacheId, $tags);
+        	} catch (Exception $e) {
+        		throw $e;
+        	}
         }
 
         return $result;
