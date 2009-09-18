@@ -160,7 +160,9 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             }
             if ($options->meta->name instanceof Zend_Config) {
 	            foreach ($options->meta->name as $name => $value) {
-	            	$headMeta->setName($name, $value);
+		            if (!$value instanceof Zend_Config) {
+	            		$headMeta->setName($name, $value);
+	            	}
 	            }
             }
         }
