@@ -5,7 +5,7 @@ class KontorX_Controller_Plugin_Locale extends Zend_Controller_Plugin_Abstract {
 		$locale = $request->getCookie('locale');
 		$locale = $request->getParam('locale', $locale);
 
-		if (strlen($locale)) {
+		if (!strlen($locale)) {
 			$locale = $this->_getLocale()->getLanguage();
 		} else {
 			try {
