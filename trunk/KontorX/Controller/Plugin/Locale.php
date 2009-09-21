@@ -4,7 +4,8 @@ class KontorX_Controller_Plugin_Locale extends Zend_Controller_Plugin_Abstract {
 	public function routeShutdown(Zend_Controller_Request_Abstract $request) {
 		$locale = $request->getCookie('locale');
 		$locale = $request->getParam('locale', $locale);
-		if (!strlen($locale)) {
+
+		if ('' == $locale) {
 			$locale = $this->_getLocale()->getLanguage();
 		} else {
 			Zend_Locale::setDefault($locale);
@@ -12,9 +13,11 @@ class KontorX_Controller_Plugin_Locale extends Zend_Controller_Plugin_Abstract {
 		}
 
 		// sprzężone z translacja routera ;]
-		Zend_Controller_Front::getInstance()->getRouter()->setGlobalParam('locale', $locale);
+		Zend_Controller_Front::getInstance()
+			->getRouter()
+			->setGlobalParam('locale', $locale);
 	}
-	
+
 	/**
 	 * Instancja Zend_Locale
 	 * @var Zend_Locale
