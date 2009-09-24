@@ -390,7 +390,11 @@ abstract class KontorX_Image_Abstract {
      * @param bool $capture
      * @return mixed
      */
-    public function display($type = IMAGETYPE_JPEG, $quality = self::IMAGE_QUALITY, $capture = false) {
+    public function display($type = null, $quality = self::IMAGE_QUALITY, $capture = false) {
+    	if (null === $type) {
+    		$type = $this->_type;
+    	}
+
         // wyslij naglowki
         if ($capture !== true) {
             header('Content-type:' . image_type_to_mime_type($type));
