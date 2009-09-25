@@ -32,7 +32,17 @@ class Promotor_View_Helper_Site_Childrens extends Promotor_View_Helper_Site_Abst
 		/* @var $model Site_Model_Site */
 		$model = $this->_site->getModel();
 		/* @var $rowset KontorX_Db_Table_Tree_Rowset_Abstract */
-		$rowset = $model->findChildrens($this->getIdentification(), $this->_depthLevel);
+		$rowset = $model->findChildrensCache($this->getIdentification(), $this->_depthLevel);
+
+		if (!$rowset instanceof KontorX_Db_Table_Tree_Rowset_Abstract) {
+			return '';
+		}
+		
+		// nie ma dzieci szukaj rodziców
+		if (!count($rowset)) {
+			/* @var $rowset KontorX_Db_Table_Tree_Rowset_Abstract */
+			$rowset = $model->findParentsCache($this->getIdentification(), $this->_depthLevel);
+		}
 
 		if (!$rowset instanceof KontorX_Db_Table_Tree_Rowset_Abstract) {
 			return '';
