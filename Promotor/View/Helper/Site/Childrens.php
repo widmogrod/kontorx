@@ -8,9 +8,11 @@ class Promotor_View_Helper_Site_Childrens extends Promotor_View_Helper_Site_Abst
 	
 	/**
 	 * @param integer $level
+	 * @return Promotor_View_Helper_Site_Childrens
 	 */
 	public function setDepthLevel($level) {
 		$this->_depthLevel = $level;
+		return $this;
 	}
 
 	/**
