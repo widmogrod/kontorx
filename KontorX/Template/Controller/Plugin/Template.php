@@ -68,9 +68,10 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         	$layout->setLayout($templateConfig->layout);
         }
 
-        $this->_initViewHelpers($templateConfig);
+        // inicjuje dodatkowe opcje
+        $this->_init($templateConfig);
 	}
-	
+
 	/**
 	 * @param Zend_Layout $layout
 	 * @return KontorX_Template_Controller_Plugin_Template;
@@ -89,6 +90,14 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             }
 		}
 		return $this;
+	}
+	
+	/**
+	 * @param Zend_Config $templateConfig
+	 * @return void
+	 */
+	protected function _init(Zend_Config $templateConfig) {
+		$this->_initViewHelpers($templateConfig);
 	}
 	
 	/**
@@ -169,27 +178,73 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 
         // script
         if (isset($options->script)) {
+        	$i = 0;
         	/* @var $headScript Zend_View_Helper_HeadScript */
             $headScript = $view->getHelper('HeadScript');
-            $i = 0;
-            foreach ($options->script->js as $file) {
-                $headScript->offsetSetFile(++$i,
-            								$file->src,
-            								isset($file->type) ? $file->type : null,
-            								isset($file->attribs) ? $file->attribs->toArray() : array());
+
+            // wsteczna kompatybilność
+            if (isset($options->script->js)) {
+            	$options->script->file = $options->script->js;
+            }
+
+            if (isset($options->script->file)
+            		&& $options->script->file instanceof Iterator)
+            {
+	            foreach ($options->script->file as $key => $file) {
+	                $headScript->offsetSetFile(is_numeric($key) ? ++$i : $key,
+	            							   isset($file->src) ? $file->src : $file,
+	            							   isset($file->type) ? $file->type : null,
+	            							   (isset($file->attribs) && $file->attribs instanceof Zend_Config)
+												 	? $file->attribs->toArray() : array());
+	            }
+            }
+            
+        	if (isset($options->script->script)
+            		&& $options->script->script instanceof Iterator)
+            {
+	            foreach ($options->script->script as $key => $script) {
+	                $headScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
+	            								 isset($script->src) ? $script->src : $script,
+												 isset($script->type) ? $script->type : null,
+												 (isset($script->attribs) && $script->attribs instanceof Zend_Config)
+												 	? $script->attribs->toArray() : array());
+	            }
             }
         }
         
 		// inlineScript
         if (isset($options->inlineScript)) {
+        	$i = 0;
         	/* @var $inlineScript Zend_View_Helper_InlineScript */
             $inlineScript = $view->getHelper('InlineScript');
-            $i = 0;
-            foreach ($options->inlineScript->js as $file) {
-            	$inlineScript->offsetSetFile(++$i,
-            								$file->src,
-            								isset($file->type) ? $file->type : null,
-            								isset($file->attribs) ? $file->attribs->toArray() : array());
+
+        	// wsteczna kompatybilność
+            if (isset($options->inlineScript->js)) {
+            	$options->inlineScript->file = $options->inlineScript->js;
+            }
+
+            if (isset($options->inlineScript->file)
+            		&& $options->inlineScript->file instanceof Iterator)
+            {
+	            foreach ($options->inlineScript->file as $key => $file) {
+	                $inlineScript->offsetSetFile(is_numeric($key) ? ++$i : $key,
+	            							   isset($file->src) ? $file->src : $file,
+	            							   isset($file->type) ? $file->type : null,
+	            							   (isset($file->attribs) && $file->attribs instanceof Zend_Config)
+												 	? $file->attribs->toArray() : array());
+	            }
+            }
+            
+        	if (isset($options->inlineScript->script)
+            		&& $options->inlineScript->script instanceof Iterator)
+            {
+	            foreach ($options->inlineScript->script as $key => $script) {
+	                $inlineScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
+	            								 isset($script->src) ? $script->src : $script,
+												 isset($script->type) ? $script->type : null,
+												 (isset($script->attribs) && $script->attribs instanceof Zend_Config)
+												 	? $script->attribs->toArray() : array());
+	            }
             }
         }
 
@@ -207,7 +262,5 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
                 $headLink->headLink($file);
             }
         }
-        
-        
 	}
 }
