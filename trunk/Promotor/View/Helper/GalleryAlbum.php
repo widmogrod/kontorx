@@ -9,11 +9,37 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 	protected $_primaryKey;
 	
 	/**
-	 * @param integer $primaryKey
-	 * @return unknown_type
+	 * @param integer|string $primaryKey
+	 * @return Promotor_View_Helper_GalleryAlbum
+	 */
+	public function setPrimaryKey($primaryKey) {
+		$this->_primaryKey = $primaryKey;
+		return $this;
+	}
+	
+	/**
+	 * @var integer
+	 */
+	protected $_albumType;
+	
+	/**
+	 * @param string $type
+	 * @return Promotor_View_Helper_GalleryAlbum
+	 */
+	public function setAlbumType($type) {
+		$this->_albumType = $type;
+		return $this;
+	}
+
+	/**
+	 * @param integer|string $primaryKey
+	 * @return Promotor_View_Helper_GalleryAlbum
 	 */
 	public function galleryAlbum($primaryKey) {
-		$this->_primaryKey = $primaryKey;
+		$this->_primaryKey = (null === $primaryKey)
+			? null
+			: strtolower((string) $primaryKey);
+
 		return $this;
 	}
 	
@@ -30,11 +56,9 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 		if (!array_key_exists($primaryKey, $this->_data)) {
 			$model = new Gallery_Model_Album();
 			if (is_int($primaryKey)) {
-				@list($row, $rowset) = $model->fetchAllByIdCache($primaryKey);
-				$this->_data[$primaryKey] = $rowset;
+				$this->_data[$primaryKey] = $model->fetchAllByIdCache($primaryKey);
 			} elseif (is_string($primaryKey)) {
-				@list($row, $rowset) = $model->fetchAllByAliasCache($primaryKey);
-				$this->_data[$primaryKey] = $rowset;
+				$this->_data[$primaryKey] = $model->fetchAllByAliasCache($primaryKey);
 			} else {
 				trigger_error(sprintf('Primary key "%s" is not valid', $primaryKey), E_USER_WARNING);
 				return array();
@@ -44,16 +68,39 @@ class Promotor_View_Helper_GalleryAlbum extends Zend_View_Helper_Abstract {
 	}
 
 	/**
-	 * @param string $partial
+	 * @param string $name
 	 * @return Promotor_View_Helper_GalleryAlbum
 	 */
-	public function render($partial = null) {
-		if (null === $partial) {
-			$partial = self::PARTIAL;
-		}
+	public function render($name = null) {
+		/* @var $partial Zend_View_Helper_Partial */
+		$partial = $this->view->getHelper('partial');
 
-		$data = $this->_getData($this->_primaryKey);
-		return $this->view->partial($partial, array('data' => $data));
+		list($row, $rowset) = $this->_getData($this->_primaryKey);
+		
+		$model = array(
+			'data' => $rowset,
+			'row' => $row,
+			'rowset' => $rowset,
+			'displayContent' => false,
+		);
+		
+		switch ($this->_albumType) {
+			case 'jshorizont':
+			case 'autoviewer':
+			case 'simpleviewer':
+			case 'tiltviewer':
+			case 'postcardviewer':
+				$model['type'] = $this->_albumType;
+				$name = 'album/display-' . $this->_albumType . '.phtml';
+				return $partial->partial($name, 'gallery', $model);
+
+			default:
+				$name = (null === $name)
+					? $name = self::PARTIAL
+					: $name;
+
+				return $partial->partial($name, null, $model);
+		}
 	}
 
 	/**
