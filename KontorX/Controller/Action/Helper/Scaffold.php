@@ -234,7 +234,6 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 
 		$form = $this->getForm();
 		if (!$rq->isPost()) {
-			$form->setDefaults($row->toArray());
 			$this->_setStatus(self::NO_POST_DATA);
 			return;
 		}
