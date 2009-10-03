@@ -68,7 +68,11 @@ abstract class Promotor_View_Helper_Site_Abstract {
 	 * @return Promotor_View_Helper_Site_Abstract
 	 */
 	public function setId($id) {
-		$this->_id = (int) $id;
+		if (is_numeric($id)) {
+			$this->_id = (int) $id;
+		} else {
+			$this->_id = null;
+		}
 		return $this;
 	}
 
