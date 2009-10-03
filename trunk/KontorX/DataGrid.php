@@ -191,7 +191,7 @@ class KontorX_DataGrid {
     			} else
     			if (isset($options['pagination'][0])
     					&& isset($options['pagination'][1])) {
-    				@list($pageNumber, $itemCountPerPage) = $options['pagination'];
+    				list($pageNumber, $itemCountPerPage) = $options['pagination'];
     				$this->setPagination($pageNumber, $itemCountPerPage);
     			}
     		}
@@ -718,77 +718,58 @@ class KontorX_DataGrid {
         return $paginator;
     }
     
-	/**
-     * Default name of partial file @see Zend_View_Helper_Partial
-     * @todo dodać partial w zasobach biblioteki!
-     * @var string
+    /**
+     * @var KontorX_DataGrid_Renderer_Interface
      */
-    private $_defaultPartial = 'dataGrid.phtml';
+    protected $_renderer = 'KontorX_DataGrid_Renderer_HtmlTable';
 
     /**
-     * Set name of partial file @see Zend_View_Helper_Partial
-     * @var string
+     * @param KontorX_DataGrid_Renderer_Interface|string $renderer
+     * @return KontorX_DataGrid
      */
-    public function setDefaultPartial($partial) {
-        $this->_defaultPartial = (string) $partial;
+    public function setRenderer($renderer) {
+    	$this->_renderer = $renderer;
+    	return $this;
     }
 
     /**
-     * Return name of partial file @see Zend_View_Helper_Partial
+     * @return KontorX_DataGrid_Renderer_Interface
      */
-    public function getDefaultPartial() {
-        return $this->_defaultPartial;
+    public function getRenderer() {
+    	if (!$this->_renderer instanceof KontorX_DataGrid_Renderer_Interface) {
+    		if (is_string($this->_renderer)) {
+	    		if (!class_exists($this->_renderer)) {
+	    			require_once 'Zend/Loader.php';
+	    			Zend_Loader::loadClass($this->_renderer);
+	    		}
+	
+	    		/* @var $renderer KontorX_DataGrid_Renderer_Interface */
+	    		$this->_renderer = new $this->_renderer();
+	    	} else {
+	    		require_once 'KontorX/DataGrid/Exception.php';
+	    		throw new KontorX_DataGrid_Exception(
+	    				sprintf('Renderer "%s" is not instance of "KontorX_DataGrid_Renderer_Interface"',
+	    						is_object($this->_renderer)
+	    							? get_class($this->_renderer)
+	    							: (string) $this->_renderer));
+	    	}
+    	}
+
+    	$this->_renderer->setDataGrid($this);
+
+    	return $this->_renderer;
     }
-
-    /**
-     * @var Zend_View_Interface
-     */
-    private $_view = null;
-
-    /**
-     * Ustawienie widoku
-     * @param Zend_View_Interface $view
-     */
-    public function setView(Zend_View_Interface $view) {
-        $this->_view = $view;
-    }
-
-    /**
-	 * @return Zend_View
-	 */
-	public function getView() {
-		if (null === $this->_view) {
-			if (Zend_Registry::isRegistered('Zend_View')) {
-				$this->_view = Zend_Registry::get('Zend_View');
-			} elseif(Zend_Registry::isRegistered('view')) {
-				$this->_view = Zend_Registry::get('view');
-			} else {
-				require_once 'Zend/View.php';
-				$this->_view = new Zend_View();				
-			}
-		}
-		return $this->_view;
-	}
     
-	/**
-     * Renderowanie
-     * @param Zend_View_Interface $view
-     * @param string $partial
+    /**
+     * @param KontorX_DataGrid_Renderer_Interface $renderer
      * @return string
      */
-    public function render(Zend_View_Interface $view = null, $partial = null) {
-        if (null != $view) {
-            $this->setView($view);
-        }
+    public function render(KontorX_DataGrid_Renderer_Interface $renderer = null) {
+    	if (null !== $renderer) {
+    		$this->setRenderer($renderer);
+    	}
 
-        $view = $this->getView();
-
-        if(!$view->getHelperPath('KontorX_View_Helper_')) {
-        	$view->addHelperPath('KontorX/View/Helper', 'KontorX_View_Helper_');
-        }
-
-        // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this, $partial);
+    	return $this->getRenderer();
     }
 
     /**
@@ -796,6 +777,6 @@ class KontorX_DataGrid {
      * @return string
      */
     public function __toString() {
-        return $this->render();
+        return $this->getRenderer()->render();
     }
 }
