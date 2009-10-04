@@ -22,6 +22,8 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 	public function toJavaScript($renderToId = null) {
 		$options = array(
 			'columns' => $this->_columns,
+			'loadMask' => $this->_loadMask,
+		
 			// wysokość teoretycznie nie musi zostać podana.. ale wtedy wyświetla się jeden wiersz
 			'height' => $this->_height,
 			'renderTo' => (null === $renderToId) 
@@ -32,6 +34,9 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 		if (null !== $this->_width)
 			$options['width'] = $this->_width;
 		
+		if (null !== $this->_title)
+			$options['title'] = $this->_title;
+		
 		$options = $this->_toJavaScript($options);
 
 		return sprintf('new Ext.grid.GridPanel(%s);', $options);
@@ -41,7 +46,7 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 	 * @var KontorX_Ext_Data_Store_Interface|string
 	 */
 	protected $_store;
-	
+
 	/**
 	 * @param KontorX_Ext_Data_Store_Interface|KontorX_JavaScript_Interface|string $store
 	 * @return KontorX_Ext_Grid_GridPanel
@@ -86,6 +91,23 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 		return $this;
 	}
 	
+	/**
+	 * @var bool
+	 */
+	protected $_loadMask = true;
+	
+	/**
+	 * @param integer $loadMask
+	 * @return KontorX_Ext_Grid_GridPanel
+	 */
+	public function setLoadMask($loadMask) {
+		$this->_loadMask = (bool) $loadMask;
+		return $this;
+	}
+	
+	/**
+	 * @var string
+	 */
 	protected $_renderToId = 'kx_ext_grid';
 	
 	/**
@@ -94,6 +116,20 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 	 */
 	public function setRenderId($renderToId) {
 		$this->_renderToId = (string) $renderToId;
+		return $this;
+	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_title;
+	
+	/**
+	 * @param string $title
+	 * @return KontorX_Ext_Grid_GridPanel
+	 */
+	public function setTitle($title) {
+		$this->_title = (string) $title;
 		return $this;
 	}
 
