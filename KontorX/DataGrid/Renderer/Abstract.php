@@ -35,7 +35,7 @@ abstract class KontorX_DataGrid_Renderer_Abstract implements KontorX_DataGrid_Re
 		try {
 			return $this->render();
 		} catch (Exception $e) {
-			$message = get_class($e) . ' :: ' . $e->getMessage();
+			$message = get_class($e) . ' :: ' . $e->getMessage() . "\n" . $e->getTraceAsString();
 			trigger_error($message, E_USER_WARNING);
 		}
 		return '';
