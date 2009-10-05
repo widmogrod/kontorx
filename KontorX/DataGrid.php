@@ -6,9 +6,8 @@ require_once 'Zend/Config.php';
  *
  * @category 	KontorX
  * @package 	KontorX_DataGrid
- * @version 	0.5.1
- * @license	GNU GPL
- * @author 	Marcin `widmogror` Habryn, widmogrod@gmail.com
+ * @license		GNU GPL
+ * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_DataGrid {
     const DEFAULT_CELL_TYPE   = 'Text';
@@ -665,7 +664,7 @@ class KontorX_DataGrid {
 
     /**
      * Return pagination controls
-     * @return array
+     * @return array array($pageNumber, $itemCountPerPage)
      */
     public function getPagination() {
         return $this->_pagination;
