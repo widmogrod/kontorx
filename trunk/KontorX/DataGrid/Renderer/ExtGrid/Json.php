@@ -45,7 +45,11 @@ class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_E
 		$varGridPanel = 'kx_dataGrid_ExtGridPanel_'.$renderToId;
 		$js->addVar($varGridPanel, $panel);
 
-		$js->callMethod($varStore.'.load();');
+		if ($grid->enabledPagination()) {
+			$js->callMethod($varStore.'.load({params:{start: 0, limit: '.$grid->getItemCountPerPage().'}});');
+		} else {
+			$js->callMethod($varStore.'.load();');
+		}
 
 		return $js->toJavaScript();
 	}
