@@ -27,6 +27,11 @@ interface KontorX_DataGrid_Cell_Interface {
     public function setData($data);
     
     /**
+     * @return mixed
+     */
+    public function getValue();
+    
+    /**
      * @param KontorX_DataGrid_Column_Interface $column
      * @return void
      */
