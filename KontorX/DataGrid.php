@@ -655,19 +655,53 @@ class KontorX_DataGrid {
 
     /**
      * Set pagination parameters
-     * @param integer $limit
-     * @param integer $rowCount
+     * @param integer $pageNumber
+     * @param integer $itemCountPerPage
+     * @return KontorX_DataGrid
      */
     public function setPagination($pageNumber, $itemCountPerPage) {
         $this->_pagination = array($pageNumber, $itemCountPerPage);
+        return $this;
     }
-
-    /**
+    
+	/**
      * Return pagination controls
      * @return array array($pageNumber, $itemCountPerPage)
      */
     public function getPagination() {
         return $this->_pagination;
+    }
+
+    /**
+     * @param integer $pageNumber
+     * @return KontorX_DataGrid
+     */
+    public function setPageNumber($pageNumber) {
+    	$this->_pagination[0] = (int) $pageNumber;
+    	return $this;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getPageNumber() {
+    	return isset($this->_pagination[0]) ? $this->_pagination[0] : null;
+    }
+
+	/**
+     * @param integer $itemCountPerPage
+     * @return KontorX_DataGrid
+     */
+    public function setItemCountPerPage($itemCountPerPage) {
+    	$this->_pagination[1] = (int) $itemCountPerPage;
+    	return $this;
+    }
+    
+	/**
+     * @return integer
+     */
+    public function getItemCountPerPage() {
+    	return isset($this->_pagination[1]) ? $this->_pagination[1] : null;
     }
 
     /**
