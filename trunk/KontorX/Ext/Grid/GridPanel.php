@@ -28,14 +28,21 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 			'height' => $this->_height,
 			'renderTo' => (null === $renderToId) 
 							? $this->_renderToId : $renderToId,
-			'store' => $this->_store
+			'store' => $this->_store,
+ 			'collapsible' => true,
+			'frame' => true,
+							
+//			'view' => new KontorX_JavaScript_Expresion('new Ext.grid.GroupingView({forceFit:true})')							
 		);
 
 		if (null !== $this->_width)
 			$options['width'] = $this->_width;
-		
+			
 		if (null !== $this->_title)
 			$options['title'] = $this->_title;
+			
+		if (null !== $this->_bbar)
+			$options['bbar'] = $this->_bbar;
 		
 		$options = $this->_toJavaScript($options);
 
@@ -116,6 +123,20 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 	 */
 	public function setRenderId($renderToId) {
 		$this->_renderToId = (string) $renderToId;
+		return $this;
+	}
+	
+	/**
+	 * @var KontorX_JavaScript_Interface
+	 */
+	protected $_bbar;
+
+	/**
+	 * @param KontorX_JavaScript_Interface $bbar
+	 * @return KontorX_Ext_Grid_GridPanel
+	 */
+	public function setBbar(KontorX_JavaScript_Interface $bbar) {
+		$this->_bbar = $bbar;
 		return $this;
 	}
 	
