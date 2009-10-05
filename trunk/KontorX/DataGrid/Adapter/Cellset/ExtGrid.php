@@ -9,6 +9,7 @@ class KontorX_DataGrid_Adapter_Cellset_ExtGrid extends KontorX_DataGrid_Adapter_
 			$type = $cell->getClassName();
 			switch(strtolower($type)) {
 				case 'url':
+				case 'image':
 					$result[$name] = (string) $cell->render();
 					break;
 
