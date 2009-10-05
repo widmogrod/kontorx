@@ -10,12 +10,19 @@ class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_E
 	protected $_readerClass = 'KontorX_Ext_Data_Reader_Json';
 	
 	public function render($renderToId = null) {
+		$varStore 	  = 'kx_dataGrid_ExtStore_'.$renderToId;
+		$varGridPanel = 'kx_dataGrid_ExtGridPanel_'.$renderToId;
+
 		$grid = $this->getDataGrid();
 
+		// setup pagination
+		if ($grid->enabledPagination()) {
+			$this->_setupPegination($varStore);
+		}
+		
 		list($columns, $fields) = $this->_getColumnsAndFields();
 
-		require_once 'KontorX/JavaScript.php';
-		$js = new KontorX_JavaScript();
+		$js = $this->getJavaScript();
 
 			$data = $grid->getAdapter()->fetchData();
 		
