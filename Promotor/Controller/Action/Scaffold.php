@@ -264,7 +264,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 */
 	protected function _setupDataGridPaginator(KontorX_DataGrid $grid) {
 		$page = $this->_getParam('page',1);
-		$count = $this->_getParam('itemCountPerPage', 10);
+		$count = $this->_getParam('itemCountPerPage', 30);
 		$grid->setPagination($page, $count);
 	}
 }
