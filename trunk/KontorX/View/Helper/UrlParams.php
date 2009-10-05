@@ -10,15 +10,20 @@ class KontorX_View_Helper_UrlParams extends Zend_View_Helper_Abstract {
 	 * @var array
 	 */
 	protected static $_params = null;
+	
+	/**
+	 * @return void
+	 */
+	public function __construct() {
+		if (null === self::$_params) {
+			self::$_params = Zend_Controller_Front::getInstance()->getRequest()->getParams();
+		}
+	}
 
 	/**
 	 * @return KontorX_View_Helper_UrlParams
 	 */
 	public function urlParams($param = null, $default = null) {
-		if (null === self::$_params) {
-			self::$_params = Zend_Controller_Front::getInstance()->getRequest()->getParams();
-		}
-
 		if (null !== $param) {
 			return $this->get($param, $default);
 		}
