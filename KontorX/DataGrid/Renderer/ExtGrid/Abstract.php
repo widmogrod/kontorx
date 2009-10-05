@@ -96,6 +96,7 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 	 */
 	public function setStore(KontorX_Ext_Data_Store_Interface $store) {
 		$this->_store = $store;
+		return $this;
 	}
 
 	/**
@@ -110,6 +111,67 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 		return $this->_store;
 	}
 	
+	/**
+	 * @var KontorX_JavaScript
+	 */
+	protected $_javaScript;
+
+	/**
+	 * @param KontorX_JavaScript $javaScript
+	 * @return KontorX_DataGrid_Renderer_ExtGrid_Abstract
+	 */
+	public function setJavaScript(KontorX_JavaScript $javaScript) {
+		$this->_javaScript = $javaScript;
+		return $this;
+	}
+
+	/**
+	 * @return KontorX_JavaScript
+	 */
+	public function getJavaScript() {
+		if (null === $this->_javaScript) {
+			require_once 'KontorX/JavaScript.php';
+			$this->_javaScript = new KontorX_JavaScript();
+		}
+		return $this->_javaScript;
+	}
+	
+	/**
+	 * @var KontorX_Ext_PagingToolbar
+	 */
+	protected $_pagingToolbar;
+
+	/**
+	 * @param KontorX_Ext_PagingToolbar $pagingToolbar
+	 * @return KontorX_DataGrid_Renderer_ExtGrid_Abstract
+	 */
+	public function setPagingToolbar(KontorX_Ext_PagingToolbar $pagingToolbar) {
+		$this->_pagingToolbar = $pagingToolbar;
+		return $this;
+	}
+
+	/**
+	 * @return KontorX_Ext_PagingToolbar
+	 */
+	public function getPagingToolbar() {
+		if (null === $this->_pagingToolbar) {
+			$grid = $this->getDataGrid();
+
+			require_once 'KontorX/Ext/PagingToolbar.php';
+			$this->_pagingToolbar = new KontorX_Ext_PagingToolbar();
+
+				require_once 'KontorX/Ext/Ux/SlidingPager.php';
+				$slidingPager = new KontorX_Ext_Ux_SlidingPager();
+
+			$this->_pagingToolbar->setPlugins($slidingPager);
+
+				list($pageNumber, $itemCountPerPage) = $grid->getPagination();
+
+			$this->_pagingToolbar->setPageSize($itemCountPerPage);
+		}
+		return $this->_pagingToolbar;
+	}
+
 	/**
 	 * @return array array($columns, $fileds)
 	 */
@@ -154,5 +216,17 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 		}
 
 		return array($panelColumns, $readerFields);
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function _setupPegination($store) {
+		$gridPanel = $this->getGridPanel();
+			$pagingToolbar = $this->getPagingToolbar();
+				require_once 'KontorX/JavaScript/Expresion.php';
+				$store = new KontorX_JavaScript_Expresion((string) $store);
+			$pagingToolbar->setStore($store);
+		$gridPanel->setBbar($pagingToolbar);
 	}
 }
