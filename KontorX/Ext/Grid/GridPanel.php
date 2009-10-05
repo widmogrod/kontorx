@@ -29,9 +29,9 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 			'renderTo' => (null === $renderToId) 
 							? $this->_renderToId : $renderToId,
 			'store' => $this->_store,
- 			'collapsible' => true,
-			'frame' => true,
-							
+ 			'collapsible' => $this->_collapsible,
+			'frame' => $this->_frame,
+			
 //			'view' => new KontorX_JavaScript_Expresion('new Ext.grid.GroupingView({forceFit:true})')							
 		);
 
@@ -104,11 +104,39 @@ class KontorX_Ext_Grid_GridPanel extends KontorX_Ext_Abstract {
 	protected $_loadMask = true;
 	
 	/**
-	 * @param integer $loadMask
+	 * @param bool $loadMask
 	 * @return KontorX_Ext_Grid_GridPanel
 	 */
 	public function setLoadMask($loadMask) {
 		$this->_loadMask = (bool) $loadMask;
+		return $this;
+	}
+	
+	/**
+	 * @var bool
+	 */
+	protected $_collapsible = true;
+	
+	/**
+	 * @param bool $collapsible
+	 * @return KontorX_Ext_Grid_GridPanel
+	 */
+	public function setCollapsible($collapsible) {
+		$this->_collapsible = (bool) $collapsible;
+		return $this;
+	}
+	
+	/**
+	 * @var bool
+	 */
+	protected $_frame = true;
+	
+	/**
+	 * @param bool $frame
+	 * @return KontorX_Ext_Grid_GridPanel
+	 */
+	public function setFrame($frame) {
+		$this->_frame = (bool) $frame;
 		return $this;
 	}
 	
