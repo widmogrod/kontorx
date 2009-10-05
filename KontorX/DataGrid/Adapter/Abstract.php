@@ -235,4 +235,13 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
     protected function _cacheEnabled() {
         return (self::$_cache === null || $this->_cacheEnabled === false) ? false : true;
     }
+
+	public function toArray() {
+		$result = array();
+		foreach ($this as $i => $cellset) {
+			/* @var $cellset KontorX_DataGrid_Adapter_Cellset_Interface */
+			$result[$i] = $cellset->toArray();
+		}
+		return $result;
+	}
 }

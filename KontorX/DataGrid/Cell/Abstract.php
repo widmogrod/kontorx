@@ -94,6 +94,10 @@ abstract class KontorX_DataGrid_Cell_Abstract implements KontorX_DataGrid_Cell_I
             ? $this->_data[$name] : null;
     }
 
+    public function getValue() {
+    	return $this->_data[$this->_columnName];
+    }
+    
 	/**
      * @var KontorX_DataGrid_Column_Interface
      */
