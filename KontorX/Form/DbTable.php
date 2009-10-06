@@ -177,11 +177,18 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
 					require_once 'Zend/Loader.php';
                 	Zend_Loader::loadClass($refClassName);                	
                 }
+                /* @var $refClass Zend_Db_Table_Abstract */
                 $refClass = new $refClassName();
 
                 $foreign = array(null => null); // pierwsze pole powinno byc zawsze puste!
 
-                $rowsetClass = $refClass->fetchAll();
+                // grupowanie
+                $select = $refClass->select();
+                if (strlen($refColumnsAsName)) {
+                	$select->order(sprintf('%s ASC', $refColumnsAsName));
+                }
+                
+                $rowsetClass = $refClass->fetchAll($select);
                 foreach ($rowsetClass as $row) {
                     $key = $row-> {$refColumns};
                     $value = (null === $refColumnsAsName)
@@ -190,9 +197,9 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
                         ? strip_tags($row-> {$refColumnsAsName})
                         : $key);
 
-                                        /**
-                                         * @todo Zrobić to lepiej!
-                                         */
+					/**
+					 * @todo Zrobić to lepiej!
+					 */
                     if ($row instanceof KontorX_Db_Table_Tree_Row_Abstract) {
                         $value = str_repeat("-", $row->getDepth()) . " " . $value;
                     }
