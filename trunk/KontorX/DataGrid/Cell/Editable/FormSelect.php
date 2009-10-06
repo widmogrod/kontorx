@@ -47,6 +47,6 @@ class KontorX_DataGrid_Cell_Editable_FormSelect extends KontorX_DataGrid_Cell_Ed
 		}
 
 		$helper = $this->getHelperName();
-		return $this->getView()->$helper($name, $value, $this->getAttribs(), $this->getMultiOptions());
+		return $this->getView()->getHelper($helper)->$helper($name, $value, $this->getAttribs(), $this->getMultiOptions());
 	}
 }
