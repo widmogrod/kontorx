@@ -27,26 +27,6 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 	}
 
 	/**
-	 * Uchwyt przed parsowaniem
-	 *
-	 * @param string $content
-	 * @return string
-	 */
-	protected function _preContent($content) {
-		return $content;
-	}
-
-	/**
-	 * Uchwyt po parsowaniu
-	 *
-	 * @param string $content
-	 * @return string
-	 */
-	protected function _postContent($content) {
-		return $content;
-	}
-
-	/**
 	 * Renderowanie
 	 *
 	 * @param string $content
@@ -57,9 +37,9 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 			? $this->_content
 			: $content;
 
-		$content = $this->_preContent($content);
-		$content = preg_replace("/{{(\w+):([a-z0-9_\-\.=;:^}}]+)}}/ie","\$this->_parse('$1','$2')", $content);
-		$content = $this->_postContent($content);
+		if (strlen($content) > 10) {
+			$content = preg_replace("/{{(\w+):([^}}]+)}}/ie","\$this->_parse('$1','$2')", $content);
+		}
 		return $content;
 	}
 
@@ -86,9 +66,10 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 	 */
 	protected function _parse($type, $value) {
 		$value = urldecode($value);
+
 		/* @var $view Zend_View */
 		$view = $this->view;
-//		$view->addScriptPath(PUBLIC_PATHNAME . PUBLIC_TEMPLATES_DIRNAME . DIRECTORY_SEPARATOR . KX_TEMPLATE_SKIN);
+
 		switch ($type) {
 			default:
 				trigger_error(sprintf('undefinded parser type "%s" with value "%s"', $type, $value), E_USER_NOTICE);
@@ -122,6 +103,16 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 					$params 	= $this->_prepareParam((array) $params);
 					return $view->action($action, $controoler, $module, $params);
 				}
+
+			case 'helper':
+				// separator parametrow ;
+				$params = (array) explode(';',$value);
+
+				$name   = array_shift($params);
+				$params = $this->_prepareParam((array) $params);
+
+				$helper = $view->getHelper($name);
+				return (string) call_user_func_array(array($helper, $name), (array) $params)->render();
 		}
 	}
 
