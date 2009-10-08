@@ -31,6 +31,12 @@ class Promotor_View_Helper_Site_Static extends Promotor_View_Helper_Site_Abstrac
 			return '';
 		}
 
-		return (null === $partial) ? $row['content'] : $this->_site->view->getHelper('partial')->partial($partial, $row);
+		$content = (null === $partial) 
+			? $row['content'] 
+			: $this->_site->view->getHelper('partial')->partial($partial, $row);
+
+		/* @var $renderer Promotor_View_Helper_Renderer */
+		$renderer = $this->_site->view->getHelper('Renderer');
+		return $renderer->render((string) $content);
 	}
 }
