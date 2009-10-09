@@ -8,7 +8,7 @@ class Promotor_Navigation_Recursive_Visitor_ShopCategory implements KontorX_Navi
 		} else {
 			$params	= array('alias' => $current['id']);
 		}
-		
+
 		$current['route'] = 'shop-category';
 		$current['params'] = $params;
 		
