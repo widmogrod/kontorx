@@ -173,7 +173,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				 ->setRowPK($this->_getAllParams());
 
 		/* @var $form Zend_Form */
-		$form = new $this->_formEditClass(array(
+		$form = new $this->_formAddClass(array(
 			'primaryKey' => $scaffold->getRowPK()
 		));
 
@@ -282,15 +282,20 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$model = new $this->_modelClass();
 		$dbTable = $model->getDbTable();
 
-		$form = new $this->_formRemoveClass();
+		/* @var $scaffold KontorX_Controller_Action_Helper_Scaffold */
+		$scaffold = $this->_helper->getHelper('Scaffold');
+		$scaffold->setDbTable($dbTable)
+				 ->setRowPK($this->_getAllParams());
+		
+		/* @var $form Zend_Form */
+		$form = new $this->_formRemoveClass(array(
+			'primaryKey' => $scaffold->getRowPK()
+		));
 
-		$scaffold = $this->_helper->getHelper('scaffold');
-		$scaffold
-			->setDbTable($dbTable)
-			->setForm($form)
-			->setRowPk($this->_getAllParams())
-			->run(KontorX_Controller_Action_Helper_Scaffold::DELETE);
+		$scaffold->setForm($form)
+				 ->run(KontorX_Controller_Action_Helper_Scaffold::DELETE);
 
+		 /* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 			
 		$status = $scaffold->getStatus();
