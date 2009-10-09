@@ -109,9 +109,11 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 	 * @return bool
 	 */
 	public function hasRowPK() {
-		return is_array($this->_rowPK);
+		return is_array($this->_rowPK)
+			? count($this->getRowPK())
+			: false;
 	}
-	
+
 	/**
 	 * @return Zend_Form
 	 * @throws Zend_Controller_Action_Exception
