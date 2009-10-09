@@ -167,20 +167,21 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$model = new $this->_modelClass();
 		$dbTable = $model->getDbTable();
 
-		$form = new $this->_formAddClass();
-		
 		/* @var $scaffold KontorX_Controller_Action_Helper_Scaffold */
-		$scaffold = $this->_helper->getHelper('scaffold');
+		$scaffold = $this->_helper->getHelper('Scaffold');
 		$scaffold->setDbTable($dbTable)
-				 ->setForm($form)
-				 ->setSuppressArrayNotation(true);
+				 ->setRowPK($this->_getAllParams());
 
-		if ($this->_hasParam('id')) {
-			$scaffold->setRowPK($this->_getAllParams());
-		}
+		/* @var $form Zend_Form */
+		$form = new $this->_formEditClass(array(
+			'primaryKey' => $scaffold->getRowPK()
+		));
 
-		$scaffold->run(KontorX_Controller_Action_Helper_Scaffold::CREATE);
+		$scaffold->setForm($form)
+				 ->setSuppressArrayNotation(true)
+				 ->run(KontorX_Controller_Action_Helper_Scaffold::CREATE);
 
+		/* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 		
 		$status = $scaffold->getStatus();
@@ -221,16 +222,21 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	public function editAction() {
 		$model = new $this->_modelClass();
 		$dbTable = $model->getDbTable();
+		
+		/* @var $scaffold KontorX_Controller_Action_Helper_Scaffold */
+		$scaffold = $this->_helper->getHelper('Scaffold');
+		$scaffold->setDbTable($dbTable)
+				 ->setRowPK($this->_getAllParams());
 
-		$form = new $this->_formEditClass(array('primaryKey' => $this->_getParam('id')));
+		/* @var $form Zend_Form */
+		$form = new $this->_formEditClass(array(
+			'primaryKey' => $scaffold->getRowPK()
+		));
 
-		$scaffold = $this->_helper->getHelper('scaffold');
-		$scaffold
-			->setDbTable($dbTable)
-			->setForm($form)
-			->setRowPk($this->_getAllParams())
-			->run(KontorX_Controller_Action_Helper_Scaffold::UPDATE);
+		$scaffold->setForm($form)
+				 ->run(KontorX_Controller_Action_Helper_Scaffold::UPDATE);
 
+		/* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
 			
 		$status = $scaffold->getStatus();
