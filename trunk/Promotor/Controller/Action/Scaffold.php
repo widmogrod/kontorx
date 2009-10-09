@@ -39,7 +39,29 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @var string
 	 */
 	protected $_deletePostObservableName;
+	
+	/**
+	 * @var bool
+	 */
+	protected $_pagination = true;
 
+	/**
+	 * @var string
+	 */
+	protected $_configFilename;
+	
+	
+	/**
+	 * @return string
+	 */
+	protected function _getConfigFilename() {
+		// ustawienie dynamicznie nazwy pliku konfiguracujnego
+		if (null === $this->_configFilename) {
+			$this->_configFilename = $this->getRequest()->getControllerName() . '.xml';
+		}
+		return $this->_configFilename;
+	}
+	
 	/**
 	 * @param string $suffix
 	 * @return void
@@ -93,6 +115,49 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				$flashMessenger->addMessage($message);
 			}
 		}
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function listAction() {
+		/* @var $model Promotor_Model_Scaffold */
+		$model = new $this->_modelClass();
+
+		$rq = $this->getRequest();
+		if ($rq->isPost()) {
+			switch ($rq->getPost('action_type')) {
+				case 'update':
+					if (null !== $rq->getPost('editable')) {
+						if ($this->_helper->acl->isAllowed('update')) {
+							$data = $rq->getPost('editable');
+							$model->editableUpdate($data);
+							$this->_helper->flashMessenger($model->getStatus());
+						}
+					}
+					break;
+				case 'delete':
+					if (null !== $rq->getPost('action_checked')) {
+						if ($this->_helper->acl->isAllowed('delete')) {
+							$data = $rq->getPost('action_checked');
+							$model->editableDelete($data);
+							$this->_helper->flashMessenger($model->getStatus());
+						}
+					}
+					break;
+			}
+			$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+			return;
+		}
+
+		// setup data grid
+		$config = $this->_helper->config($this->_getConfigFilename());
+		$grid = KontorX_DataGrid::factory($model->selectList(), $config->grid);
+		$grid->setValues($this->_getAllParams());
+
+		$this->_setupDataGridPaginator($grid);
+
+		$this->view->grid = $grid;
 	}
 
 	/**
@@ -263,8 +328,10 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @return void
 	 */
 	protected function _setupDataGridPaginator(KontorX_DataGrid $grid) {
-		$page = $this->_getParam('page',1);
-		$count = $this->_getParam('itemCountPerPage', 30);
-		$grid->setPagination($page, $count);
+		if ($this->_pagination) {
+			$page = $this->_getParam('page',1);
+			$count = $this->_getParam('itemCountPerPage', 30);
+			$grid->setPagination($page, $count);
+		}
 	}
 }
