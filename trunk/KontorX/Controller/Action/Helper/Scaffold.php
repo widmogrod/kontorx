@@ -203,9 +203,12 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 	 */
 	public function getFilterInput() {
 		if (null === $this->_filterInput) {
+			require_once 'KontorX/Filter/MagicQuotes.php';
 			$this->_filterInput = new Zend_Filter_Input(array(
 				Zend_Filter_Input::RULE_WILDCARD => new KontorX_Filter_MagicQuotes()
 			), array());
+
+			require_once 'KontorX/Filter/None.php';
 			$this->_filterInput->setDefaultEscapeFilter(new KontorX_Filter_None());
 		}
 		return $this->_filterInput;
