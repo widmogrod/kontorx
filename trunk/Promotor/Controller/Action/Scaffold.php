@@ -110,7 +110,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		foreach ((array) $messages as $key => $message) {
 			if (is_array($message)) {
-				$flashMessenger->addMessage(sprintf("%s::%s", $key, implode("<br/>", $message)));
+				$flashMessenger->addMessage(sprintf("%s::%s", $key, print_r($messages, true)));
 			} else {
 				$flashMessenger->addMessage($message);
 			}
@@ -194,15 +194,17 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				$manager = Promotor_Observable_Manager::getInstance();
 				$list = $manager->notify(
 					$this->_addPostObservableName,
-					$scaffold->getResult());
+					$result,
+					$form);
 	
 				$flashMessenger->addMessage($status);
 				foreach ($list->getMessages() as $observerName => $messages) {
-					// TODO ...
-					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
+					$flashMessenger->addMessage(sprintf("%s::%s", $observerName, print_r($messages, true)));
 				}
 			} else {
-				$this->_noticeObserver('post', $scaffold->getRowPK());
+				$this->_noticeObserver('post', 
+					$result,
+					$form);
 			}
 
 			$this->_helper->redirector->goTo('add');
@@ -249,15 +251,17 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				$manager = Promotor_Observable_Manager::getInstance();
 				$list = $manager->notify(
 					$this->_editPostObservableName,
-					$scaffold->getRowPK());
+					$scaffold->getRowPK(),
+					$scaffold->getForm());
 	
 				$flashMessenger->addMessage($status);
 				foreach ($list->getMessages() as $observerName => $messages) {
-					// TODO ...
-					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
+					$flashMessenger->addMessage(sprintf("%s::%s", $observerName, print_r($messages, true)));
 				}
 			} else {
-				$this->_noticeObserver('post', $scaffold->getRowPK());
+				$this->_noticeObserver('post',
+					$scaffold->getRowPK(),
+					$scaffold->getForm());
 			}
 			$this->view->form = $form;
 			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
@@ -308,15 +312,17 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				$manager = Promotor_Observable_Manager::getInstance();
 				$list = $manager->notify(
 					$this->_deletePostObservableName,
-					$scaffold->getResult());
+					$scaffold->getRowPK(),
+					$scaffold->getForm());
 	
 				$flashMessenger->addMessage($status);
 				foreach ($list->getMessages() as $observerName => $messages) {
-					// TODO ...
-					$flashMessenger->addMessage(sprintf("%s=%s", implode("<br/>", $messages), $observerName));
+					$flashMessenger->addMessage(sprintf("%s::%s", $observerName, print_r($messages, true)));
 				}
 			} else {
-				$this->_noticeObserver('post', $scaffold->getRowPK());
+				$this->_noticeObserver('post', 
+					$scaffold->getRowPK(),
+					$scaffold->getForm());
 			}
 			
 			$this->_helper->redirector->goTo('list');
