@@ -44,39 +44,44 @@ class KontorX_Form_Decorator_JsTree extends Zend_Form_Decorator_Abstract {
 		}
 		$this.children("a").removeClass("clicked");
 		if($this.children("a").hasClass("checked")) {
-			$this.find("li").andSelf().children("a").removeClass("checked").removeClass("undetermined").addClass("unchecked");
+			$this.find("a:first").removeClass("checked").removeClass("undetermined").addClass("unchecked");
+			removeStoreId($this.attr("id"));
+
 			var state = 0;
 			
-			$this.find("li").andSelf().each(function(){
-				var $id = $(this).attr("id");
-				removeStoreId($id);
-			});
+//			$this.find("li").andSelf().each(function(){
+//				var $id = $(this).attr("id");
+//				removeStoreId($id);
+//			});
 		}
 		else {
-			$this.find("li").andSelf().children("a").removeClass("unchecked").removeClass("undetermined").addClass("checked");
+			$this.find("a:first").removeClass("unchecked").removeClass("undetermined").addClass("checked");
+			addStoreId($this.attr("id"));
+
 			var state = 1;
 
 			// add
-			$this.find("li").andSelf().each(function(){
-				var $id = $(this).attr("id");
-				addStoreId($id);
-			});
+//			$this.find("li").andSelf().each(function(){
+//				var $id = $(this).attr("id");
+//				addStoreId($id);
+//			});
 		}
+		// zaznacza/odznacza rodziców 
 		$this.parents("li").each(function (i,k) {
 			if(state == 1) {
 				if($(this).find("a.unchecked, a.undetermined").size() - 1 > 0) {
-					$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
-					return false;
+					//$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
+					//return false;
 				} else {
-					$(this).children("a").removeClass("unchecked").removeClass("undetermined").addClass("checked");
+					//$(this).children("a").removeClass("unchecked").removeClass("undetermined").addClass("checked");
 				}
 			}
 			else {
 				if($(this).find("a.checked, a.undetermined").size() - 1 > 0) {
-					$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
-					return false;
+					//$(this).parents("li").andSelf().children("a").removeClass("unchecked").removeClass("checked").addClass("undetermined");
+					//return false;
 				} else {
-					$(this).children("a").removeClass("checked").removeClass("undetermined").addClass("unchecked");
+					//$(this).children("a").removeClass("checked").removeClass("undetermined").addClass("unchecked");
 				}
 			}
 		});

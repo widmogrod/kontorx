@@ -7,12 +7,16 @@ class Promotor_View_Helper_ShopCategoryNavigation extends Zend_View_Helper_Navig
 	 */
 	public function ShopCategoryNavigation($proxy = null) {
 		if (null !== $proxy) {
-			$this->setDefaultProxy($proxy);
+			$nav = $this->findHelper($proxy);
+		} else {
+			$nav = $this;
 		}
+		
 
 		$model = new Shop_Model_Category();
 		$container = $model->getNavigation();
-		$this->setContainer($container);
-		return $this;
+
+		$nav->setContainer($container);
+		return $nav;
 	}
 }

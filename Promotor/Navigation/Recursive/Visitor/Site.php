@@ -2,6 +2,8 @@
 class Promotor_Navigation_Recursive_Visitor_Site implements KontorX_Navigation_Recursive_Visitor_Interface {
 	public function prepare(array $current) {
 		$current['label'] = @$current['name'];
+		$current['resetParams'] = true;
+
 		if (strlen(@$current['alias']) > 0) {
 			$params = array('alias' => $current['alias']);
 			if (strlen(@$current['locale']) > 0) {
