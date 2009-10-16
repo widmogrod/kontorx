@@ -85,11 +85,11 @@ class Promotor_View_Helper_GalleryImage extends Zend_View_Helper_Abstract {
 		if (null === $module) {
 			$module = $this->_module;
 		}
-		
+
 		if (null !== $partial) {
 			/* @var $partial Zend_View_Helper_Partial */
-			$partial = $this->view->getHelper('partial');
-			return $partial->partial($partial, $module, array('rowset' => $rowset));
+			$helper = $this->view->getHelper('partial');
+			return $helper->partial($partial, $module, array('rowset' => $rowset));
 		}
 
 		if (count($rowset) == 1) {

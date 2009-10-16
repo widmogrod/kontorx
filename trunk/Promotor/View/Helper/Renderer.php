@@ -112,7 +112,7 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 				$params = $this->_prepareParam((array) $params);
 
 				$helper = $view->getHelper($name);
-				return (string) call_user_func_array(array($helper, $name), (array) $params)->render();
+				return (string) call_user_func_array(array($helper, $name), (array) $params);
 		}
 	}
 
