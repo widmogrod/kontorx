@@ -20,13 +20,13 @@ class KontorX_View_Helper_FlashMessages extends Zend_View_Helper_Abstract {
 	 * @return array
 	 */
 	public function flashMessages() {
-		return $this->direct();
+		return $this->get();
 	}
 
 	/**
 	 * @return array
 	 */
-	public function direct() {
+	public function get() {
 		$fm = $this->getFlashMessenger();
 
 		$result = array();
