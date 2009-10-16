@@ -17,9 +17,10 @@ class Promotor_View_Helper_Site_Static extends Promotor_View_Helper_Site_Abstrac
 	
 	/**
 	 * @param string $partial
+	 * @param string $default
 	 * @return string  
 	 */
-	public function render($partial = null) {
+	public function render($partial = null, $default = null) {
 		// 
 		if (null === $partial) {
 			$partial = $this->_partial;
@@ -28,15 +29,17 @@ class Promotor_View_Helper_Site_Static extends Promotor_View_Helper_Site_Abstrac
 		/* @var $model Site_Model_Site */
 		$model = $this->_site->getModel();
 		if (!$row = $model->findOneCache($this->getIdentification())) {
-			return '';
+			return (string) $default;
 		}
 
 		$content = (null === $partial) 
-			? $row['content'] 
+			? $row['content']
 			: $this->_site->view->getHelper('partial')->partial($partial, $row);
 
 		/* @var $renderer Promotor_View_Helper_Renderer */
 		$renderer = $this->_site->view->getHelper('Renderer');
-		return $renderer->render((string) $content);
+		$content = $renderer->render((string) $content);
+
+		return strlen($content) ? $content : $default;
 	}
 }
