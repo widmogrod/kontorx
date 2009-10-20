@@ -255,7 +255,7 @@ class Promotor_Model_Abstract {
 
         		$resultCache->save($result, $cacheId, $tags);
         	} catch (Exception $e) {
-        		throw $e;
+        		$this->_addException($e);
         	}
         }
 
