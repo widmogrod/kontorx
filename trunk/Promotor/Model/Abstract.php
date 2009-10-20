@@ -223,7 +223,7 @@ class Promotor_Model_Abstract {
     /**
      * Wywoluje metode keszujac rezultat jej wyniku
      * @return mixed
-     * @throws Zend_Db_Table_Exception
+     * @throws Exception
      */
     public function cache() {
         // pobieranie parametrow
@@ -233,8 +233,7 @@ class Promotor_Model_Abstract {
 		// metoda nie istnieje w tablicy zdefiniowanej przez użytkownika
 		if (!in_array($method, $this->_cachedMethods)) {
 			$message = "Method '$method' is not enabled as cached method";
-			require_once 'Zend/Db/Table/Exception.php';
-			throw new Zend_Db_Table_Exception($message);
+			throw new Exception($message);
 		}
 
         $resultCache = $this->getResultCache();
@@ -242,7 +241,7 @@ class Promotor_Model_Abstract {
         if (!$resultCache instanceof Zend_Cache_Core) {
             $message = "Cache object is not instanceof Zend_Cache_Core or is not set";
             require_once 'Zend/Db/Table/Exception.php';
-            throw new Zend_Db_Table_Exception($message);
+            throw new Exception($message);
         }
 
         // identyfikator cache
@@ -252,11 +251,32 @@ class Promotor_Model_Abstract {
 
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
-            $result = call_user_func_array(array($this, $method), $params);
-            $resultCache->save($result, $cacheId, $tags);
+        	try {
+        		// łapę błędy - jeżeli występują żuć wyjątek! {@see _cacheErorHandler}
+        		set_error_handler(array($this, '_cacheErorHandler'));
+        		$result = call_user_func_array(array($this, $method), $params);
+        		restore_error_handler();
+
+        		$resultCache->save($result, $cacheId, $tags);
+        	} catch (Exception $e) {
+        		$this->_addException($e);
+        	}
         }
 
         return $result;
+    }
+    
+	/**
+     * @param $errno
+     * @param $errstr
+     * @param $errfile
+     * @param $errline
+     * @return void
+     * @throws Exception
+     */
+    private function _cacheErorHandler($errno, $errstr, $errfile, $errline) {
+    	$error = sprintf('ERROR %d :: %s (%s [%d])', $errno, $errstr, basename($errfile), $errline);
+    	throw new Exception($error);
     }
 
     /**
