@@ -246,8 +246,13 @@ class Promotor_Model_Abstract {
 
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
+        	
         	try {
+        		// łapę błędy - jeżeli występują żuć wyjątek!
+        		set_error_handler(array($this, '_cacheErorHandler'));
         		$result = call_user_func_array(array($this, $method), $params);
+        		restore_error_handler();
+
         		$resultCache->save($result, $cacheId, $tags);
         	} catch (Exception $e) {
         		throw $e;
@@ -257,6 +262,19 @@ class Promotor_Model_Abstract {
         return $result;
     }
 
+    /**
+     * @param $errno
+     * @param $errstr
+     * @param $errfile
+     * @param $errline
+     * @return void
+     * @throws Exception
+     */
+    private function _cacheErorHandler($errno, $errstr, $errfile, $errline) {
+    	$error = sprintf('ERROR %d :: %s (%s [%d])', $errno, $errstr, basename($errfile), $errline);
+    	throw new Exception($error);
+    }
+    
     /**
      * Zwraca cache id.
      * @return string
