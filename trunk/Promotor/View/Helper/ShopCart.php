@@ -22,10 +22,11 @@ class Promotor_View_Helper_ShopCart extends Zend_View_Helper_Abstract {
 	}
 
 	public function render() {
-		if (($count = $this->_cart->hasProducts()) > 0) {
+		if (($this->_cart->hasProducts()) > 0) {
 			$message = '<p>W Twoim koszyku znajduje się <b>%d produktów</b>, <br/>na łączną kwotę <b>%s zł</b></p>';
-			$total = $this->_cart->getTotalPrice();
-			return sprintf($message, $count, $total);
+			$amount = $this->_cart->getTotalQuantity();
+			$total  = $this->_cart->getTotalPrice();
+			return sprintf($message, $amount, $total);
 		} else {
 			return '<p>Twój koszyk na zakupy jest pusty!</p>';
 		}
