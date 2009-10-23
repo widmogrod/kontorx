@@ -60,6 +60,7 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		$result = false;
 
 		$key = $this->_getLevelKey();
+
 		if (isset($this->_childrens[$key])) {
 			return (bool) count($this->_childrens[$key]);
 		}
@@ -71,14 +72,16 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 				continue;
 			}
 
-			if (false !== strstr($data[$this->_level], $key)) {
+			// sprawdz czy poczatek $data[$this->_level] jest identyczny z kluczem
+			// jeśli tak, to jest to dziecko
+			if (($key == substr($data[$this->_level], 0, strlen($key)))) {
 				$this->_childrens[$key][] = $data;
 				unset($this->_data[$pointer]);
 				--$this->_count;
 				$result = true;
 			}
 		}
-
+		
 		if ($result) {
 			// reset keys
 			$this->_data = array_values($this->_data);
