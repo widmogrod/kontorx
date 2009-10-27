@@ -112,7 +112,7 @@ class KontorX_File_Upload {
 
 			if (true === $filterName) {
 				$extension = end(explode('.', $fileName));
-				$name	   = implode('.', (array) $a);
+				$name	   = implode('.', (array) $extension);
 
 				require_once 'KontorX/Filter/Word/Rewrite.php';
 				$filter = new KontorX_Filter_Word_Rewrite();
