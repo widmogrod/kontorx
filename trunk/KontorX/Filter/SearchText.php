@@ -6,16 +6,25 @@ require_once 'Zend/Filter/Interface.php';
  * 
  * @category 	KontorX
  * @package 	KontorX_Filter
- * @version 	0.1.0
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Filter_SearchText implements Zend_Filter_Interface {
 
 	private $_replaceText = array();
+
 	private $_minTextLenght = 3;
+
 	private $_wordList = array();
 
+	public function __construct($options = null) {
+		if (is_integer($options)) {
+			$this->setMinTextLenght($options);
+		} elseif(is_array($options)) {
+			if (isset($options['replaceText'])) {
+				$this->setReplaceText($options);
+			}
+		}
+	}
+	
 	/**
 	 * Enter description here...
 	 *
@@ -33,8 +42,8 @@ class KontorX_Filter_SearchText implements Zend_Filter_Interface {
 		$value = str_replace('-', ' ', $value);
 		$valueArray = explode(' ', $value);
 		// Przefiltruj slowa
-		$this->_wordList = array_filter($valueArray,array($this,'_filter'));
-		
+		$this->_wordList = array_filter($valueArray, array($this,'_filter'));
+
 		// Musza byc jakies slowa, nie ma czyli nie przeszlo filtracji
 		if (count($this->_wordList) == 0) {
 			return null;
