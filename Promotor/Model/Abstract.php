@@ -253,8 +253,12 @@ class Promotor_Model_Abstract {
         if (false === ($result = $resultCache->load($cacheId))) {
         	try {
         		// łapę błędy - jeżeli występują żuć wyjątek! {@see _cacheErorHandler}
-        		set_error_handler(array($this, '_cacheErorHandler'));
+        		set_error_handler(array($this, '_cacheErrorHandler'));
         		$result = call_user_func_array(array($this, $method), $params);
+                if (null !== $this->_cacheErrorHandler) {
+                    $error = vsprintf('ERROR %d :: %s (%s [%d])', (array) $this->_cacheErrorHandler);
+                    $this->_cacheErrorHandler = null;
+                }
         		restore_error_handler();
 
         		$resultCache->save($result, $cacheId, $tags);
@@ -265,18 +269,21 @@ class Promotor_Model_Abstract {
 
         return $result;
     }
-    
-	/**
+
+    /**
+     * @var array
+     */
+    protected $_cacheErrorHandler = null;
+
+    /**
      * @param $errno
      * @param $errstr
      * @param $errfile
      * @param $errline
      * @return void
-     * @throws Exception
      */
-    private function _cacheErorHandler($errno, $errstr, $errfile, $errline) {
-    	$error = sprintf('ERROR %d :: %s (%s [%d])', $errno, $errstr, basename($errfile), $errline);
-    	throw new Exception($error);
+    private function _cacheErrorHandler($errno, $errstr, $errfile, $errline) {
+        $this->_cacheErrorHandler = array($errno, $errstr, basename($errfile), $errline);
     }
 
     /**
