@@ -84,7 +84,7 @@ class KontorX_Search_Semantic {
     			// sprawdz typ: czy interpreter, czy logic
 	    		if (isset($options['type'])) {
 	    			$type = (string) $options['type'];
-	    			unset($options['name']);
+	    			unset($options['type']);
 	    		}
     			if (isset($options['options'])) {
     				$options = (array) $options['options'];
