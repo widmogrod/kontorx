@@ -128,8 +128,14 @@ class KontorX_Form_Element_Db_Abstract extends Zend_Form_Element_Multi {
 		$cols = $this->getTableCols();
 
 		$select = new Zend_Db_Select($db);
-		$stmt = $select->from($name, $cols)
-					   ->query(Zend_Db::FETCH_ASSOC);
+		$select->from($name, $cols);
+
+		if (null !== ($val = $this->getOptionValue())) {
+			$select->order($val . ' ASC');
+		}
+
+		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
+					   
 		return $stmt;
 	}
 	
