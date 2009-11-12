@@ -329,4 +329,94 @@ class Promotor_Model_Abstract {
             return call_user_func_array(array($this, 'cache'), $params);
         }
     }
+    
+/**
+	 * @param array $data
+	 * @return void
+	 */
+	public function editableUpdate(array $data) {
+		$table = $this->getDbTable();
+		$db = $table->getAdapter();
+
+		$primaryKey = $table->info(Zend_Db_Table::PRIMARY);
+
+		$db->beginTransaction();
+		try {
+			foreach ($data as $key => $values) {
+				$where = array();
+				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
+				foreach ($primaryKey as $i => $column) {
+					if (isset($primaryValues[$i-1])) {
+						$where[] = $db->quoteInto($column . ' = ?', $primaryValues[$i-1]);
+					}
+				}
+
+				// update tylko gdy są dane
+				if (count($where)) {
+					$where = implode(' AND ', $where);
+					$table->update($values, $where);
+				}
+			}
+
+			$db->commit();
+
+			// notify observers
+			$this->_noticeObserver('post_editableUpdate');
+
+			$this->_setStatus(self::SUCCESS);
+		} catch (Zend_Db_Table_Exception $e) {
+			$db->rollBack();
+			$this->_setStatus(self::FAILURE);
+			$this->_addMessage($e->getMessage());
+		}
+	}
+	
+	/**
+	 * @param array $data
+	 * @return void
+	 */
+	public function editableDelete(array $data) {
+		$table = $this->getDbTable();
+		$db = $table->getAdapter();
+
+		$primaryKey = $table->info(Zend_Db_Table::PRIMARY);
+
+		$db->beginTransaction();
+		try {
+			foreach ($data as $key => $values) {
+				$where = array();
+				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
+
+				if (is_array($values) && !current($values)) {
+					continue;
+				} else
+				if (!(bool)$values) {
+					continue;
+				} 
+				
+				foreach ($primaryKey as $i => $column) {
+					if (isset($primaryValues[$i-1])) {
+						$where[] = $db->quoteInto($column . ' = ?', $primaryValues[$i-1]);
+					}
+				}
+
+				// delete tylko gdy są dane
+				if (count($where)) {
+					$where = implode(' AND ', $where);
+					$table->delete($where);
+				}
+			}
+
+			$db->commit();
+			
+			// notify observers
+			$this->_noticeObserver('post_editableDelete');
+
+			$this->_setStatus(self::SUCCESS);
+		} catch (Zend_Db_Table_Exception $e) {
+			$db->rollBack();
+			$this->_setStatus(self::FAILURE);
+			$this->_addMessage($e->getMessage());
+		}
+	}
 }
