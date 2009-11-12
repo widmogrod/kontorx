@@ -95,6 +95,13 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 		$db->beginTransaction();
 		try {
 			foreach ($data as $key => $values) {
+				if (is_array($values) && !current($values)) {
+					continue;
+				} else
+				if (!(bool)$values) {
+					continue;
+				} 
+
 				$where = array();
 				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
 				
