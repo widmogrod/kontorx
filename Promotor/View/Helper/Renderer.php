@@ -108,11 +108,24 @@ class Promotor_View_Helper_Renderer extends Zend_View_Helper_Abstract {
 				// separator parametrow ;
 				$params = (array) explode(';',$value);
 
-				$name   = array_shift($params);
+				$method = $name = array_shift($params);
 				$params = $this->_prepareParam((array) $params);
 
 				$helper = $view->getHelper($name);
-				return (string) call_user_func_array(array($helper, $name), (array) $params);
+				
+				// sprawdzanie czy jest parametr odpowiadający za użycie innej metody
+				if (substr(@$params[0], 0, 2) == 'm#') {
+					// metoda bez to string
+					$method = substr(array_shift($params), 2);
+					call_user_func_array(array($helper, $method), (array) $params);
+					return;
+				} else
+				if (substr(@$params[0], 0, 3) == 'ms#') {
+					// metoda bindowana do (string'a)
+					$method = substr(array_shift($params), 3);
+				}
+
+				return (string) call_user_func_array(array($helper, $method), (array) $params);
 		}
 	}
 
