@@ -31,7 +31,7 @@ class KontorX_Form_Decorator_TinyMCE extends Zend_Form_Decorator_Abstract {
 
 			'language' => 'pl',
 //			'document_base_url' => $view->baseUrl(),
-			'content_css' => $view->baseUrl() . '/css/promotor/tinymce.css',
+			'content_css' => $view->baseUrl() . '/css/kontorx/messages-light.css',
 
 			'plugins' => 'safari,style,layer,table,save,advimage,advlink,inlinepopups,preview,media,searchreplace,contextmenu,paste,fullscreen,visualchars,nonbreaking,xhtmlxtras,filemanager',
 		
