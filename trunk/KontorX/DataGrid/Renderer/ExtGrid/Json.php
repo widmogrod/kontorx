@@ -58,7 +58,7 @@ class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_E
 	 * @var string
 	 */
 	protected $_url;
-	
+
 	/**
 	 * @param string $url
 	 * @return KontorX_Ext_Data_Store
