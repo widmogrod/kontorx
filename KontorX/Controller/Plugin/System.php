@@ -409,12 +409,29 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         if (isset($options->script)) {
         	/* @var $headScript Zend_View_Helper_HeadScript */
             $headScript = $view->getHelper('HeadScript');
-            $i = 0;
-            foreach ($options->script->js as $file) {
-                $headScript->offsetSetFile(++$i,
-            								$file->src,
-            								isset($file->type) ? $file->type : null,
-            								isset($file->attribs) ? $file->attribs->toArray() : array());
+            
+            if (isset($options->script->js)
+            		&& $options->script->js instanceof Iterator)
+            {
+            	$i = 0;
+	            foreach ($options->script->js as $file) {
+	                $headScript->offsetSetFile(++$i,
+	            								$file->src,
+	            								isset($file->type) ? $file->type : null,
+	            								isset($file->attribs) ? $file->attribs->toArray() : array());
+	            }
+            }
+            
+        	if (isset($options->script->script)
+            		&& $options->script->script instanceof Iterator)
+            {
+	            foreach ($options->script->script as $key => $script) {
+	                $headScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
+	            								 isset($script->src) ? $script->src : $script,
+												 isset($script->type) ? $script->type : null,
+												 (isset($script->attribs) && $script->attribs instanceof Zend_Config)
+												 	? $script->attribs->toArray() : array());
+	            }
             }
         }
         

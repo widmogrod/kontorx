@@ -56,7 +56,8 @@ class KontorX_Controller_Plugin_i18n extends Zend_Controller_Plugin_Abstract {
 				: $locale;
 		}
 		Zend_Controller_Front::getInstance()
-			->setParam('i18n', $language);
+			->setParam('i18n', $language)
+			->setParam('locale', $language);
 //		$request->setParam('i18n', $language);
 	}
 }

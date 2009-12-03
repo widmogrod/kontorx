@@ -9,7 +9,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
     protected $_rowClass = 'KontorX_Db_Table_Tree_Row';
 
     protected $_rowsetClass = 'KontorX_Db_Table_Tree_Rowset';
-
+    
     /**
      * Nazwa kolumny poziomu zagnieżdżenia
      * @var string
@@ -21,7 +21,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
      * @var string
      */
     protected $_separator = '/';
-    
+
     public function init() {
         if (null === $this->_level) {
                 require_once 'KontorX/Db/Table/Tree/Exception.php';
@@ -34,7 +34,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
 
         parent::init();
     }
-    
+
     public function select() {
     	/**
     	 * Poprawne przejście iteratora @see KontorX_Db_Table_Tree_Rowset_Abstract,
@@ -58,7 +58,7 @@ class KontorX_Db_Table_Tree_Abstract extends KontorX_Db_Table_Abstract {
     public function getSeparator() {
             return $this->_separator;
     }
-    
+
 	public function __sleep() {
 		return array('_level', '_separator');
 	}
