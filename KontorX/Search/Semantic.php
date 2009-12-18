@@ -155,6 +155,8 @@ class KontorX_Search_Semantic {
 
 		$interpreterContext = clone $context;
     	foreach ($this->_interpreter as $interpreterName => $interpreterInstance) {
+    		/* @var $interpreterInstance KontorX_Search_Semantic_Interpreter_Interface */
+
     		$interpreterContext->clearOutput();
     		$interpreterContext->rewind();
 
