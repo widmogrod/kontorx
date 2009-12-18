@@ -10,7 +10,7 @@ class KontorX_DataGrid_Filter_Order_Db extends KontorX_DataGrid_Filter_Abstract 
             require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Wrong filter adapter");
         }
-
+        
         $select = $adapter->getSelect();
         $column = $this->getColumnName();
         // set default order type
@@ -20,6 +20,7 @@ class KontorX_DataGrid_Filter_Order_Db extends KontorX_DataGrid_Filter_Abstract 
             $order = ($order != 'asc') ? 'desc' : $order;
             $select->order(sprintf('%s %s', $column, $order));
         } else
+        // grupowanie po tej koumnie - ustawia domyślne sortowanie
     	if ($this->getColumn()->isGroup()) {
         	$select->order(sprintf('%s %s', $column, 'desc'));
         }

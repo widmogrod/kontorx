@@ -6,8 +6,6 @@ require_once 'Zend/Config.php';
  *
  * @category 	KontorX
  * @package 	KontorX_DataGrid
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_DataGrid {
     const DEFAULT_CELL_TYPE   = 'Text';
@@ -30,8 +28,8 @@ class KontorX_DataGrid {
      */
     public static function factory($data, $options = null) {
         $instance = null;
-        if ($data instanceof Zend_Db_Table_Abstract) {
-        	if ($data instanceof KontorX_Db_Table_Tree_Abstract) {
+        if (($data instanceof Zend_Db_Table_Abstract)) {
+        	if (($data instanceof KontorX_Db_Table_Tree_Abstract)) {
         		require_once 'KontorX/DataGrid/Adapter/DbTable.php';
             	$adapter = new KontorX_DataGrid_Adapter_DbTableTree($data);
         	} else {
@@ -39,7 +37,7 @@ class KontorX_DataGrid {
             	$adapter = new KontorX_DataGrid_Adapter_DbTable($data);
         	}
         } else
-        if ($data instanceof Zend_Db_Select) {
+        if (($data instanceof Zend_Db_Select)) {
             require_once 'KontorX/DataGrid/Adapter/DbSelect.php';
             $adapter = new KontorX_DataGrid_Adapter_DbSelect($data);
         } else
@@ -56,7 +54,7 @@ class KontorX_DataGrid {
 
         if (is_array($options)) {
             $instance->setOptions($options);
-        } elseif ($options instanceof Zend_Config) {
+        } elseif (($options instanceof Zend_Config)) {
             $instance->setConfig($options);
         }
 
@@ -261,13 +259,14 @@ class KontorX_DataGrid {
     private $_values = null;
 
     /**
-     * Set array of values
-     * array(
-     *  //columns => ..
-     *  filters => ..
-     * )
-     *
+     * Ustawia wartości stanu ustawień między innymi dla _Column i _Filter (explicite)
+     * 
+     * Jest to nic innego jak taki mediator, który posiada informację o aktualnej
+     * konfiguracji danego filtra i kolumny.
+     * Jedna instancja dla wszystkich obiektów w kompozycji _Column i _Filter.
+     * 
      * @param Zend_Config $values
+     * @return void
      */
     public function setValues($values) {
         if (is_array($values)) {
@@ -290,7 +289,11 @@ class KontorX_DataGrid {
     }
 
     /**
+     * Ustawia wartości stanu ustawień dla _Column i _Filter
+     * z danych przekazanych poprzez  GET lub POST - implicite.
+     * 
      * @param string $type
+     * @return void
      */
     public function setRequestValues($type = null) {
         $type = strtoupper($type);
@@ -303,13 +306,21 @@ class KontorX_DataGrid {
                 break;
         }
 
+        /**
+         * @todo Filtrowanie parametrów XSS itp.
+         */
+
         if (isset($values['filter'])) {
             $this->setValues((array) $values['filter']);
         }
     }
 
     /**
-     * Return @see Zend_Config
+     * Zwraca obiekt {@see Zend_Config}
+     * 
+     * Obiekt {@see Zend_Config} reprezentuje wartości stanu ustawień dla _Column i _Filter.
+     * Przechowuje "konfigurację" obiektu _Column i _Filter - jeżeli tego wymaga lub korzysta.
+     * 
      * @return Zend_Config
      */
     public function getValues() {
@@ -320,46 +331,73 @@ class KontorX_DataGrid {
     }
 
     /**
-     * Set each column property value
+     * Przekazuje obiekt {@see Zend_Config} wszystkim instancją _Column i _Filter
+     * 
      * @return void
      */
-    private function _noticeValues() {
+    private function _initValues() {
         $values = $this->getValues();
-        if ($values instanceof Zend_Config) {
-            foreach ($this->getColumns() as $name => $column) {
-                $column->setValues($values);
-                // if column has filter - set values to filter!
-                foreach ($column->getFilters() as $filter) {
-                    $filter->setValues($values);
-                }
-            }
-        }
+		foreach ($this->getColumns() as $column) {
+			/* @var $column KontorX_DataGrid_Column_Interface */
+			$column->setValues($values);
+
+			foreach ($column->getFilters() as $filter) {
+				/* @var $filter KontorX_DataGrid_Filter_Interface */
+				$filter->setValues($values);
+			}
+		}
     }
 
     /**
      * @var string
      */
-    protected $_group = null;
+    protected $_groupColumn = null;
     
     /**
-     * @param string $columnName
+     * Ustawia nazwę lub obiekt {@see KontorX_DataGrid_Column_Instance} klumny,
+     * która jest grupowana.
+     * 
+     * @param string|KontorX_DataGrid_Column_Instance $column
+     * @return void
      */
-    public function setGroup($columnName) {
-    	$this->_group = (string) $columnName;
+    public function setGroupColumn($column) {
+    	if (($column instanceof KontorX_DataGrid_Column_Abstract)) {
+    		$column = $column->getColumnName();
+    	}
+
+		$this->_groupColumn = (string) $column;
     }
     
     /**
-     * @return string
+     * Zwraca nazwę klumny, po której odbywa się grupowanie.
+     * 
+     * @return string lub null jeżeli nie istnieje kolumna,
+     * 						   po której odbywa się grupowanie 
      */
-	public function getGroup() {
-    	return $this->_group;
+	public function getGroupColumn() {
+    	return $this->_groupColumn;
     }
 
     /**
+     * Sprawdź czy jest grupowanie lub czy kolumna jest grupowana.
+     * 
+     * Nie został podany parametr - sprawdzane jest czy jest grupowanie.
+     * Został podany parametr     - sprawdza czy odbywa się grupowanie po kolumnie.
+     * 
+     * @param string|KontorX_DataGrid_Column_Instance $column
      * @return bool
      */
-	public function isGrouping() {
-    	return null !== $this->_group;
+	public function isGroupColumn($column = null) {
+		if (($column instanceof KontorX_DataGrid_Column_Abstract)) {
+    		$column = $column->getColumnName();
+    	} else
+    	if (null === $column) {
+    		// zwraca true - jeżeli jest grupowanie.
+    		return null !== $this->_groupColumn;
+    	}
+
+    	// zwraca true - jeżeli po tej kolumnie odbywa się grupowanie
+    	return $column === $this->_groupColumn;
     }
 
     /**
@@ -369,6 +407,7 @@ class KontorX_DataGrid {
 
     /**
      * Dodaje kolumnę
+     * 
      * @param string $columnName
      * @param array $options
      */
@@ -404,7 +443,7 @@ class KontorX_DataGrid {
             $type = self::DEFAULT_COLUMN_TYPE;
         }
 
-        if (!$columnName instanceof KontorX_DataGrid_Column_Interface) {
+        if (!($columnName instanceof KontorX_DataGrid_Column_Interface)) {
         	// create column instance
 	        $columnClass = $this->getPluginLoader(self::COLUMN)->load($type);
 	        /* @var $columnInstance KontorX_DataGrid_Column_Interface */
@@ -413,10 +452,15 @@ class KontorX_DataGrid {
         	/* @var $columnInstance KontorX_DataGrid_Column_Interface */
         	$columnInstance = $columnName;
         }
-        
+
+        /**
+         * Łączy obiekt {@see KontorX_DataGrid} z {@see KontorX_DataGrid_Column_Interface} 
+         */
+        $columnInstance->setDataGrid($this);
+
         // set group column
         if (array_key_exists('group', $options)) {
-			$columnInstance->setGroup((bool) $options['group']);
+        	$this->setGroupColumn($columnInstance);
         }
 
         // create filter
@@ -574,7 +618,7 @@ class KontorX_DataGrid {
     /**
      * @return void
      */
-    private function _noticeFilters() {
+    private function _initFilters() {
     	$adapter = $this->getAdapter();
         foreach ($this->getColumns() as $column) {
             foreach ($column->getFilters() as $filter) {
@@ -594,8 +638,8 @@ class KontorX_DataGrid {
      */
     public function getVars() {
         if (null === $this->_vars) {
-            $this->_noticeValues();
-            $this->_noticeFilters();
+            $this->_initValues();
+            $this->_initFilters();
 
             $this->_orderColumns();
 

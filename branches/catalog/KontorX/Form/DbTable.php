@@ -234,16 +234,22 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
             // aktualizowanie danych elementu
             if (array_key_exists($column, (array) @$formOptions['elements'])) {
                 $formElementOptions = $formOptions['elements'][$column];
+
                 // zmiana typu
                 if (isset($formElementOptions['type'])) {
                     $element = $formElementOptions['type'];
                 }
+
                 // aktualizacja opcji
                 if (isset($formElementOptions['options'])) {
-                    $elementOptions = array_merge (
-                        $elementOptions,
-                        (array) $formElementOptions['options']
-                    );
+                	if (is_string($formElementOptions['options'])) {
+                		$elementOptions['label'] = $formElementOptions['options'];
+                	} elseif(is_array($formElementOptions['options'])) {
+                		$elementOptions = array_merge(
+	                        $elementOptions,
+	                        (array) $formElementOptions['options']
+	                    );
+                	}
                 }
             }
 
@@ -291,6 +297,7 @@ class KontorX_Form_DbTable extends Zend_Dojo_Form {
     protected function _createElement(array $options, $loop = false) {
         // TODO Dodać możliwośc pobierania nazwy z opisu pola w DB (?)
         $elementName = $options['COLUMN_NAME'];
+
         $elementOptions = array(
 			'label' => $elementName
         );

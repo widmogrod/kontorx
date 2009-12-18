@@ -58,12 +58,17 @@ interface KontorX_DataGrid_Column_Interface {
      * @return KontorX_DataGrid_Cell_Interface
      */
     public function getCell();
-
+    
     /**
-     * @param bool $flag
+     * @param KontorX_DataGrid $dataGrid
      * @return void
      */
-    public function setGroup($flag = true);
+    public function setDataGrid(KontorX_DataGrid $dataGrid);
+
+    /**
+     * @return KontorX_DataGrid
+     */
+    public function getDataGrid();
     
     /**
      * @return bool

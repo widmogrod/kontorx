@@ -313,7 +313,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      * @param Zend_Form $form
      */
     protected function _addOnIsPost(Zend_Form $form) {
-        $this->view->form = $form->render();
+        $this->view->form = $form;
     }
 
 	/**
@@ -331,7 +331,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
      * @param Zend_Form $form
      */
     protected function _addOnIsNoValid(Zend_Form $form) {
-        $this->view->form = $form->render();
+        $this->view->form = $form;
     }
 
     /**

@@ -113,8 +113,13 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
                 $cell = clone $column->getCell();
 				$cell->setData($this->_data[$this->_pointer]);
 
-	            if ($column->isGroup()) {
-	            	// compare string
+				if ($column->isGroup()) {
+					/**
+					 * Grupowanie odbywa się za pomoca porównywania nazwiy komurki
+					 * Różne nazwy - przekazuje nową nazwę do porównywania
+		             * 				 i dodaje do _Cellset kolumne. po której
+		             * 				 odbywa się grupowanie.
+					 */
 	            	if ((string) $this->_groupCell != (string) $cell) {
 	            		$this->_groupCell = $cell;
 	            		$cellset->setGroupCell($cell);

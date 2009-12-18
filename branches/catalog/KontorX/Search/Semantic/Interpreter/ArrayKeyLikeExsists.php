@@ -30,7 +30,7 @@ class KontorX_Search_Semantic_Interpreter_ArrayKeyLikeExsists extends KontorX_Se
 			$this->setMulti($array['multi']);
 			unset($array['multi']);
 		}
-
+		
 		foreach ($array as $data) {
 			// @todo Exception?
 			if (is_array($data)) {
