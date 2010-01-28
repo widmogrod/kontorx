@@ -16,7 +16,7 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
         	require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Wrong filter adapter");
         }
-
+        
         // przekaż parametry
         $filter->setClassName($this->getClassName());
         $filter->setName($this->getName());

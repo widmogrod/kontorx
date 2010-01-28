@@ -2,9 +2,9 @@
 class Promotor_Application_Resource_View extends Zend_Application_Resource_ResourceAbstract {
 	public function init(array $options = array()) {
 		$view = new Zend_View($options);
+
 		Zend_Dojo::enableView($view);
 
-		$view->addHelperPath('advertising/views/helpers','Advertising_View_Helper_');
 		$view->addHelperPath('KontorX/View/Helper','KontorX_View_Helper_');
 		$view->addHelperPath('Promotor/View/Helper','Promotor_View_Helper_');
 		
@@ -19,7 +19,7 @@ class Promotor_Application_Resource_View extends Zend_Application_Resource_Resou
 			->setDjConfigOption('parseOnLoad', true)
 			 ->setLocalPath('/js/dojo/dojo/dojo.js')
 			 ->addStyleSheetModule('dijit.themes.tundra');
-					 
+
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
 		$viewRenderer->setView($view);
 	

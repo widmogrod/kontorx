@@ -22,6 +22,9 @@ class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_ViewHelper {
                 $orderNext = 'desc';
                 break;
             case 'desc':
+                $orderNext = 'group';
+                break;
+            case 'group':
                 $orderNext = 'null';
                 break;
         }
@@ -29,7 +32,7 @@ class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_ViewHelper {
         /**
          * klonowanie wzrtosci i zmiana atrybotow
          * umozliwia ich aktywacje po kliknieciu linku!
-         */ 
+         */
         $backup = $this->getValue();
         $this->setValue($orderNext);
         $values = clone $this->getValues();
@@ -41,11 +44,15 @@ class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_ViewHelper {
         	$view = $this->getView();
 			$href = $view->url($params, $router);
         }
-        
+
         $href = rtrim($href, '?') . '?';
         $href .= http_build_query($values->toArray());
 
-        $format = '<a class="column column_order" href="%s">%s <span class="order order-%s">%s</span></a>';
+        $format  = '<div class="kx_column">';
+//        $format .= '<a class="kx_group" href="%s">*</a>';
+        $format .= '<a class="kx_column_order" href="%s">%s <span class="kx_order kx_order-%s">%s</span></a>';
+        $format .= '</div>';
+
         return sprintf($format, $href, $this->getName(), $orderCurrent, $orderCurrent);
     }
 }

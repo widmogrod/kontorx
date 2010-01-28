@@ -92,8 +92,8 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 		$name = $this->getName();
 		$class = $this->getAttrib('class');
 
-		$format = '<a class="%s" href="%s"><span>%s</span></a>';
-		return sprintf($format, $class, $href, $name);
+		$format = '<a class="%s" href="%s" title="%s"><span>%s</span></a>';
+		return sprintf($format, $class, $href, $name, $name);
 	}
 
 	/**

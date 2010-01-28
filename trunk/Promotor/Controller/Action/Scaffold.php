@@ -135,7 +135,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 							$this->_helper->flashMessenger($model->getStatus());
 						}
 					}
-					break;
+					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+					return;
+
 				case 'delete':
 					if (null !== $rq->getPost('action_checked')) {
 						if ($this->_helper->acl->isAllowed('delete')) {
@@ -144,10 +146,10 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 							$this->_helper->flashMessenger($model->getStatus());
 						}
 					}
-					break;
+
+					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+					return;
 			}
-			$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
-			return;
 		}
 
 		// setup data grid
@@ -158,6 +160,10 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$this->_setupDataGridPaginator($grid);
 
 		$this->view->grid = $grid;
+		
+//		/* @var $viewRenderer Zend_Controller_Action_Helper_ViewRenderer  */
+//		$viewRenderer = $this->_helper->getHelper('ViewRenderer');
+//		$viewRenderer->
 	}
 
 	/**
