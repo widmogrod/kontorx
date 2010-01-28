@@ -4,13 +4,15 @@
  *
  */
 class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
-	
+
 	/**
 	 * @var array
 	 */
 	protected $_observers = array();
 
 	/**
+	 * Powiadamianie obserwatorów zdefiniowanych dla określonej akcji..
+	 * 
 	 * @param string|bool $name
 	 * @return void
 	 */
@@ -39,6 +41,90 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 	 */
 	public function selectList() {
 		return $this->getDbTable()->select();
+	}
+
+	/**
+	 * @param mixed $primaryKey
+	 * @param bool $createIfNotExsists
+	 * @return Zend_Db_Table_Row_Abstract|null
+	 */
+	public function findByPK ($primaryKey, $createIfNotExsists = false) {
+		$table = $this->getDbTable();
+		
+		$rowset = $table->find($primaryKey);
+		if (count($rowset)) {
+			return $rowset->current();
+		}
+
+		if ($createIfNotExsists) {
+			return $table->createRow();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Create/Update row
+	 * 
+	 * @param array $data
+	 * @param Zend_Db_Table_Row_Abstract|array|int $row
+	 * @return Zend_Db_Table_Row_Abstract
+	 */
+	public function save(array $data, $row = null) {
+		if (null === $row) {
+			$row = $this->getDbTable()->createRow();
+		}
+		if (is_numeric($row) || is_array($row)) {
+			$row = $this->getDbTable()->find($row)->current();
+			if (null === $row) {
+				$message = 'do not find row by primaryKey';
+				$message = sprintf('%s (%s::%s)"', $message, get_class($this), __METHOD__);
+				$this->_addMessage($message);
+				$this->_setStatus(self::FAILURE);
+			}
+		} else
+		if (!($row instanceof Zend_Db_Table_Row_Abstract)) {
+			$message = '$row is not instanceof "Zend_Db_Table_Row_Abstract';
+			$message = sprintf('%s (%s::%s)"', $message, get_class($this), __METHOD__);
+			$this->_addMessage($message);
+			$this->_setStatus(self::FAILURE);
+			return;
+		}
+		
+		$this->_noticeObserver('pre_save');
+		
+		try {
+			$row->setFromArray($data);
+			$row->save();
+			
+			$this->_noticeObserver('post_save');
+
+			$this->_setStatus(self::SUCCESS);
+		} catch (Zend_Db_Exception $e) {
+			$this->_addException($e);
+			$this->_setStatus(self::FAILURE);
+		}
+
+		return $row;
+	}
+	
+	/**
+	 * @param Zend_Db_Table_Row_Abstract $row
+	 * @return void
+	 */
+	public function delete(Zend_Db_Table_Row_Abstract $row) {
+		$this->_noticeObserver('pre_delete');
+
+		try {
+			$row->delete();
+			
+			$this->_noticeObserver('post_delete');
+			
+			$this->_setStatus(self::SUCCESS);
+		} catch (Zend_Db_Exception $e) {
+			$this->_addException($e);
+			$this->_setStatus(self::FAILURE);
+		}
 	}
 	
 	/**

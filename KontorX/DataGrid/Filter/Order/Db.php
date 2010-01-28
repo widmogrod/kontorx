@@ -10,11 +10,15 @@ class KontorX_DataGrid_Filter_Order_Db extends KontorX_DataGrid_Filter_Abstract 
             require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Wrong filter adapter");
         }
-        
+
         $select = $adapter->getSelect();
         $column = $this->getColumnName();
         // set default order type
         $order = $this->getValue($this->getAttrib('order'));
+
+        if ($order == 'group') {
+        	$this->getColumn()->getDataGrid()->setGroupColumn($column);
+        }
 
         if (null !== $order) {
             $order = ($order != 'asc') ? 'desc' : $order;

@@ -119,7 +119,7 @@ class KontorX_Controller_Action_Helper_FormWizard
 	 * wszystkich akcji
 	 * 
 	 *  @param string|null $action
-	 *  @return array|null
+	 *  @return array
 	 */
 	public function getStoredData($action = null) {
 		if (null === $action) {
@@ -128,6 +128,8 @@ class KontorX_Controller_Action_Helper_FormWizard
 		if (isset($this->_storedData[$action])) {
 			return $this->_storedData[$action];
 		}
+		
+		return array();
 	}
 
 	/**
@@ -304,6 +306,11 @@ class KontorX_Controller_Action_Helper_FormWizard
 
 		} catch(KontorX_Controller_Action_Helper_FormWizard_ActionHasNoFormException $e) {
 			// Akcja w kreatorze nie korzysta z Zend_Form
+
+			// Sprawdzam czy są dane POST - jest to 'conditio sine qua non'!
+			if (!$rq->isPost()) {
+				return;
+			}
 		}
 
 		++$this->_pointer;
@@ -329,7 +336,7 @@ class KontorX_Controller_Action_Helper_FormWizard
 	 * @return bool 
 	 */
 	public function valid() {
-		return $this->_pointer <= $this->_count;
+		return !($this->_pointer > $this->_count || $this->_pointer < 0) ;
 	}
 
 	/**
