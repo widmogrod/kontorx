@@ -64,14 +64,11 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
 	 */
 	public function getView() {
 		if (null === $this->_view) {
-			if (Zend_Registry::isRegistered('Zend_View')) {
-				$this->_view = Zend_Registry::get('Zend_View');
-			} elseif(Zend_Registry::isRegistered('view')) {
-				$this->_view = Zend_Registry::get('view');
-			} else {
-				require_once 'Zend/View.php';
-				$this->_view = new Zend_View();				
-			}
+			require_once 'Zend/Controller/Action/HelperBroker.php';
+			/* @var $viewRenderer Zend_Controller_Action_Helper_ViewRenderer */
+			$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
+			$viewRenderer->initView();
+			$this->_view = $viewRenderer->view;
 		}
 		return $this->_view;
 	}
