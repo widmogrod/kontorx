@@ -3,7 +3,7 @@
  * @author gabriel
  *
  */
-class Promotor_Form_Scaffold extends Zend_Dojo_Form {
+class Promotor_Form_Scaffold extends Zend_Form {
 	
 	public function getValues($suppressArrayNotation = false) {
         $values = array();

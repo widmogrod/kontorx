@@ -48,11 +48,9 @@ class KontorX_DataGrid_Column_Order extends KontorX_DataGrid_Column_ViewHelper {
         $href = rtrim($href, '?') . '?';
         $href .= http_build_query($values->toArray());
 
-        $format  = '<div class="kx_column">';
 //        $format .= '<a class="kx_group" href="%s">*</a>';
-        $format .= '<a class="kx_column_order" href="%s">%s <span class="kx_order kx_order-%s">%s</span></a>';
-        $format .= '</div>';
+        $format = '<a class="kx_column_order kx_order-%s" href="%s">%s <span class="kx_order_type">%s</span></a>';
 
-        return sprintf($format, $href, $this->getName(), $orderCurrent, $orderCurrent);
+        return sprintf($format, $orderCurrent, $href, $this->getName(), $orderCurrent);
     }
 }

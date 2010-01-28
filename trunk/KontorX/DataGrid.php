@@ -467,7 +467,16 @@ class KontorX_DataGrid {
         if (isset($options['filter'])) {
             $filter = $this->_createFilter((array) $options['filter']);
             $columnInstance->addFilter($filter);
-        }
+            unset($options['filter']);
+        } else
+        // create and add filter set
+        if (isset($options['filters']) && is_array($options['filters'])) {
+        	foreach ($options['filters'] as $filter) {
+        		$filter = $this->_createFilter((array) $filter);
+            	$columnInstance->addFilter($filter);
+        	}
+        	unset($options['filters']);
+        } 
 
         // cell is allways
 		$cell = $this->_createCell((array) @$options['cell']);
