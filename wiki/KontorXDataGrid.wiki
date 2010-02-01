@@ -1,11 +1,11 @@
 #summary DataGrid example
-#labels Phase-Deploy,Deprecated
+#labels Phase-Deploy,Featured
 
 = Introduction =
 
 `KontorX_DataGrid`
 
-[http://code.google.com/p/kontorx/wiki/images/kontorx_data_grid.png]
+[http://kontorx.googlecode.com/svn/wiki/images/kontorx_data_grid.png]
 
 == Example ==
 
