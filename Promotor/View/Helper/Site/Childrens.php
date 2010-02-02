@@ -44,11 +44,13 @@ class Promotor_View_Helper_Site_Childrens extends Promotor_View_Helper_Site_Abst
 		if (!count($rowset)) {
 			/* @var $rowset KontorX_Db_Table_Tree_Rowset_Abstract */
 			$rowset = $model->findParentsCache($this->getIdentification(), $this->_depthLevel);
+			if (!$rowset instanceof KontorX_Db_Table_Tree_Rowset_Abstract) {
+				return '';
+			}
 		}
-
-		if (!$rowset instanceof KontorX_Db_Table_Tree_Rowset_Abstract) {
-			return '';
-		}
+		
+		// ratuje przed fatal error
+		$rowset->setTable($model->getDbTable());
 
 		$recursive = new RecursiveIteratorIterator($rowset, RecursiveIteratorIterator::SELF_FIRST);
 		$navigation = new KontorX_Navigation_Recursive($rowset);
