@@ -25,6 +25,7 @@ class Promotor_View_Helper_ShopPromotions extends Zend_View_Helper_Abstract {
 
 	public function setLimit($limit) {
 		$this->_limit = $limit;
+		return $this;
 	}
 	
 	public function _getData() {
