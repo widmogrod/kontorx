@@ -7,9 +7,6 @@ require_once 'Zend/Validate/Abstract.php';
  * 
  * @category 	KontorX
  * @package 	KontorX_Validate
- * @version 	0.1.5
- * @license		GNU GPL
- * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Validate_Required extends Zend_Validate_Abstract {
 	const IS_REQUIRED      = 'isRequired';
@@ -26,15 +23,11 @@ class KontorX_Validate_Required extends Zend_Validate_Abstract {
     );
 
     /**
-     * Enter description here...
-     *
      * @var Zend_Form
      */
     private $_form = null;
     
     /**
-     * Enter description here...
-     *
      * @var string
      */
     private $_element = null;
