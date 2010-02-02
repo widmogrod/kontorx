@@ -2,7 +2,7 @@
 require_once 'Zend/View/Helper/Abstract.php';
 class KontorX_View_Helper_DataGrid extends Zend_View_Helper_Abstract {
 
-    public function dataGrid(KontorX_DataGrid $grid = null, $partial = null) {
+    public function dataGrid(KontorX_DataGrid $grid = null, $partial = null, $module = null) {
         if (null === $grid) {
             if (!isset($this->view->dataGrid) || $this->view->dataGrid instanceof KontorX_DataGrid) {
                 require_once 'Zend/View/Exception.php';
@@ -27,6 +27,6 @@ class KontorX_View_Helper_DataGrid extends Zend_View_Helper_Abstract {
         }
 
         $vars = $grid->getVars();
-        return $this->view->getHelper('partial')->partial($partial, $vars);
+        return $this->view->getHelper('partial')->partial($partial, $module, $vars);
     }
 }

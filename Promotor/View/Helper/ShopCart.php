@@ -9,7 +9,7 @@ class Promotor_View_Helper_ShopCart extends Zend_View_Helper_Abstract {
 	public function __construct() {
 		$this->_cart = Shop_Model_Cart::getInstance();
 	}
-	
+
 	public function shopCart() {
 		return $this;
 	}
@@ -21,12 +21,12 @@ class Promotor_View_Helper_ShopCart extends Zend_View_Helper_Abstract {
 		return $this->_cart->getProducts();
 	}
 
-	public function render() {
+	public function render($append = null) {
 		if (($this->_cart->hasProducts()) > 0) {
 			$message = '<p>W Twoim koszyku znajduje się <b>%d produktów</b>, <br/>na łączną kwotę <b>%s zł</b></p>';
 			$amount = $this->_cart->getTotalQuantity();
 			$total  = $this->_cart->getTotalPrice();
-			return sprintf($message, $amount, $total);
+			return sprintf($message, $amount, $total) . $append;
 		} else {
 			return '<p>Twój koszyk na zakupy jest pusty!</p>';
 		}

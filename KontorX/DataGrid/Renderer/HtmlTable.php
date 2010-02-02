@@ -7,11 +7,16 @@ require_once 'KontorX/DataGrid/Renderer/Abstract.php';
  */
 class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abstract {
 
-	public function render($partial = null) {
+	public function render($partial = null, $module = null) {
 		if (is_string($partial)) {
 			$this->setPartial($partial);
 		}
+		if (is_string($module)) {
+			$this->setPartial($module);
+		}
+		
 		$partial = $this->getPartial();
+		$module  = $this->getModule();
 
 		/* @var $view Zend_View */
 		$view = $this->getView();
@@ -20,12 +25,11 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
         }
 
         // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this->getDataGrid(), $partial);
+        return $view->dataGrid($this->getDataGrid(), $partial, $module);
 	}
 
 	/**
      * Default name of partial file @see Zend_View_Helper_Partial
-     * @todo dodać partial w zasobach biblioteki!
      * @var string
      */
     private $_partial = '_partial/dataGrid.phtml';
@@ -43,6 +47,29 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
      */
     public function getPartial() {
         return $this->_partial;
+    }
+    
+	/**
+     * Default name of module name @see Zend_View_Helper_Partial
+     * @var string
+     */
+    private $_module = null;
+
+    /**
+     * Set name of partial file @see Zend_View_Helper_Partial
+     * @var string
+     * @return void
+     */
+    public function setModule($module) {
+        $this->_module = (string) $module;
+    }
+
+    /**
+     * Return name of module
+     * @return string
+     */
+    public function getModule() {
+        return $this->_module;
     }
 	
 	/**

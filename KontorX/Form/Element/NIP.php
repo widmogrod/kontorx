@@ -38,7 +38,7 @@ class KontorX_Form_Element_NIP extends Zend_Form_Element_Xhtml {
 	 * @return string
 	 */
 	public function getValue() {
-		$value = parent::getValue();
+		$value = (array) parent::getValue();
 		return implode($value);
 	}
 
@@ -46,7 +46,7 @@ class KontorX_Form_Element_NIP extends Zend_Form_Element_Xhtml {
 	 * @return array:
 	 */
 	public function getNIPParts() {
-		$value = (array) array_values(parent::getValue());
+		$value = (array) parent::getValue();
 		$value += array_fill(0,4,null);
 		return $value;
 	}
