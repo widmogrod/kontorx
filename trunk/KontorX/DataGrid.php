@@ -4,8 +4,8 @@ require_once 'Zend/Config.php';
 /**
  * KontorX_DataGrid
  *
- * @category 	KontorX
- * @package 	KontorX_DataGrid
+ * @version $Id$
+ * @author $Author$
  */
 class KontorX_DataGrid {
     const DEFAULT_CELL_TYPE   = 'Text';

@@ -1,7 +1,7 @@
 <?php
 /**
- * @author gabriel
- *
+ * @version $Id$
+ * @author $Author$
  */
 class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
@@ -117,6 +117,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		}
 	}
 	
+	/**
+	 * @var array
+	 */
 	protected $_redirectAction = array(
 		'add' => array('save','next','exit'),
 		'edit' => array('save','next','exit'),
@@ -124,6 +127,11 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	);
 	
 
+	/**
+	 * @param string $type
+	 * @param array $rowPK
+	 * @return void
+	 */
 	protected function _redirectAction($type, array $rowPK = null) {
 		if (!isset($this->_redirectAction[$type])) {
 			throw new Zend_Controller_Action_Exception(
