@@ -117,6 +117,50 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		}
 	}
 	
+	protected $_redirectAction = array(
+		'add' => array('save','next','exit'),
+		'edit' => array('save','next','exit'),
+		'delete' => array('exit'),
+	);
+	
+
+	protected function _redirectAction($type, array $rowPK = null) {
+		if (!isset($this->_redirectAction[$type])) {
+			throw new Zend_Controller_Action_Exception(
+				'action type "'.$type.'"for redirect do not exsists or is not defined');
+		}
+
+		/* @var $rq Zend_Controller_Request_Http */
+		$rq = $this->getRequest();
+
+		$action = $rq->getPost('__kx_action');
+		$redirects = (array) $this->_redirectAction[$type];
+
+		/* @var $redirector Zend_Controller_Action_Helper_Redirector */
+		$redirector = $this->_helper->getHelper('Redirector');
+		
+		// przekierowywani domyslne
+		if (!in_array($action, $redirects)) {
+			$redirector->goTo($type);
+			return;
+		}
+
+		switch($action) {
+			case 'next':
+				$this->_helper->redirector->goTo('add');
+				break;
+
+			case 'save':
+				$this->_helper->redirector->goTo('edit', null, null, $rowPK);
+				break;
+
+			case 'exit':
+			default:
+				$this->_helper->redirector->goTo('list');
+				break;
+		}
+	}
+
 	/**
 	 * @return void
 	 */
@@ -213,7 +257,11 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					$form);
 			}
 
-			$this->_helper->redirector->goTo('add');
+			/**
+			 * Przekierowywanie akcji! 
+			 */
+			$this->_redirectAction('add', $scaffold->getRowPK());
+
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
@@ -270,11 +318,17 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					$scaffold->getForm());
 			}
 			$this->view->form = $form;
-			$this->_helper->redirector->goTo('edit',null,null,$scaffold->getRowPK());			
+			/**
+			 * Przekierowywanie akcji! 
+			 */
+			$this->_redirectAction('edit', $scaffold->getRowPK());		
 		} else
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::NO_EXSISTS) {
 			$flashMessenger->addMessage($status);
-			$this->_helper->redirector->goTo('list');
+			/**
+			 * Przekierowywanie akcji! 
+			 */
+			$this->_redirectAction('edit');
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
@@ -331,11 +385,17 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					$scaffold->getForm());
 			}
 			
-			$this->_helper->redirector->goTo('list');
+			/**
+			 * Przekierowywanie akcji! 
+			 */
+			$this->_redirectAction('remove', $scaffold->getRowPK());
 		} else
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::NO_EXSISTS) {
 			$flashMessenger->addMessage($status);
-			$this->_helper->redirector->goTo('list');
+			/**
+			 * Przekierowywanie akcji! 
+			 */
+			$this->_redirectAction('remove');
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
