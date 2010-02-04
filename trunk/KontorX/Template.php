@@ -234,7 +234,13 @@ class KontorX_Template {
 	 * @return KontorX_Template
 	 */
 	public function addTemplatePath($path) {
-		$this->_templatePaths[] = rtrim((string) $path, DIRECTORY_SEPARATOR);
+		$path = rtrim((string) $path, DIRECTORY_SEPARATOR);
+
+		if (!is_dir($path)) { 
+			throw new Exception('template path "'. $path .'" do not exsists');
+		}
+
+		$this->_templatePaths[] = $path; 
 		return $this;
 	}
 	
@@ -252,20 +258,27 @@ class KontorX_Template {
 		$target = (null === $inflectorTarget)
 			? $this->getTemplateTargetInflector()
 			: $inflectorTarget;
-		
+
 		$source = array(
 			'templateName' => $this->getTemplateName(),
 			'styleName' => $this->getStyleName()
 		);
 
 		$result = array();
+
 		$inflector = $this->getInflector();
 		foreach ($this->_templatePaths as $path) {
 			$source['templatePath'] = $path;
 			$source = array_merge($source, $sourceMerge);
 			$inflector->setTarget($target);
-			$result[] = $inflector->filter($source);
+			$path = $inflector->filter($source);
+
+			// dodaj tylko jeżeli istnieje
+			if (file_exists($path)) {
+				$result[] = $path;
+			}
 		}
+
 		return $result;
 	}
 	
@@ -462,11 +475,19 @@ class KontorX_Template {
 		}
 
 		// definiowanie GLOBAL..
+
+		/**
+		 * Tutaj może pojawić się probelem gdy będzie podwójne renderowanie.. 
+		 * generalnie nie przewidywane i nie możliwe
+		 * .. bo plugin jest 'postDispatch'
+		 * .. a dla tege error bo globale denfinuje się tylko raz! 
+		 */
 		if (!defined('KX_TEMPLATE_SKIN')) {
-			$skinpath = str_replace($this->getTemplatePaths(),
+			$this->_activeStylePath = str_replace($this->getTemplatePaths(),
 									null,
 									dirname($path));
-			define('KX_TEMPLATE_SKIN', $skinpath);
+
+			define('KX_TEMPLATE_SKIN', $this->_activeStylePath);
 		}
 
 		$type = strtolower(pathinfo($this->_styleConfigFilename, PATHINFO_EXTENSION));
@@ -492,8 +513,15 @@ class KontorX_Template {
 		
 		return $conf;
 	}
-
 	
+	/**
+	 * @var string
+	 */
+	protected $_activeStylePath;
+	
+	public function getActiveStylePath() {
+		return $this->_activeStylePath;
+	}
 
 	/**
 	 * @var array
@@ -504,16 +532,21 @@ class KontorX_Template {
 	 * @return array
 	 */
 	public function findTemplates() {
-		if (null === $this->_findTemplates) {
+		if (null === $this->_findTemplates)
+		{
 			$this->_findTemplates = array();
-			foreach ($this->getTemplatePaths() as $path) {
+			foreach ($this->getTemplatePaths() as $path)
+			{
 				$iterator = new DirectoryIterator($path);
-				foreach ($iterator as $file) {
+				foreach ($iterator as $file)
+				{
 					/* @var $file DirectoryIterator */
-					if (!$file->isDot() && $file->isDir()) {
+					if (!$file->isDot() && $file->isDir())
+					{
 						$filename = $file->getFilename();
 						// katalogi tylko alfa-numeryczne
-						if (1 == preg_match('/^[a-z0-9]+$/i', $filename)) {
+						if (1 == preg_match('/^[a-z0-9]+$/i', $filename))
+						{
 							$filename = ltrim($filename, '.');
 							$this->_findTemplates[$filename] = array(
 								'name' => $filename
@@ -537,26 +570,31 @@ class KontorX_Template {
 	 */
 	public function findStyles($template) {
 		$template = basename($template);
-		if (!isset($this->_findStyles[$template])) {
+		if (!isset($this->_findStyles[$template])) 
+		{
 			$this->_findStyles[$template] = array();
 			$source = array('templateName' => $template);
 			$paths = $this->getTemplatePaths(true,
 							$this->getStylesTargetInflector(),
 							$source);
 	
-			foreach ($paths as $path) {
+			foreach ($paths as $path) 
+			{
 				try {
 					$iterator = new DirectoryIterator($path);
 				} catch (RuntimeException $e) {
 					continue;
 				}
 
-				foreach ($iterator as $file) {
+				foreach ($iterator as $file) 
+				{
 					/* @var $file DirectoryIterator */
-					if (!$file->isDot() && $file->isDir()) {
+					if (!$file->isDot() && $file->isDir()) 
+					{
 						$filename = $file->getFilename();
 						// katalogi tylko alfa-numeryczne
-						if (1 == preg_match('/^[a-z0-9]+$/i', $filename)) {
+						if (1 == preg_match('/^[a-z0-9]+$/i', $filename)) 
+						{
 							$this->_findStyles[$template][$filename] = array(
 								'name' => $filename
 							);
@@ -568,7 +606,7 @@ class KontorX_Template {
 		return $this->_findStyles[$template];
 	}
 
-/**
+	/**
 	 * @var string
 	 */
 	protected $_templateTargetInflector = ':templatePath/:templateName/';
@@ -649,19 +687,20 @@ class KontorX_Template {
      * @return Zend_Filter_Inflector
      */
 	public function getInflector() {
-		if (null === $this->_inflector) {
+		if (null === $this->_inflector)
+		{
 			require_once 'Zend/Filter/Inflector.php';
 			$this->_inflector = new Zend_Filter_Inflector();
             $this->_inflector->setThrowTargetExceptionsOn(false);
             $this->_inflector->addRules(array(
-            	':templatePath' => array(),
-				':templateName' => array('Word_CamelCaseToDash', 'StringToLower'),
-				':styleName' => array('Word_CamelCaseToDash', 'StringToLower'),
-            	':stylesDir' => array()
-			))
-			->setStaticRuleReference('templateName', $this->_templateName)
-			->setStaticRuleReference('styleName', $this->_styleName)
-			->setStaticRuleReference('stylesDir', $this->_styleDirName);
+	            	':templatePath' => array(),
+					':templateName' => array('Word_CamelCaseToDash', 'StringToLower'),
+					':styleName' => array('Word_CamelCaseToDash', 'StringToLower'),
+	            	':stylesDir' => array()
+				))
+				->setStaticRuleReference('templateName', $this->_templateName)
+				->setStaticRuleReference('styleName', $this->_styleName)
+				->setStaticRuleReference('stylesDir', $this->_styleDirName);
 		}
 
 		return $this->_inflector;
