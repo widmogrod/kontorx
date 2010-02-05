@@ -155,7 +155,12 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		switch($action) {
 			case 'next':
-				$this->_helper->redirector->goTo('add');
+				$params = array();
+				if (false !== ($id = $rq->getPost('id', false))) {
+					$params['id'] = $id;
+				}
+
+				$this->_helper->redirector->goTo('add', null, null, $params);
 				break;
 
 			case 'save':
@@ -396,14 +401,14 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			/**
 			 * Przekierowywanie akcji! 
 			 */
-			$this->_redirectAction('remove', $scaffold->getRowPK());
+			$this->_redirectAction('delete', $scaffold->getRowPK());
 		} else
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::NO_EXSISTS) {
 			$flashMessenger->addMessage($status);
 			/**
 			 * Przekierowywanie akcji! 
 			 */
-			$this->_redirectAction('remove');
+			$this->_redirectAction('delete');
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
