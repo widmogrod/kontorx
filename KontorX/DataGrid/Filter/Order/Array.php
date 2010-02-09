@@ -19,10 +19,6 @@ class KontorX_DataGrid_Filter_Order_Array extends KontorX_DataGrid_Filter_Abstra
         	$orderColumn[$key] = $value[$column];
         }
 
-    	if ($order == 'group') {
-        	$this->getColumn()->getDataGrid()->setGroupColumn($column);
-        }
-        
         if ('null' != $order) {
         	if (null !== $order) {
 	            $order = ($order != 'asc') ? SORT_DESC : SORT_ASC;

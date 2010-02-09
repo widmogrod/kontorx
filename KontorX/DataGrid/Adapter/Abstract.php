@@ -115,9 +115,9 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 
 				if ($column->isGroup()) {
 					/**
-					 * Grupowanie odbywa się za pomoca porównywania nazwy komórki
+					 * Grupowanie odbywa się za pomoca porównywania nazwiy komurki
 					 * Różne nazwy - przekazuje nową nazwę do porównywania
-		             * 				 i dodaje do _Cellset kolumne, po której
+		             * 				 i dodaje do _Cellset kolumne. po której
 		             * 				 odbywa się grupowanie.
 					 */
 	            	if ((string) $this->_groupCell != (string) $cell) {

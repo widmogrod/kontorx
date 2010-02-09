@@ -81,9 +81,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 		/* @var Zend_View_Interface */
 		$view = $template->getView();
 		$paths = $template->getTemplatePaths(true);
-
 		$paths = array_diff($paths, $view->getScriptPaths());
-
 		foreach ($paths as $path) {
 			if (method_exists($view, 'addScriptPath')) {
                 $view->addScriptPath($path);

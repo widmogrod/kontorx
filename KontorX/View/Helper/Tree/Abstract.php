@@ -6,7 +6,9 @@ require_once 'Zend/View/Helper/Abstract.php';
  * @category 	KontorX
  * @package 	KontorX_View
  * @subpackage  Helper
+ * @version 	0.1.5
  * @license		GNU GPL
+ * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstract {
 	/**
@@ -21,14 +23,10 @@ abstract class KontorX_View_Helper_Tree_Abstract extends Zend_View_Helper_Abstra
 	 * Renderowanie stroktory drzewiastej
 	 *
 	 * @param KontorX_Db_Table_Tree_Rowset_Abstract $rowset
-	 * @param string $class
 	 * @return string
 	 */
-	public function tree(KontorX_Db_Table_Tree_Rowset_Abstract $rowset, $class = null) {
-		$result = strlen($class) > 0
-			? '<ul class="'.$class.'">'
-			: '<ul>';
-
+	public function tree(KontorX_Db_Table_Tree_Rowset_Abstract $rowset) {
+		$result  = '<ul>';
 		if (count($rowset)) {
 			$result .= $this->_node($rowset);
 		}

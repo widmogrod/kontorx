@@ -7,16 +7,11 @@ require_once 'KontorX/DataGrid/Renderer/Abstract.php';
  */
 class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abstract {
 
-	public function render($partial = null, $module = null) {
+	public function render($partial = null) {
 		if (is_string($partial)) {
 			$this->setPartial($partial);
 		}
-		if (is_string($module)) {
-			$this->setPartial($module);
-		}
-		
 		$partial = $this->getPartial();
-		$module  = $this->getModule();
 
 		/* @var $view Zend_View */
 		$view = $this->getView();
@@ -25,11 +20,12 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
         }
 
         // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this->getDataGrid(), $partial, $module);
+        return $view->dataGrid($this->getDataGrid(), $partial);
 	}
 
 	/**
      * Default name of partial file @see Zend_View_Helper_Partial
+     * @todo dodać partial w zasobach biblioteki!
      * @var string
      */
     private $_partial = '_partial/dataGrid.phtml';
@@ -47,29 +43,6 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
      */
     public function getPartial() {
         return $this->_partial;
-    }
-    
-	/**
-     * Default name of module name @see Zend_View_Helper_Partial
-     * @var string
-     */
-    private $_module = null;
-
-    /**
-     * Set name of partial file @see Zend_View_Helper_Partial
-     * @var string
-     * @return void
-     */
-    public function setModule($module) {
-        $this->_module = (string) $module;
-    }
-
-    /**
-     * Return name of module
-     * @return string
-     */
-    public function getModule() {
-        return $this->_module;
     }
 	
 	/**
@@ -91,11 +64,14 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
 	 */
 	public function getView() {
 		if (null === $this->_view) {
-			require_once 'Zend/Controller/Action/HelperBroker.php';
-			/* @var $viewRenderer Zend_Controller_Action_Helper_ViewRenderer */
-			$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
-			$viewRenderer->initView();
-			$this->_view = $viewRenderer->view;
+			if (Zend_Registry::isRegistered('Zend_View')) {
+				$this->_view = Zend_Registry::get('Zend_View');
+			} elseif(Zend_Registry::isRegistered('view')) {
+				$this->_view = Zend_Registry::get('view');
+			} else {
+				require_once 'Zend/View.php';
+				$this->_view = new Zend_View();				
+			}
 		}
 		return $this->_view;
 	}

@@ -1,68 +1,51 @@
 <?php
+
 require_once 'Zend/Validate/Abstract.php';
 
+require_once 'identificationNumber/identificationNumberValidator.class.php';
+require_once 'identificationNumber/nip/nipValidator.class.php';
+
 /**
- * Port do ZF by Gabriel
+ * KontorX_Validate_NIP
  * 
- * @author Jaroslaw (jareeny) Reglinski
- * @copyright 2009 Jaroslaw Reglinski
- * @license http://www.gnu.org/licenses/gpl.html GNU General Public License v3
- * @version 1.0
+ * @category 	KontorX
+ * @package 	KontorX_Validate
+ * @version 	0.1.1
+ * @license		GNU GPL
+ * @author 		Marcin `widmogror` Habryn, widmogrod@gmail.com
  */
 class KontorX_Validate_NIP extends Zend_Validate_Abstract {
-
 	const TO_SHORT_OR_LONG  = 'nipToShotOrLon';
 	const IS_INCORRECT      = 'nipIsIncorrect';
+	const IS_ON_BLACKLIST   = 'nipIsOnBlacklist';
 
-	/**
-	 * Weight array for NIP number
-	 * @var array
-	 */
-	private $_weight = array(
-        6,5,7,2,3,4,5,6,7
-	);
-
+    // TODO: TO  english
     protected $_messageTemplates = array(
-        self::TO_SHORT_OR_LONG 	=> 'Ten numer NIP ma nieprawidłową ilość znaków',
-		self::IS_INCORRECT		=> 'Ten numer NIP jest nieprawidłowy'
+        self::TO_SHORT_OR_LONG 	=> "Podany numer NIP ma nieprawdłową ilosć znaków",
+		self::IS_INCORRECT		=> "Podany numer NIP jest nieprawidłowy",
+		self::IS_ON_BLACKLIST	=> "Podany numer NIP znajduje się na liście niepoprawnych numerów",
     );
 
 	public function isValid($value) {
-		$value = (string)$value;
+		$this->_setValue($value);
 
-		if(!is_numeric($value)) {
-			$this->_error(self::IS_INCORRECT);
-			return false;
-		}
-		
-		if(strlen($value) !== 10) {
-			$this->_error(self::TO_SHORT_OR_LONG);
-			return false;
-		}
-
-		if (!$this->_checkControlsum($value)) {
-			$this->_error(self::IS_INCORRECT);
-			return false;
-		}
-
-		return true;
-	}
-	
-	/**
-	 * Check a NIP number
-	 * @return void
-	 */
-	private function _checkControlsum($nip) {
-		$controlSum = 0;
-		for($i = 0; $i <= 8; $i++) {
-			$controlSum += $nip[$i] * $this->_weight[$i];
-		}
-
-		$controlNumber = $controlSum % 11;
-		if($nip[9] == $controlNumber) {
+		$nip = new nipValidator($value);
+		if ($nip->isValid()) {
 			return true;
 		}
 
+		if (!$nip->hasErrors()) {
+			$this->_error(self::IS_INCORRECT);
+			return false;
+		}
+
+		foreach ($nip->getErrors() as $error) {
+			switch ($error['code']) {
+				case 0: $this->_error(self::TO_SHORT_OR_LONG); break;
+				case 1: $this->_error(self::IS_INCORRECT); break;
+				case 2: $this->_error(self::IS_ON_BLACKLIST); break;
+			}
+		}
 		return false;
 	}
 }
