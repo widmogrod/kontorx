@@ -17,13 +17,24 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 			$options = array();
 		}
 
-		if (true === @$attribs['repeatSeparator']) {
-			$this->setRepeatSeparator($attribs['repeatSeparator']);
+		// separator ..
+		if (array_key_exsists('repeatSeparator', $attribs))
+		{
+			if (true === $attribs['repeatSeparator'])
+			{
+				$this->setRepeatSeparator($attribs['repeatSeparator']);
+			}
+			unset($attribs['repeatSeparator']);
 		}
 
 		// dodaje pierwszy element jako pusty
-		if (true === @$attribs['firstNull']) {
-			$result[null] = null;
+		if (array_key_exsists('firstNull', $attribs))
+		{
+			if (true === $attribs['firstNull'])
+			{
+				$result[null] = null;
+			}
+			unset($attribs['firstNull']);
 		}
 
 		if ($rowset instanceof RecursiveIterator) {
