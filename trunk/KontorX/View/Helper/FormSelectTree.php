@@ -18,7 +18,7 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 		}
 
 		// separator ..
-		if (array_key_exsists('repeatSeparator', $attribs))
+		if (array_key_exists('repeatSeparator', $attribs))
 		{
 			if (true === $attribs['repeatSeparator'])
 			{
@@ -28,7 +28,7 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 		}
 
 		// dodaje pierwszy element jako pusty
-		if (array_key_exsists('firstNull', $attribs))
+		if (array_key_exists('firstNull', $attribs))
 		{
 			if (true === $attribs['firstNull'])
 			{
