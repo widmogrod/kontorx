@@ -11,6 +11,7 @@ class Promotor_Form_Scaffold extends Zend_Dojo_Form {
                 $values[$key] = $element->getValue();
             }
         }
+
         foreach ($this->getSubForms() as $key => $subForm) {
             /*$fValues = $this->_attachToArray($subForm->getValues(true), $subForm->getElementsBelongTo());*/
             $values = array_merge($values, $subForm->getValues(true));
