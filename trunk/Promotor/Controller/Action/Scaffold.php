@@ -146,17 +146,11 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		/* @var $redirector Zend_Controller_Action_Helper_Redirector */
 		$redirector = $this->_helper->getHelper('Redirector');
-		
-		// przekierowywani domyslne
-		if (!in_array($action, $redirects)) {
-			$redirector->goTo($type);
-			return;
-		}
 
 		switch($action) {
 			case 'next':
 				$params = array();
-				if (false !== ($id = $rq->getPost('id', false))) {
+				if (false !== ($id = $rq->getParam('id', false))) {
 					$params['id'] = $id;
 				}
 

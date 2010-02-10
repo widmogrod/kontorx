@@ -569,7 +569,7 @@ class KontorX_Template {
 	 * @return array
 	 */
 	public function findStyles($template) {
-		$template = basename($template);
+		$template = basename((string) $template);
 		if (!isset($this->_findStyles[$template])) 
 		{
 			$this->_findStyles[$template] = array();
