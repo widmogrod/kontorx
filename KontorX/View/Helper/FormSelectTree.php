@@ -27,9 +27,9 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
 		}
 
 		if ($rowset instanceof RecursiveIterator) {
-			$result = $this->_setupOptionsFromRecursiveIterator($rowset, $options, $result);
+			$result += $this->_setupOptionsFromRecursiveIterator($rowset, $options, $result);
 		} else {
-			$result = $this->_setupOptionsFromArray($options, $result);
+			$result += $this->_setupOptionsFromArray($options, $result);
 		}
 
 		return $this->formSelect($name, $value, $attribs, $result, $listsep);
