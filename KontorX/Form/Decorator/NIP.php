@@ -1,8 +1,13 @@
 <?php
+/**
+ * Dekorator dekoruje tylko elementy {@see KontorX_Form_Element_NIP}
+ * 
+ * @version $Id$
+ * @author $Author$
+ */
 class KontorX_Form_Decorator_NIP extends Zend_Form_Decorator_Abstract {
-	public function render($content) {
-		// element dekoruje tylko KontorX_Form_Element_NIP
-
+	public function render($content)
+	{
 		/* @var KontorX_Form_Element_NIP */
 		$element = $this->getElement();
 		if (!($element instanceof KontorX_Form_Element_NIP)) {
