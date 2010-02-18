@@ -28,7 +28,6 @@ class KontorX_Update_File_Sql extends KontorX_Update_File_Abstract {
 
 		try {
 			$stmt = $adapter->query($sql);
-			$stmt->execute();
 			$this->_setStatus(self::SUCCESS);
 		} catch(Exception $e) {
 			$this->_addException($e);
