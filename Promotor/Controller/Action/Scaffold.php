@@ -231,7 +231,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		/* @var $form Zend_Form */
 		$form = new $this->_formAddClass(array(
-			'primaryKey' => $scaffold->getRowPK()
+			'primaryKey' => $scaffold->getRowPK(),
+			'request' => $this->getRequest()
 		));
 
 		$scaffold->setForm($form)
@@ -293,7 +294,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		/* @var $form Zend_Form */
 		$form = new $this->_formEditClass(array(
-			'primaryKey' => $scaffold->getRowPK()
+			'primaryKey' => $scaffold->getRowPK(),
+			'request' => $this->getRequest()
 		));
 
 		$scaffold->setForm($form)
@@ -360,7 +362,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		
 		/* @var $form Zend_Form */
 		$form = new $this->_formRemoveClass(array(
-			'primaryKey' => $scaffold->getRowPK()
+			'primaryKey' => $scaffold->getRowPK(),
+			'request' => $this->getRequest()
 		));
 
 		$scaffold->setForm($form)

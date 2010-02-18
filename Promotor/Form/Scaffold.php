@@ -45,6 +45,25 @@ class Promotor_Form_Scaffold extends Zend_Form {
 	}
 	
 	/**
+	 * @var Zend_Controller_Request_Abstract
+	 */
+	private $_request = null;
+	
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
+	 */
+	public function setRequest(Zend_Controller_Request_Abstract $request) {
+		$this->_request = $request;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getRequest() {
+		return $this->_request;
+	}
+	
+	/**
 	 * @var Zend_Db_Table_Rowset_Abstract
 	 */
 	private $_rowset = null;
