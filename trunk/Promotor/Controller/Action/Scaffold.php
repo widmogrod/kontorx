@@ -120,12 +120,22 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	/**
 	 * @var array
 	 */
-	protected $_redirectAction = array(
+	protected $_defaultRedirectActions = array(
 		'add' => array('save','next','exit'),
 		'edit' => array('save','next','exit'),
 		'delete' => array('exit'),
 	);
 	
+	/**
+	 * user customizable
+	 * @var array
+	 */
+	protected $_redirectAction = array();
+	
+	/**
+	 * user customizable
+	 * @var array
+	 */
 	protected $_redirectActionParams = array();
 
 	/**
@@ -134,7 +144,11 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @return void
 	 */
 	protected function _redirectAction($type, array $rowPK = null) {
-		if (!isset($this->_redirectAction[$type])) 
+		$redirectAction = array_merge(
+				$this->_defaultRedirectActions, 
+				$this->_redirectAction);
+
+		if (!isset($redirectAction[$type])) 
 		{
 			throw new Zend_Controller_Action_Exception(
 				'action type "'.$type.'"for redirect do not exsists or is not defined');
@@ -144,7 +158,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$rq = $this->getRequest();
 
 		$action = $rq->getPost('__kx_action');
-		$redirects = (array) $this->_redirectAction[$type];
+		$redirects = (array) $redirectAction[$type];
 		
 		/* @var $redirector Zend_Controller_Action_Helper_Redirector */
 		$redirector = $this->_helper->getHelper('Redirector');

@@ -119,7 +119,8 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 	 * @throws Zend_Controller_Action_Exception
 	 */
 	public function getRowPK() {
-		if (null === $this->_rowPK) {
+		if (null === $this->_rowPK)
+		{
 			require_once 'Zend/Controller/Action/Exception.php';
 			throw new Zend_Controller_Action_Exception('primary key data for find row is not set');
 		}
@@ -128,15 +129,16 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 		$primaryKey = $dbTable->info(Zend_Db_Table::PRIMARY);
 
 		$result = array_intersect_key($this->_rowPK, array_flip($primaryKey));
-		if (count($result) < 1)
+		
+		if (count($result) < 1 && count($this->_rowPK) == count($primaryKey))
 		{
-			foreach ($primaryKey as $id => $val)
+			foreach ($primaryKey as $id)
 			{
 				$result[$id] = current($this->_rowPK);
 				next($this->_rowPK);
 			}
 		}
-		
+
 		return $result; 
 	}
 	
