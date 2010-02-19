@@ -127,7 +127,17 @@ class KontorX_Controller_Action_Helper_Scaffold extends Zend_Controller_Action_H
 		$dbTable = $this->getDbTable();
 		$primaryKey = $dbTable->info(Zend_Db_Table::PRIMARY);
 
-		return array_intersect_key($this->_rowPK, array_flip($primaryKey));
+		$result = array_intersect_key($this->_rowPK, array_flip($primaryKey));
+		if (count($result) < 1)
+		{
+			foreach ($primaryKey as $id => $val)
+			{
+				$result[$id] = current($this->_rowPK);
+				next($this->_rowPK);
+			}
+		}
+		
+		return $result; 
 	}
 	
 	/**

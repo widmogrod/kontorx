@@ -126,6 +126,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		'delete' => array('exit'),
 	);
 	
+	protected $_redirectActionParams = array();
 
 	/**
 	 * @param string $type
@@ -133,7 +134,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	 * @return void
 	 */
 	protected function _redirectAction($type, array $rowPK = null) {
-		if (!isset($this->_redirectAction[$type])) {
+		if (!isset($this->_redirectAction[$type])) 
+		{
 			throw new Zend_Controller_Action_Exception(
 				'action type "'.$type.'"for redirect do not exsists or is not defined');
 		}
@@ -143,13 +145,21 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		$action = $rq->getPost('__kx_action');
 		$redirects = (array) $this->_redirectAction[$type];
-
+		
 		/* @var $redirector Zend_Controller_Action_Helper_Redirector */
 		$redirector = $this->_helper->getHelper('Redirector');
 
-		switch($action) {
+		$params = array();
+		if (isset($this->_redirectActionParams[$type])
+		 		&& isset($this->_redirectActionParams[$type][$action]))
+		{
+			$params = $rq->getParams();
+			$params = array_intersect_key($params, array_flip((array) $this->_redirectActionParams[$type][$action]));
+		}
+		
+		switch($action) 
+		{
 			case 'next':
-				$params = array();
 				if (false !== ($id = $rq->getParam('id', false))) {
 					$params['id'] = $id;
 				}
@@ -158,7 +168,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 				break;
 
 			case 'save':
-				$this->_helper->redirector->goTo('edit', null, null, $rowPK);
+				$params = array_merge($rowPK, $params);
+				$this->_helper->redirector->goTo('edit', null, null, $params);
 				break;
 
 			case 'exit':
@@ -337,7 +348,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 			/**
 			 * Przekierowywanie akcji! 
 			 */
-			$this->_redirectAction('edit');
+			$this->_redirectAction('edit', $scaffold->getRowPK());
 		} else {
 			$flashMessenger->addMessage($status);
 			if ($result instanceof Exception) {
