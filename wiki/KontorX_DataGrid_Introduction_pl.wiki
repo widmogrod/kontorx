@@ -1,0 +1,60 @@
+#summary One-sentence summary of this page.
+#labels Phase-Design
+
+= Wprowadzenie do DataGrid =
+
+FIXIT: poprawić stylistykę..
+
+KontorX_DataGrid -jest to biblioteka napisana w dla integracji z Zend Framework. 
+Zawiera już adaptery dla danych Zend_Db_Table, Zend_Db_Select, Array.
+Prosta możliwość pisania własnych adapterów stanowi łatwy sposób na rozszerzenie funkcjonalność o inne biblioteki przechowywujące / pobierające struktury danych.
+
+== Cel i zadaniem biblioteki ==
+
+FIXIT: sformułować to lepiej
+
+Cel i zadania biblioteki KontorX_DataGrid jest:
+
+  * wizualizacja tabelarycznych struktór danych.
+  * filtrowania danych po różnych kryteriach
+  * edytowania wierszy rekordów z poziomu widoku tabeli danych
+  * różnorodna wizualizacja struktur danych (html table, ExtJS Grid ...)
+
+== Struktura i model ==
+
+Ogólna struktura klas składa się z:
+
+TODO: wstawić diagram UML
+
+
+
+
+== Typy danych ==
+
+=== Adaptery danych ===
+
+TODO: rozwinąć opisy
+
+KontorX_DataGrid_Adapter_*
+
+  * Interface
+  * Abstract
+  * DbTable
+  * DbSelect
+  * DbTableTree
+
+
+TODO: opisać drobne sztuczki z adapterami (przykłady zastosowań)
+
+=== Rodzaje wizualizacji danych ===
+
+KontorX_DataGrid_Adapter_*
+  * Interface
+  * Abstract
+  * HtmlTable - natywna tabela HTML 
+  * ExtGrid_Array
+  * ExtGrid_Json
+
+TODO: pokazać wizualizacje
+TODO: opisać plusy i minusy
+TODO: przykłądowy kod implementacji
