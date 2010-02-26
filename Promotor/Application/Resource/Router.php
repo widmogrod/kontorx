@@ -1,6 +1,8 @@
 <?php
 class Promotor_Application_Resource_Router extends Zend_Application_Resource_Router {
 
+	protected $_globalParams = array();
+	
 	public function init() {
 		$result = parent::init();
 		$this->_initGlobalParams();
