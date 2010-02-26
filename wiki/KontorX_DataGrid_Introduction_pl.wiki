@@ -58,3 +58,47 @@ KontorX_DataGrid_Adapter_*
 TODO: pokazać wizualizacje
 TODO: opisać plusy i minusy
 TODO: przykłądowy kod implementacji
+
+
+=== KontorX_DataGrid_Filter_* ===
+
+==== KontorX_DataGrid_Filter_Text ====
+
+options:
+  * correlationName - string - nazwa korelacji baz danych , tabela z której wartość ma być filtrowana
+  * mappedColumn - string - nazwa kolumny, po której ma się odbywać filtrowanie
+
+Przykład:
+
+Zend_Db_Select przekazywany do KontorX_DataGrid::factory
+
+{{{
+$select = new Zend_Db_Select($db);
+
+		$select->from(array('sp' => 'shop_product'))
+			   ->join(
+			   		array('sm' => 'shop_manufacturer'),
+			   			'sp.manufacturer_id = sm.id', array('manufacturer' => 'name'));
+}}}
+
+Wynik zapytania jaki jest generowany
+
+{{{
+SELECT `sp`.*, `sm`.`name` AS `manufacturer` FROM `shop_product` AS `sp` INNER JOIN `shop_manufacturer` AS `sm` ON sp.manufacturer_id = sm.id 
+}}}
+
+Konfiguracja kolumny z korelacją
+
+{{{
+            <name type="Order" name="Nazwa produktu">
+                <filter type="Text">
+                	<options correlationName="sp"></options>
+                </filter>
+                <cell type="Html">
+					<content><![CDATA[
+						<a class="action edit small" href="/shop/product/edit/id/{id}">{name}</a>
+						<small class="right blur"><b class="action attach small">alias:</b> {alias}</small>
+					]]></content>
+                </cell>
+            </name>
+}}}
