@@ -1,0 +1,2 @@
+<?php
+class KontorX_Controller_Action_Helper_FormWizard_ActionHasNoFormException extends Exception {}
