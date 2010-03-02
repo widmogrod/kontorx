@@ -202,30 +202,30 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		$rq = $this->getRequest();
 		if ($rq->isPost()) {
-			switch ($rq->getPost('action_type')) {
-				case 'update':
-					if (null !== $rq->getPost('editable')) {
-						if ($this->_helper->acl->isAllowed('update')) {
-							$data = $rq->getPost('editable');
-							$model->editableUpdate($data);
-							$this->_helper->flashMessenger($model->getStatus());
-						}
-					}
-					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
-					return;
-
-				case 'delete':
-					if (null !== $rq->getPost('action_checked')) {
-						if ($this->_helper->acl->isAllowed('delete')) {
-							$data = $rq->getPost('action_checked');
-							$model->editableDelete($data);
-							$this->_helper->flashMessenger($model->getStatus());
-						}
-					}
-
-					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
-					return;
-			}
+//			switch ($rq->getPost('action_type')) {
+//				case 'update':
+//					if (null !== $rq->getPost('editable')) {
+//						if ($this->_helper->acl->isAllowed('update')) {
+//							$data = $rq->getPost('editable');
+//							$model->editableUpdate($data);
+//							$this->_helper->flashMessenger($model->getStatus());
+//						}
+//					}
+//					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+//					return;
+//
+//				case 'delete':
+//					if (null !== $rq->getPost('action_checked')) {
+//						if ($this->_helper->acl->isAllowed('delete')) {
+//							$data = $rq->getPost('action_checked');
+//							$model->editableDelete($data);
+//							$this->_helper->flashMessenger($model->getStatus());
+//						}
+//					}
+//
+//					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+//					return;
+//			}
 		}
 
 		// setup data grid
@@ -451,7 +451,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 	protected function _setupDataGridPaginator(KontorX_DataGrid $grid) {
 		if ($this->_pagination) {
 			$page = $this->_getParam('page',1);
-			$count = $this->_getParam('itemCountPerPage', 30);
+			$count = $this->_getParam('itemCountPerPage', 20);
 			$grid->setPagination($page, $count);
 		}
 	}
