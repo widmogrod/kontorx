@@ -142,8 +142,10 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 			foreach ($data as $key => $values) {
 				$where = array();
 				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
-				foreach ($primaryKey as $i => $column) {
-					if (isset($primaryValues[$i-1])) {
+				foreach ($primaryKey as $i => $column)
+				{
+					if (isset($primaryValues[$i-1]))
+					{
 						$where[] = $db->quoteInto($column . ' = ?', $primaryValues[$i-1]);
 					}
 				}
