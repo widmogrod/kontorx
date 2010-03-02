@@ -443,7 +443,8 @@ class KontorX_DataGrid {
             $type = self::DEFAULT_COLUMN_TYPE;
         }
 
-        if (!($columnName instanceof KontorX_DataGrid_Column_Interface)) {
+        if (!($columnName instanceof KontorX_DataGrid_Column_Interface))
+        {
         	// create column instance
 	        $columnClass = $this->getPluginLoader(self::COLUMN)->load($type);
 	        /* @var $columnInstance KontorX_DataGrid_Column_Interface */
@@ -459,27 +460,31 @@ class KontorX_DataGrid {
         $columnInstance->setDataGrid($this);
 
         // set group column
-        if (array_key_exists('group', $options)) {
+        if (array_key_exists('group', $options))
+        {
         	$this->setGroupColumn($columnInstance);
         }
 
         // create filter
-        if (isset($options['filter'])) {
-            $filter = $this->_createFilter((array) $options['filter']);
+        if (isset($options['filter']))
+        {
+            $filter = $this->_createFilter($options['filter']);
             $columnInstance->addFilter($filter);
             unset($options['filter']);
         } else
         // create and add filter set
-        if (isset($options['filters']) && is_array($options['filters'])) {
-        	foreach ($options['filters'] as $filter) {
-        		$filter = $this->_createFilter((array) $filter);
+        if (isset($options['filters']) && is_array($options['filters']))
+        {
+        	foreach ($options['filters'] as $filter)
+        	{
+        		$filter = $this->_createFilter($filter);
             	$columnInstance->addFilter($filter);
         	}
         	unset($options['filters']);
         } 
 
         // cell is allways
-		$cell = $this->_createCell((array) @$options['cell']);
+		$cell = $this->_createCell(@$options['cell']);
 		$columnInstance->setCell($cell);
 
         $this->_columns[$columnInstance->getColumnName()] = $columnInstance;
@@ -548,6 +553,11 @@ class KontorX_DataGrid {
      * @return KontorX_DataGrid_Filter_Interface
      */
     private function _createFilter($options = null) {
+    	if ($options instanceof KontorX_DataGrid_Filter_Interface)
+    	{
+    		return $options;
+    	}
+
         if (null === $options) {
             $options = array();
         } else
@@ -583,6 +593,11 @@ class KontorX_DataGrid {
      * @return KontorX_DataGrid_Cell_Interface
      */
     private function _createCell($options = null) {
+    	if ($options instanceof KontorX_DataGrid_Cell_Interface)
+    	{
+    		return $options;
+    	}
+
         if (null === $options) {
             $options = array();
         } else

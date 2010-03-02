@@ -81,6 +81,7 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 	public function render() {
 		$params = $this->getUrlParams();
 		$router = $this->getAttrib('router');
+		$target = $this->getAttrib('target','_self');
 
 		$view = $this->getView();
 		$href = $view->url($params, $router, false, false);
@@ -92,8 +93,8 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 		$name = $this->getName();
 		$class = $this->getAttrib('class');
 
-		$format = '<a class="%s" href="%s" title="%s"><span>%s</span></a>';
-		return sprintf($format, $class, $href, $name, $name);
+		$format = '<a class="%s" href="%s" title="%s" target="%s"><span>%s</span></a>';
+		return sprintf($format, $class, $href, $name, $target, $name);
 	}
 
 	/**
