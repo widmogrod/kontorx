@@ -47,6 +47,13 @@ abstract class KontorX_Image_Abstract {
     }
 
     /**
+     * @return string
+     */
+    public function getPathname() {
+    	return $this->_pathname;
+    }
+    
+    /**
      * Wczytanie grafiki
      * @param string $pathname
      */
@@ -372,6 +379,27 @@ abstract class KontorX_Image_Abstract {
     }
 
     /**
+     * @return KontorX_Image_Abstract
+     */
+    public function rotate($angle, $backgroundColor = 0, $ignoreTransparent = 0)
+    {
+    	$angle = (float) $angle;
+    	$backgroundColor = (int) $backgroundColor;
+    	$ignoreTransparent = (int) $ignoreTransparent;
+
+    	if (!($image = imagerotate($this->_image, $angle, $backgroundColor, $ignoreTransparent)))
+    	{
+    		require_once 'KontorX/Image/Exception.php';
+    		throw new KontorX_Image_Exception('imagerotate return false');
+    	}
+
+    	$this->_image = $image;
+    	unset($image);
+
+    	return $this;
+    }
+    
+    /**
      * @param string $filename
      * @param integer $type
      * @param integer $quality
@@ -501,4 +529,127 @@ abstract class KontorX_Image_Abstract {
 
         return null;
     }
+}
+
+if (!function_exists('imagerotate'))
+{
+	/**
+	 * @link http://php.mainseek.com/manual/en/function.imagerotate.php#93151
+	 * 
+	 * @param unknown_type $srcImg
+	 * @param unknown_type $angle
+	 * @param unknown_type $bgcolor
+	 * @param unknown_type $ignore_transparent
+	 * @return number|number|unknown|resource
+	 */
+	function imagerotate($srcImg, $angle, $bgcolor, $ignore_transparent = 0)
+	{
+	    function rotateX($x, $y, $theta)
+	    {
+	        return $x * cos($theta) - $y * sin($theta);
+	    }
+
+	    function rotateY($x, $y, $theta)
+	    {
+	        return $x * sin($theta) + $y * cos($theta);
+	    }
+	
+	    $srcw = imagesx($srcImg);
+	    $srch = imagesy($srcImg);
+	
+	    //Normalize angle
+	    $angle %= 360;
+	    //Set rotate to clockwise
+	    $angle = -$angle;
+	
+	    if($angle == 0) {
+	        if ($ignore_transparent == 0) {
+	            imagesavealpha($srcImg, true);
+	        }
+	        return $srcImg;
+	    }
+	
+	    // Convert the angle to radians
+	    $theta = deg2rad ($angle);
+	
+	    //Standart case of rotate
+	    if ( (abs($angle) == 90) || (abs($angle) == 270) ) {
+	        $width = $srch;
+	        $height = $srcw;
+	        if ( ($angle == 90) || ($angle == -270) ) {
+	            $minX = 0;
+	            $maxX = $width;
+	            $minY = -$height+1;
+	            $maxY = 1;
+	        } else if ( ($angle == -90) || ($angle == 270) ) {
+	            $minX = -$width+1;
+	            $maxX = 1;
+	            $minY = 0;
+	            $maxY = $height;
+	        }
+	    } else if (abs($angle) === 180) {
+	        $width = $srcw;
+	        $height = $srch;
+	        $minX = -$width+1;
+	        $maxX = 1;
+	        $minY = -$height+1;
+	        $maxY = 1;
+	    } else {
+	        // Calculate the width of the destination image.
+	        $temp = array (rotateX(0, 0, 0-$theta),
+	        rotateX($srcw, 0, 0-$theta),
+	        rotateX(0, $srch, 0-$theta),
+	        rotateX($srcw, $srch, 0-$theta)
+	        );
+	        $minX = floor(min($temp));
+	        $maxX = ceil(max($temp));
+	        $width = $maxX - $minX;
+	
+	        // Calculate the height of the destination image.
+	        $temp = array (rotateY(0, 0, 0-$theta),
+	        rotateY($srcw, 0, 0-$theta),
+	        rotateY(0, $srch, 0-$theta),
+	        rotateY($srcw, $srch, 0-$theta)
+	        );
+	        $minY = floor(min($temp));
+	        $maxY = ceil(max($temp));
+	        $height = $maxY - $minY;
+	    }
+	
+	    $destimg = imagecreatetruecolor($width, $height);
+	    
+	    /**
+    	 * Dodanie dodatkowej obsługi:
+    	 * 
+    	 * 1. sprawdź czy ignorować przeźroczystość
+    	 *    (nie będą ignorowane jeżeli ustawiono wartość 0)
+    	 * 2. sprawdz czy wersja PHP jest większa niż 5.1
+    	 *    bo PHP < od 5.1 nie obsługuje $ignoreTransparent
+    	 */
+		if ($ignore_transparent == 0) {
+	        $temp = imagecolorallocatealpha($destimg, 255,255, 255, 127);
+	        imagefill($destimg, 0, 0, $temp);
+	        //if set the default color or white or magic pink then use transparent color
+	        if ( ($bgcolor == 0) || ($bgcolor == 16777215) || ($bgcolor == 16711935) )  {
+	            $bgcolor = $temp;
+	        }
+	        imagesavealpha($destimg, true);
+	    }
+	
+	    // sets all pixels in the new image
+	    for($x=$minX; $x<$maxX; $x++) {
+	        for($y=$minY; $y<$maxY; $y++) {
+	            // fetch corresponding pixel from the source image
+	            $srcX = round(rotateX($x, $y, $theta));
+	            $srcY = round(rotateY($x, $y, $theta));
+	            if($srcX >= 0 && $srcX < $srcw && $srcY >= 0 && $srcY < $srch) {
+	                $color = imagecolorat($srcImg, $srcX, $srcY );
+	            } else {
+	                $color = $bgcolor;
+	            }
+	            imagesetpixel($destimg, $x-$minX, $y-$minY, $color);
+	        }
+	    }
+	    return $destimg;
+	}
 }

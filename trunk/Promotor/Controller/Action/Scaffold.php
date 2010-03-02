@@ -269,11 +269,13 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		
 		$status = $scaffold->getStatus();
 		$result = $scaffold->getResult();
-		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
+		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) 
+		{
 			$flashMessenger->addMessage($status);
 			
 			// uduchamianie powiadomień
-			if (null !== $this->_addPostObservableName) {
+			if (null !== $this->_addPostObservableName) 
+			{
 				$manager = Promotor_Observable_Manager::getInstance();
 				$list = $manager->notify(
 					$this->_addPostObservableName,
@@ -281,7 +283,8 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 					$form);
 	
 				$flashMessenger->addMessage($status);
-				foreach ($list->getMessages() as $observerName => $messages) {
+				foreach ($list->getMessages() as $observerName => $messages) 
+				{
 					$flashMessenger->addMessage(sprintf("%s::%s", $observerName, print_r($messages, true)));
 				}
 			} else {
@@ -396,7 +399,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		 /* @var $flashMessenger Zend_Controller_Action_Helper_FlashMessenger */
 		$flashMessenger = $this->_helper->getHelper('FlashMessenger');
-			
+
 		$status = $scaffold->getStatus();
 		$result = $scaffold->getResult();
 		if ($status === KontorX_Controller_Action_Helper_Scaffold::SUCCESS) {
