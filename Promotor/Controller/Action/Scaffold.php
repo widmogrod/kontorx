@@ -202,35 +202,57 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		$rq = $this->getRequest();
 		if ($rq->isPost()) {
-//			switch ($rq->getPost('action_type')) {
-//				case 'update':
-//					if (null !== $rq->getPost('editable')) {
-//						if ($this->_helper->acl->isAllowed('update')) {
-//							$data = $rq->getPost('editable');
-//							$model->editableUpdate($data);
-//							$this->_helper->flashMessenger($model->getStatus());
-//						}
-//					}
-//					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
-//					return;
-//
-//				case 'delete':
-//					if (null !== $rq->getPost('action_checked')) {
-//						if ($this->_helper->acl->isAllowed('delete')) {
-//							$data = $rq->getPost('action_checked');
-//							$model->editableDelete($data);
-//							$this->_helper->flashMessenger($model->getStatus());
-//						}
-//					}
-//
-//					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
-//					return;
-//			}
+			switch ($rq->getPost('action_type')) 
+			{
+				case 'update':
+					if (null !== $rq->getPost('editable'))
+					{
+						if ($this->_helper->acl->isAllowed('update'))
+						{
+							$data = $rq->getPost('editable');
+							$model->editableUpdate($data);
+							$this->_helper->flashMessenger($model->getStatus());
+						}
+					}
+					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+					return;
+
+				case 'delete':
+					if (null !== $rq->getPost('action_checked'))
+					{
+						if ($this->_helper->acl->isAllowed('delete')) 
+						{
+							$data = $rq->getPost('action_checked');
+							$model->editableDelete($data);
+							$this->_helper->flashMessenger($model->getStatus());
+						}
+					}
+
+					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
+					return;
+			}
 		}
 
 		// setup data grid
 		$config = $this->_helper->config($this->_getConfigFilename());
-		$grid = KontorX_DataGrid::factory($model->selectList(), $config->grid);
+
+		/**
+		 * przestrzeń nazw dla innego typu data grid
+		 * TODO: zastanowić się czy nie lepiej to jest zrobić w nowej akcji
+		 * 76% - na nową akcję! to będzie bardziej skomplikowany DataGrid 
+		 */
+		$gridNS = $this->_getParam('dg');
+		$gridNS = 'grid' . ucfirst($gridNS);
+		if (isset($config->$gridNS))
+		{
+			$options = $config->$gridNS;
+		} else {
+			$options = $config->grid;
+		}
+		
+		
+		
+		$grid = KontorX_DataGrid::factory($model->selectList(), $options);
 		$grid->setValues($this->_getAllParams());
 
 		$this->_setupDataGridPaginator($grid);
