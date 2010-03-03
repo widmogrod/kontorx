@@ -16,6 +16,10 @@ class Promotor_Application_Resource_Router extends Zend_Application_Resource_Rou
 	public function setGlobalParams(array $params) {
 		$this->_globalParams = $params;
 	}
+
+	public function getGlobalParams() {
+		return $this->_globalParams;
+	}
 	
 	/**
 	 * @return void

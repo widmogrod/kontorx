@@ -74,6 +74,19 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 		if (null !== ($p = $this->getAttrib('params'))) {
 			$params = array_merge($params, $p);
 		}
+		if (null !== ($p = $this->getAttrib('paramsFromData'))) {
+			$p = (array) $p;
+			$r = array();
+			foreach ($p as $param => $key)
+			{
+				
+				if (false !== ($value = $this->getData($key, false)))
+				{
+					$r[$param] = $value;
+				}
+			}
+			$params = array_merge($params, $r);
+		}
 
 		return $params; 
 	}

@@ -18,6 +18,20 @@ class Promotor_View_Helper_Site_Navigation extends Promotor_View_Helper_Site_Abs
 		$this->_proxy = (string) $proxy;
 		return $this;
 	}
+	
+	/**
+	 * @var Zend_Navigation
+	 */
+	protected $_locale;
+	
+	/**
+	 * @param string $locale
+	 * @return Promotor_View_Helper_Site_Navigation
+	 */
+	public function setLocale($locale) {
+		$this->_locale = (string) $locale;
+		return $this;
+	}
 
 	/**
 	 * @var Zend_Navigation
@@ -30,7 +44,7 @@ class Promotor_View_Helper_Site_Navigation extends Promotor_View_Helper_Site_Abs
 	public function getNavigation() {
 		if (null === $this->_navigation) {
 			$model = $this->_site->getModel();
-			$this->_navigation = $model->getNavigation();
+			$this->_navigation = $model->getNavigation($this->_locale);
 		}
 		return $this->_navigation;
 	}
