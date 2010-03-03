@@ -202,14 +202,15 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 		$rq = $this->getRequest();
 		if ($rq->isPost()) {
-			switch ($rq->getPost('action_type')) 
+			$data 		= $rq->getPost('editable');
+			$actionType = $rq->getPost('action_type');
+			switch ($actionType) 
 			{
 				case 'update':
 					if (null !== $rq->getPost('editable'))
 					{
 						if ($this->_helper->acl->isAllowed('update'))
 						{
-							$data = $rq->getPost('editable');
 							$model->editableUpdate($data);
 							$this->_helper->flashMessenger($model->getStatus());
 						}
@@ -230,6 +231,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 
 					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
 					return;
+
+				default:
+					$this->_noticeObserver('pre', $actionType, $rq->getPost(), $model, $this);
 			}
 		}
 
@@ -258,7 +262,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$this->_setupDataGridPaginator($grid);
 
 		$this->view->grid = $grid;
-		
+
 //		/* @var $viewRenderer Zend_Controller_Action_Helper_ViewRenderer  */
 //		$viewRenderer = $this->_helper->getHelper('ViewRenderer');
 //		$viewRenderer->
