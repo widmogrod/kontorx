@@ -115,7 +115,10 @@ class Promotor_View_Helper_SiteAttachment extends Zend_View_Helper_Abstract {
 			case self::MEDIA:
 				$model = new Site_Model_Site();
 				$rowset = $model->findAttachments($this->_alias, $this->_type, $this->_rowCount, $this->_page);
-				return array($this->_type => array('rowset' => $rowset));
+				return array(
+					'alias' => $this->_alias,
+					$this->_type => array('rowset' => $rowset)
+				);
 		}
 
 		// @todo Exception!
