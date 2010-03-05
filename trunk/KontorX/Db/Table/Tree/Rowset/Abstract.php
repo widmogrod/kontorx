@@ -61,28 +61,42 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 
 		$key = $this->_getLevelKey();
 
-		if (isset($this->_childrens[$key])) {
+		if (isset($this->_childrens[$key]))
+		{
 			return (bool) count($this->_childrens[$key]);
 		}
 
 		$this->_childrens[$key] = array();
 
-		foreach ($this->_data as $pointer => $data) {
-			if ($pointer === $this->_pointer) {
+		foreach ($this->_data as $pointer => $data) 
+		{
+			if ($pointer === $this->_pointer) 
+			{
 				continue;
 			}
+			
+//			$thisKey = $this->_getLevelKey($data);
 
+			
+			// Tutaj jest błąd co jeżeli rodzic jest 1 a dziecko 12
+			// 12 posiada 1 na początku a nie jest jego rodzicem!
 			// sprawdz czy poczatek $data[$this->_level] jest identyczny z kluczem
 			// jeśli tak, to jest to dziecko
-			if (($key == substr($data[$this->_level], 0, strlen($key)))) {
+//			if ($key == substr($data[$this->_level], 0, strlen($key)))
+
+			// sprawcz czy klucz rodzica jest identyczny jak dziecka
+			if ($key == $data[$this->_level]) 
+			{
 				$this->_childrens[$key][] = $data;
 				unset($this->_data[$pointer]);
 				--$this->_count;
 				$result = true;
 			}
+			
 		}
 		
-		if ($result) {
+		if ($result) 
+		{
 			// reset keys
 			$this->_data = array_values($this->_data);
 		}
@@ -111,16 +125,24 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 			'level'	   => $this->_level,
 			'separator'=> $this->_separator,
         );
+
         return new self($data);
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function _getLevelKey() {
-		$current = $this->current();
-		return $current->__get($this->_level) == ''
-			? $current->__get('id')
-			: $current->__get($this->_level) . $this->_separator . $current->__get('id');
+	protected function _getLevelKey(array $data = null) {
+		if (null === $data)
+		{
+			$current = $this->current();
+			return $current->__get($this->_level) == ''
+				? $current->__get('id')
+				: $current->__get($this->_level) . $this->_separator . $current->__get('id');
+		} else {
+			return $data[$this->_level] == ''
+				? $data['id']
+				: $data[$this->_level] . $this->_separator . $data['id'];
+		}
 	}
 }

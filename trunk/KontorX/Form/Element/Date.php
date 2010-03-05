@@ -13,8 +13,7 @@ class KontorX_Form_Element_Date extends Zend_Form_Element_Xhtml {
 		);
 
 		$this->setIsArray(true);
-
-		$this->addValidator('Date', array('format' => $this->_format));
+//		$this->addValidator('Date', array('format' => $this->_format));
 	}
 	
 	/**
@@ -50,9 +49,19 @@ class KontorX_Form_Element_Date extends Zend_Form_Element_Xhtml {
 	/**
 	 * @return string
 	 */
-	public function getValue() {
+	public function getValue()
+	{
 		$value = (array) parent::getValue();
-		return implode('-', $value);
+		$value = array_filter($value);
+
+		if (empty($value))
+		{
+			return null;
+		}
+		
+		$value = trim(implode('-', $value));
+
+		return $value;
 	}
 
 	/**
@@ -64,7 +73,10 @@ class KontorX_Form_Element_Date extends Zend_Form_Element_Xhtml {
 		// YYYY-MM-DD
 		if (is_string($value))
 		{
-			$value = explode('-', $value);
+			// YYYY-MM-DD HH:MM:SS
+			$value = explode(' ', $value);
+			// YYYY-MM-DD
+			$value = explode('-', $value[0]);
 		}
 
 		$value = (array) $value;
