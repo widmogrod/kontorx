@@ -212,7 +212,21 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 						if ($this->_helper->acl->isAllowed('update'))
 						{
 							$model->editableUpdate($data);
-							$this->_helper->flashMessenger($model->getStatus());
+
+							/* @var Zend_Controller_Action_Helper_FlashMessenger */
+							$flashMessenger = $this->_helper->getHelper('FlashMessenger');
+							$flashMessenger->addMessage($model->getStatus());
+							
+							$messages = $model->getMessages();
+							foreach ($messages as $message) 
+							{
+								if (is_array($message))
+								{
+									$flashMessenger->addMessage(print_r($messages, true));
+								} else {
+									$flashMessenger->addMessage($message);
+								}
+							}
 						}
 					}
 					$this->_helper->redirector->goToUrlAndExit(getenv('HTTP_REFERER'));
@@ -225,7 +239,21 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 						{
 							$data = $rq->getPost('action_checked');
 							$model->editableDelete($data);
-							$this->_helper->flashMessenger($model->getStatus());
+
+							/* @var Zend_Controller_Action_Helper_FlashMessenger */
+							$flashMessenger = $this->_helper->getHelper('FlashMessenger');
+							$flashMessenger->addMessage($model->getStatus());
+							
+							$messages = $model->getMessages();
+							foreach ($messages as $message) 
+							{
+								if (is_array($message))
+								{
+									$flashMessenger->addMessage(print_r($messages, true));
+								} else {
+									$flashMessenger->addMessage($message);
+								}
+							}
 						}
 					}
 

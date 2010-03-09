@@ -29,11 +29,14 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 			return;
 		}
 
-		// notify observers
 		$manager = Promotor_Observable_Manager::getInstance();
-		$list = $manager->notify($name);
-
-		$this->_addMessages($list->getMessages());
+		
+		try {
+			$list = $manager->notify($name);
+			$this->_addMessages($list->getMessages());
+		} catch (KontorX_Observable_Exception $e) {
+			$this->_addException($e);
+		}
 	}
 	
 	/**
