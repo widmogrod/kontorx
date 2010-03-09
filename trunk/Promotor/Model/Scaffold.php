@@ -47,6 +47,52 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 	}
 
 	/**
+	 * @param string $column
+	 * @param mixed $value
+	 * @return Zend_Db_Table_Row_Abstract
+	 */
+	public function findOneBy($column, $value)
+	{
+		$table = $this->getDbTable();
+		
+		$select = $table->select()
+						->where($column . ' = ?', $value);
+
+		$result = null;
+						
+		try {
+			$result = $table->fetchRow($select);
+		} catch (Zend_Db_Exception $e) {
+			$this->_addException($e);
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * @param string $column
+	 * @param mixed $value
+	 * @return Zend_Db_Table_Rowset_Abstract
+	 */
+	public function findBy($column, $value)
+	{
+		$table = $this->getDbTable();
+		
+		$select = $table->select()
+						->where($column . ' = ?', $value);
+
+		$result = null;
+						
+		try {
+			$result = $table->fetchAll($select);
+		} catch (Zend_Db_Exception $e) {
+			$this->_addException($e);
+		}
+		
+		return $result;
+	}
+	
+	/**
 	 * @param mixed $primaryKey
 	 * @param bool $createIfNotExsists
 	 * @return Zend_Db_Table_Row_Abstract|null
