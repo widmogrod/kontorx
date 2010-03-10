@@ -25,18 +25,22 @@ class KontorX_Form_Element_DateTime extends Zend_Form_Element_Xhtml {
 	 * @param string $format
 	 * @return KontorX_Form_Element_Date
 	 */
-	public function setFormat($format) {
+	public function setFormat($format) 
+	{
 		$this->_format = (string) $format;
 		return $this;
 	}
 
-	public function loadDefaultDecorators() {
-		if ($this->loadDefaultDecoratorsIsDisabled()) {
+	public function loadDefaultDecorators() 
+	{
+		if ($this->loadDefaultDecoratorsIsDisabled()) 
+		{
             return;
         }
 
         $decorators = $this->getDecorators();
-        if (empty($decorators)) {
+        if (empty($decorators)) 
+        {
             $this->addDecorator('DateTime')
                 ->addDecorator('Errors')
                 ->addDecorator('Description', array('tag' => 'p', 'class' => 'description'))
@@ -70,21 +74,21 @@ class KontorX_Form_Element_DateTime extends Zend_Form_Element_Xhtml {
 	/**
 	 * @return array
 	 */
-	public function getParts() {
+	public function getParts() 
+	{
 		$value = parent::getValue();
-		
+
 		// YYYY-MM-DD
 		if (is_string($value))
 		{
 			// YYYY-MM-DD HH:MM:SS
 			$part = explode(' ', $value);
+			$value = array_fill(0,6,null);
 
 			list($value[0], $value[1], $value[2]) = explode('-', $part[0]);
 			list($value[3], $value[4], $value[5]) = explode(':', $part[1]);
 		}
 
-		$value = (array) $value;
-		$value += array_fill(0,6,null);
 		return $value;
 	}
 }

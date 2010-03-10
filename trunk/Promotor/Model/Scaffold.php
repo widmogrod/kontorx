@@ -62,8 +62,10 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 						
 		try {
 			$result = $table->fetchRow($select);
+			$this->_setStatus(self::SUCCESS);
 		} catch (Zend_Db_Exception $e) {
 			$this->_addException($e);
+			$this->_setStatus(self::FAILURE);
 		}
 		
 		return $result;
@@ -85,8 +87,10 @@ class Promotor_Model_Scaffold extends Promotor_Model_Abstract {
 						
 		try {
 			$result = $table->fetchAll($select);
+			$this->_setStatus(self::SUCCESS);
 		} catch (Zend_Db_Exception $e) {
 			$this->_addException($e);
+			$this->_setStatus(self::FAILURE);
 		}
 		
 		return $result;
