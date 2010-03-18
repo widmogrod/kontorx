@@ -8,6 +8,9 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
         $plugin  = $this->getPluginInstance();
 
         $actionName = $request->getActionName();
+        
+         /* @var $view Zend_View */
+		$view = $action->view;
 
         // setup template
         if (isset($action->skin)) {
@@ -24,6 +27,23 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
                 // layout name
                 if (isset($options['layout'])) {
                     $plugin->setLayoutName($options['layout']);
+                    
+                    /**
+                     * dodaje możliwośc personalizaowania modułu w szablonie!
+                     */
+                    
+                	$config 		= $plugin->getConfig();
+			
+			        // ustawiamy nazwę skórki
+			        $templateName = $plugin->getTemplateName();
+			        if(null === $templateName) {
+			            $templateName = $config[KontorX_Controller_Plugin_System::TEMPLATE]['name'];
+			        }
+
+                    list ($path, $pathI18N) = $plugin->getTemplatePaths($templateName);
+                     
+                    $view->addScriptPath($path . '/scripts/' . $request->getModuleName());
+                    
                 } else
                 // dynamic layout name
                 if (isset($options['dynamic'])) {
@@ -43,7 +63,8 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
                 		: Zend_Layout::getMvcInstance()->enableLayout();
                 }
                 
-                
+               
+//                var_dump($view->getScriptPaths());
 
                 // czy zablokować zmiane layout z poziomu konfiguracji szablonu
                 if (isset($options['lock'])) {

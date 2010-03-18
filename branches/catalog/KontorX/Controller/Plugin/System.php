@@ -284,8 +284,14 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
 
         // katalog z szablonem default
         list($layoutPathDefault, $layoutPathDefaultI18n) = $this->getTemplatePaths($configDefault[self::TEMPLATE]['name']);
+        //var_dump($layoutPathDefault);
+        //var_dump($layoutPathDefaultI18n);
+        
         // katalog z szablonem template
         list($layoutPathTemplate, $layoutPathTemplateI18n) = $this->getTemplatePaths($templateName);
+        //var_dump($layoutPathTemplate);
+        //var_dump($layoutPathTemplateI18n);
+        
         // ustawianie przeszukiwania katalogów
         // zasada LIFO stąd ta kolejność
         // możliwości nadpisywania tworzenia niepełnego szablonu!
