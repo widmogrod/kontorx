@@ -68,6 +68,22 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
                 	$template->disableTemplate($options['disableTemplate']);
                 }
                 
+            	// Czy widok modułu może być personalizowany
+            	// w template
+                if (array_key_exists('personalized', (array) $options)
+                		&& true === $options['personalized'])
+                {
+                    $templatePaths = $template->getTemplatePaths(true);
+                    $styleName 	   = $template->getStyleName();
+                    $moduleName    = $request->getModuleName();
+
+                    foreach($templatePaths as $templatePath)
+                    {
+                    	$scriptPath = sprintf('%s/%s/scripts/%s', $templatePath, $styleName, $moduleName);
+                    	$action->view->addScriptPath($scriptPath);	
+                    }
+                }
+
                 // dodatkowa konfiguracja
                 if (isset($options['config']) && is_array($options['config'])) {
                 	if(isset($options['config']['filename'])) {
