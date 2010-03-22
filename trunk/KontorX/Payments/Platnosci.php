@@ -112,29 +112,6 @@ class KontorX_Payments_Platnosci
 		't'  => 'płatność testowa - zostanie wyświetlony formularz, w którym można bezpośrednio zmienić status transakcji'
 	);
 	
-	/**
-	 * Stałe przekazywane w adresie powrotu 
-	 * @var array
-	 */
-	protected $_urlParams = array(
-		// identyfikator nowej transakcji utworzonej w aplikacji Platnosci.pl
-		'trans_id' => '%transId%',
-	 	// wartości pos id
-		'pos_id' => '%posId%',
-		// wartości pay type
-		'pay_type' => '%payType%',
-		// wartości session id
-		'session_id' => '%sessionId%',
-		// wartości amount - jako separator kropka
-		'amount_ps' => '%amountPS%',
-		// wartości amount - jako separator przecinek
-		'amount_cs' => '%amountCS%',
-		// wartości order id
-		'order_id' => '%orderId%',
-		// numer błędu zgodnie z tabelką 2.1 (s. 3), jest wykorzystywany tylko przy - UrlNegatywny
-		'error' => '%error%'
-	);
-	
 	public function __construct()
 	{
 		
@@ -612,7 +589,17 @@ class KontorX_Payments_Platnosci
 	{
 		if (null === $this->_clientIp)
 		{
-			throw new KontorX_Payments_Exception('nie podano "client_ip"');
+			$ip = getenv('HTTP_X_FORWARDED_FOR');
+			$ip = $ip ? getenv('REMOTE_ADDR') : $ip;
+
+			require_once 'Zend/Validate/Ip.php';
+			$v = new Zend_Validate_Ip();
+			if (!$v->isValid($ip))
+			{
+				throw new KontorX_Payments_Exception('nie podano IP klienta"');
+			}
+
+			$this->_clientIp = $ip;
 		}
 
 		return $this->_clientIp;

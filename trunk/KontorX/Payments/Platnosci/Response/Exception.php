@@ -1,0 +1,3 @@
+<?php
+class KontorX_Payments_Platnosci_Response_Exception extends KontorX_Payments_Exception
+{}
