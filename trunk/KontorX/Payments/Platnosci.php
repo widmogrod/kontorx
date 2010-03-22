@@ -8,7 +8,7 @@
  */
 class KontorX_Payments_Platnosci
 {
-	const BASE_URL = 'https://www.platnosci.pl/paygw/';
+	const BASE_URL = 'https://www.platnosci.pl/paygw';
 	
 	/**
 	 * Kody błędów
