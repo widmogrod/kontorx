@@ -112,9 +112,35 @@ class KontorX_Payments_Platnosci
 		't'  => 'płatność testowa - zostanie wyświetlony formularz, w którym można bezpośrednio zmienić status transakcji'
 	);
 	
-	public function __construct()
+	public function __construct($options = null)
 	{
-		
+		if (is_array($options)){
+			$this->setOptions($options);
+		} elseif ($options instanceof Zend_Config) {
+			$this->setOptions($options->toArray());
+		}
+	}
+	
+	public function setOptions(array $options)
+	{
+		$f = new Zend_Filter_Word_UnderscoreToCamelCase();
+		foreach ($options as $key => $value)
+		{
+			$method = 'set' . $f->filter($key);
+			if (method_exists($this, $method))
+			{
+				$this->$method($value);
+			}
+		}
+	}
+	
+	/**
+	 * Zwrucenie informacji o formach płatności
+	 * @return array 
+	 */
+	public function getPaymentsTypes()
+	{
+		return $this->_paymentTypes;
 	}
 	
 	/**
@@ -203,6 +229,46 @@ class KontorX_Payments_Platnosci
 		return $this;
 	}
 	
+	const ACTION_GET = 'Payment/get';
+	const ACTION_CONFIRM = 'Payment/confirm';
+	const ACTION_CANCEL = 'Payment/cancel';
+	const ACTION_NEW = 'NewPayment';
+	
+	/**
+	 * UrlPlatnosci.pl/Kodowanie/NazwaProcedury/Format
+	 * @param string $procedura
+	 * @return string
+	 */
+	public function getUrlDlaProcedury($procedura)
+	{
+		switch($procedura)
+		{
+			case self::ACTION_CANCEL:
+			case self::ACTION_CONFIRM:
+			case self::ACTION_CANCEL:
+				$data = array(
+					self::BASE_URL,
+					$this->_kodowanie,
+					$procedura,
+					$this->_formatDanych
+				);
+				break;
+
+			case self::ACTION_NEW:
+				$data = array(
+					self::BASE_URL,
+					$this->_kodowanie,
+					$procedura,
+				);
+				break;
+
+			default:
+				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty');
+		}
+
+		return join('/', $data);
+	}
+	
 	/**
 	 * @var string
 	 */
@@ -268,9 +334,9 @@ class KontorX_Payments_Platnosci
 	 * @param integer $posId
 	 * @return KontorX_Payments_Platnosci
 	 */
-	public function setPosId(int $posId)
+	public function setPosId($posId)
 	{
-		$this->_posId = posId;
+		$this->_posId = (int) $posId;
 		return $this;
 	}
 	
@@ -356,7 +422,12 @@ class KontorX_Payments_Platnosci
 	{
 		if (null === $this->_sessionId)
 		{
-			throw new KontorX_Payments_Exception('nie podano "session_id"');
+			if (!class_exists('Zend_Session', false))
+			{
+				throw new KontorX_Payments_Exception('nie podano "session_id"');
+			}
+			
+			$this->_sessionId = Zend_Session::getId();
 		}
 
 		return $this->_sessionId;
@@ -590,7 +661,8 @@ class KontorX_Payments_Platnosci
 		if (null === $this->_clientIp)
 		{
 			$ip = getenv('HTTP_X_FORWARDED_FOR');
-			$ip = $ip ? getenv('REMOTE_ADDR') : $ip;
+			
+			$ip = !$ip ? getenv('REMOTE_ADDR') : $ip;
 
 			require_once 'Zend/Validate/Ip.php';
 			$v = new Zend_Validate_Ip();
