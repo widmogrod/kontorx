@@ -34,8 +34,13 @@ class KontorX_Payments_Platnosci_Respond
 	{
 		// pobierz wartości które nas interesują
 		$this->_params = array_intersect_key($data, $this->_urlParams);
+		
+		$values = array_fill(0, count($this->_urlParams), null);
+		$keys   = array_keys($this->_urlParams);
+		$params = array_combine($keys, $values);
+		
 		// dopełnij null jeżeli wartości podstawowe nie zostały uwzględnione
-		$this->_params = array_merge(array_flip(array_keys($this->_urlParams)), $this->_params);
+		$this->_params = array_merge($params, $this->_params);
 	}
 
 	/**
@@ -44,7 +49,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getTransId()
 	{
-		$this->_params['trans_id'];
+		return $this->_params['trans_id'];
 	}
 
 	/**
@@ -54,7 +59,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getPosId()
 	{
-		$this->_params['pos_id'];
+		return $this->_params['pos_id'];
 	}
 
 	/**
@@ -64,7 +69,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getPayType()
 	{
-		$this->_params['pay_type'];
+		return $this->_params['pay_type'];
 	}
 
 	/**
@@ -74,7 +79,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getSessionId()
 	{
-		$this->_params['session_id'];
+		return $this->_params['session_id'];
 	}
 
 	/**
@@ -84,7 +89,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getAmountPs()
 	{
-		$this->_params['amount_ps'];
+		return $this->_params['amount_ps'];
 	}
 
 	/**
@@ -94,7 +99,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getAmountCs()
 	{
-		$this->_params['amount_cs'];
+		return $this->_params['amount_cs'];
 	}
 
 	/**
@@ -104,7 +109,7 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getOrderId()
 	{
-		$this->_params['order_id'];
+		return $this->_params['order_id'];
 	}
 
 	/**
@@ -114,6 +119,6 @@ class KontorX_Payments_Platnosci_Respond
 	 */
 	public function getError()
 	{
-		$this->_params['error'];
+		return $this->_params['error'];
 	}
 }

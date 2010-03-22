@@ -59,7 +59,7 @@ class KontorX_Payments_Platnosci
 	 * nie zostanie ona rozliczona (nie wpłyną środki do systemu Płatności.pl)
 	 * @var int
 	 */
-	const STATUS_NOWA = 1;
+//	const STATUS_NOWA = 1;
 	
 	/**
 	 * Status 2 - „anulowana” pojawi się automatycznie 
@@ -68,7 +68,7 @@ class KontorX_Payments_Platnosci
 	 * nie zostanie ona rozliczona (nie wpłyną środki do systemu Płatności.pl)
 	 * @var int
 	 */
-	const STATUS_ANULOWANA = 2;
+//	const STATUS_ANULOWANA = 2;
 	
 	/**
 	 * Statusy transakcji
@@ -121,6 +121,10 @@ class KontorX_Payments_Platnosci
 		}
 	}
 	
+	/**
+	 * @param array $options
+	 * @return void
+	 */
 	public function setOptions(array $options)
 	{
 		$f = new Zend_Filter_Word_UnderscoreToCamelCase();
@@ -132,6 +136,20 @@ class KontorX_Payments_Platnosci
 				$this->$method($value);
 			}
 		}
+	}
+	
+	/**
+	 * Pobranie treści błedu na podstawie jego kodu
+	 * @return string|null 
+	 */
+	public function getErrorByCode($code)
+	{
+		if (isset($this->_errorCodes[$code]))
+		{
+			return $this->_errorCodes[$code];
+		}
+
+		return null;
 	}
 	
 	/**
@@ -392,6 +410,69 @@ class KontorX_Payments_Platnosci
 	}
 	
 	/**
+	 * @var integer
+	 */
+	protected $_key1;
+	
+	/**
+	 * Wartość nadana przez Platnosci.pl
+	 * 
+	 * @param integer $posId
+	 * @return KontorX_Payments_Platnosci
+	 */
+	public function setKey1($key)
+	{
+		$this->_key1 = (string) $key;
+		return $this;
+	}
+	
+	/**
+	 * @return integer
+	 * @throws KontorX_Payments_Exception
+	 */
+	public function getKey1()
+	{
+		if (null === $this->_key1)
+		{
+			throw new KontorX_Payments_Exception('nie podano "key1"');
+		}
+
+		return $this->_key1;
+	}
+	
+	/**
+	 * @var integer
+	 */
+	protected $_key2;
+	
+	/**
+	 * Wartość nadana przez Platnosci.pl
+	 * 
+	 * @param integer $posId
+	 * @return KontorX_Payments_Platnosci
+	 */
+	public function setKey2($key)
+	{
+		$this->_key2 = (string) $key;
+		return $this;
+	}
+	
+	/**
+	 * @return integer
+	 * @throws KontorX_Payments_Exception
+	 */
+	public function getKey2()
+	{
+		if (null === $this->_key2)
+		{
+			throw new KontorX_Payments_Exception('nie podano "key2"');
+		}
+
+		return $this->_key2;
+	}
+	
+	
+	/**
 	 * @var STR {0, 1024}
 	 */
 	protected $_sessionId;
@@ -422,9 +503,18 @@ class KontorX_Payments_Platnosci
 	{
 		if (null === $this->_sessionId)
 		{
+			/**
+			 * Jeżeli {@see Zend_Session} nie jest uzywany wtedy
+			 * exception, w przeciwnym razie sprubuj uruchomić sesję :)
+			 */
 			if (!class_exists('Zend_Session', false))
 			{
 				throw new KontorX_Payments_Exception('nie podano "session_id"');
+			} else {
+				// jeżeli sesja nie została uruchomiona.. uruchom ją
+				if (!Zend_Session::isStarted()) {
+					Zend_Session::start();
+				}
 			}
 			
 			$this->_sessionId = Zend_Session::getId();
@@ -705,4 +795,6 @@ class KontorX_Payments_Platnosci
 
 		return md5($key);
 	}
+
+	
 }
