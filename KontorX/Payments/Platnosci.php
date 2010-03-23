@@ -251,6 +251,7 @@ class KontorX_Payments_Platnosci
 	const ACTION_CONFIRM = 'Payment/confirm';
 	const ACTION_CANCEL = 'Payment/cancel';
 	const ACTION_NEW = 'NewPayment';
+	const ACTION_PAYTYPE = 'PayType';
 	
 	/**
 	 * UrlPlatnosci.pl/Kodowanie/NazwaProcedury/Format
@@ -280,11 +281,40 @@ class KontorX_Payments_Platnosci
 				);
 				break;
 
+			case self::ACTION_PAYTYPE:
+				$parts = str_split($this->getKey1(), 2);
+				$data = array(
+					self::BASE_URL,
+					$this->_kodowanie,
+					'xml',
+					$this->getPosId(),
+					$parts[0],
+					'paytype.xml'
+				);
+				break;
+
 			default:
 				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty');
 		}
 
 		return join('/', $data);
+	}
+
+	/**
+	 * @return SimpleXMLElement
+	 */
+	public function getPayTypes()
+	{
+		$url = $this->getUrlDlaProcedury(self::ACTION_PAYTYPE);
+
+		$http = new Zend_Http_Client($url);
+		/* @var $response Zend_Http_Response */
+		$response = $http->request(Zend_Http_Client::GET);
+		
+		$xml = $response->getBody();
+
+		/* @var $config SimpleXMLElement */
+		$payTypes = simplexml_load_string($xml);
 	}
 	
 	/**
