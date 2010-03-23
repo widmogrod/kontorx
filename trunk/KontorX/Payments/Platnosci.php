@@ -172,7 +172,7 @@ class KontorX_Payments_Platnosci
 	 */
 	public function getPaymentsAvalibleTypes()
 	{
-		if ($this->_avalidblePaymentTypes)
+		if (null === $this->_avalidblePaymentTypes)
 		{
 			$url = $this->getUrlDlaProcedury(self::ACTION_PAYTYPE);
 	
@@ -190,6 +190,9 @@ class KontorX_Payments_Platnosci
 	        if (false === $this->_loadSimpleXMLError)
 	        {
 	        	$this->_avalidblePaymentTypes = $payTypes;
+	        } else {
+	        	// wyerowanie na brak błedu
+	        	$this->_loadSimpleXMLError = false;
 	        }
 		}
 
