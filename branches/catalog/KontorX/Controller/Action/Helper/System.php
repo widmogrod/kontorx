@@ -43,7 +43,6 @@ class KontorX_Controller_Action_Helper_System extends Zend_Controller_Action_Hel
                     list ($path, $pathI18N) = $plugin->getTemplatePaths($templateName);
                      
                     $view->addScriptPath($path . '/scripts/' . $request->getModuleName());
-                    
                 } else
                 // dynamic layout name
                 if (isset($options['dynamic'])) {
