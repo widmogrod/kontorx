@@ -162,6 +162,54 @@ class KontorX_Payments_Platnosci
 	}
 	
 	/**
+	 * @var SimpleXMLElement
+	 */
+	protected $_avalidblePaymentTypes;
+	
+	/**
+	 * Zwrucenie informacji o dostępnych formach płatności
+	 * @return SimpleXMLElement
+	 */
+	public function getPaymentsAvalibleTypes()
+	{
+		if ($this->_avalidblePaymentTypes)
+		{
+			$url = $this->getUrlDlaProcedury(self::ACTION_PAYTYPE);
+	
+			$http = new Zend_Http_Client($url);
+			/* @var $response Zend_Http_Response */
+			$response = $http->request(Zend_Http_Client::GET);
+	
+			$xml = $response->getBody();
+
+			set_error_handler(array($this, '_loadSimpleXMLErrorHandler'));
+			/* @var $payTypes SimpleXMLElement */
+	        $payTypes = simplexml_load_string($xml);
+	        restore_error_handler();
+	
+	        if (false === $this->_loadSimpleXMLError)
+	        {
+	        	$this->_avalidblePaymentTypes = $payTypes;
+	        }
+		}
+
+		return $this->_avalidblePaymentTypes;
+	}
+
+	/**
+	 * @var bool
+	 */
+	protected $_loadSimpleXMLError = false;
+	
+	/**
+	 * @return void
+	 */
+	protected function _loadSimpleXMLErrorHandler()
+	{
+		$this->_loadSimpleXMLError = true;
+	}
+	
+	/**
 	 * ISO-8859-2
 	 * @var string
 	 */
@@ -300,23 +348,6 @@ class KontorX_Payments_Platnosci
 		return join('/', $data);
 	}
 
-	/**
-	 * @return SimpleXMLElement
-	 */
-	public function getPayTypes()
-	{
-		$url = $this->getUrlDlaProcedury(self::ACTION_PAYTYPE);
-
-		$http = new Zend_Http_Client($url);
-		/* @var $response Zend_Http_Response */
-		$response = $http->request(Zend_Http_Client::GET);
-		
-		$xml = $response->getBody();
-
-		/* @var $config SimpleXMLElement */
-		$payTypes = simplexml_load_string($xml);
-	}
-	
 	/**
 	 * @var string
 	 */
