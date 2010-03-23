@@ -79,7 +79,7 @@ class KontorX_Template_Controller_Action_Helper_Template extends Zend_Controller
 
                     foreach($templatePaths as $templatePath)
                     {
-                    	$scriptPath = sprintf('%s/%s/scripts/%s', $templatePath, $styleName, $moduleName);
+                    	$scriptPath = sprintf('%s/styles/%s/scripts/%s', rtrim($templatePath,'/'), $styleName, $moduleName);
                     	$action->view->addScriptPath($scriptPath);	
                     }
                 }

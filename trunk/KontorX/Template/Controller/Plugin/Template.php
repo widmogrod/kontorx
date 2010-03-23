@@ -8,7 +8,7 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
 	public function __construct(KontorX_Template $template) {
 		$this->setTemplate($template);
 	}
-	
+
 	/**
 	 * @var KontorX_Template
 	 */
