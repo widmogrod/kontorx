@@ -189,7 +189,7 @@ class KontorX_Payments_Platnosci
 	
 	        if (false === $this->_loadSimpleXMLError)
 	        {
-	        	$this->_avalidblePaymentTypes = $payTypes;
+	        	$this->_avalidblePaymentTypes = $payTypes->children();
 	        } else {
 	        	// wyerowanie na brak błedu
 	        	$this->_loadSimpleXMLError = false;
