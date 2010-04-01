@@ -272,13 +272,19 @@ class Promotor_Model_Abstract {
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
         	
+        	$this->_cacheSave = null;
+        	
         	try {
         		// łapę błędy - jeżeli występują żuć wyjątek!
-        		set_error_handler(array($this, '_cacheErorHandler'));
+        		set_error_handler(array($this, '_cacheErrorHandler'));
         		$result = call_user_func_array(array($this, $method), $params);
         		restore_error_handler();
-
-        		$resultCache->save($result, $cacheId, $tags);
+				
+        		// Zapisz cache jeżeli chachowana metoda na to pozwala
+        		if ($this->_cacheSave !== self::NO_CACHE)
+        		{
+        			$resultCache->save($result, $cacheId, $tags);
+        		}
         	} catch (Exception $e) {
         		$this->_addException($e);
         	}
@@ -286,6 +292,16 @@ class Promotor_Model_Abstract {
 
         return $result;
     }
+    
+    /**
+     * @var string
+     */
+    const NO_CACHE = 'NO_CACHE';
+
+    /**
+     * @var mixed
+     */
+    protected $_cacheSave;
 
     /**
      * @param $errno
@@ -295,7 +311,10 @@ class Promotor_Model_Abstract {
      * @return void
      * @throws Exception
      */
-    private function _cacheErorHandler($errno, $errstr, $errfile, $errline) {
+    private function _cacheErrorHandler($errno, $errstr, $errfile, $errline) {
+    	// opcjonalnie.. i tach Exception zostanie przechwycone!
+    	$this->_cacheSave = self::NO_CACHE;
+
     	$error = sprintf('ERROR %d :: %s (%s [%d])', $errno, $errstr, basename($errfile), $errline);
     	throw new Exception($error);
     }
