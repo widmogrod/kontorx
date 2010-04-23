@@ -54,7 +54,7 @@ class KontorX_View_Helper_BaseUrl extends Zend_View_Helper_Abstract {
 				$protocol = 'http';
 			}
 	
-			$this->_baseUrl = $protocol . '://' . $host;
+			$this->_baseUrl = $protocol . '://' . $host . '/';
     	}
     	return $this->_baseUrl;
     }
