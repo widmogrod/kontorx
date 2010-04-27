@@ -47,7 +47,9 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$model = new $this->_modelClass();
 		$dbTable = $model->getDbTable();
 
-		$form = new $this->_formAddClass();
+		$form = new $this->_formAddClass(array(
+			'request' => $this->getRequest()
+		));
 		
 		$scaffold = $this->_helper->getHelper('scaffold');
 		$scaffold->setDbTable($dbTable)
@@ -94,7 +96,10 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		$model = new $this->_modelClass();
 		$dbTable = $model->getDbTable();
 
-		$form = new $this->_formEditClass(array('primaryKey' => $this->_getParam('id')));
+		$form = new $this->_formEditClass(array(
+			'primaryKey' => $this->_getParam('id'),
+			'request' => $this->getRequest()
+		));
 
 		$scaffold = $this->_helper->getHelper('scaffold');
 		$scaffold
