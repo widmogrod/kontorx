@@ -192,9 +192,25 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             if (isset($options->script->file)
             		&& $options->script->file instanceof Iterator)
             {
-	            foreach ($options->script->file as $key => $file) {
+	            foreach ($options->script->file as $key => $file) 
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	$src = isset($file->src) ? $file->src : $file;
+	            	if (false === strstr($src,'http://'))
+	            	{
+	            		$src .= '?s=' . filectime($src);
+	            	}
+
 	                $headScript->offsetSetFile(is_numeric($key) ? ++$i : $key,
-	            							   isset($file->src) ? $file->src : $file,
+	            							   $src,
 	            							   isset($file->type) ? $file->type : null,
 	            							   (isset($file->attribs) && $file->attribs instanceof Zend_Config)
 												 	? $file->attribs->toArray() : array());
@@ -204,9 +220,30 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         	if (isset($options->script->script)
             		&& $options->script->script instanceof Iterator)
             {
-	            foreach ($options->script->script as $key => $script) {
+	            foreach ($options->script->script as $key => $script) 
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	if (isset($script->src))
+	            	{
+	            		$src = $script->src;
+	            		if (false === strstr($src,'http://'))
+		            	{
+		            		$src .= '?s=' . filectime($src);
+		            	}
+	            	} else {
+	            		$src = $script;
+	            	}
+
 	                $headScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
-	            								 isset($script->src) ? $script->src : $script,
+	            								 $src,
 												 isset($script->type) ? $script->type : null,
 												 (isset($script->attribs) && $script->attribs instanceof Zend_Config)
 												 	? $script->attribs->toArray() : array());
@@ -228,9 +265,25 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
             if (isset($options->inlineScript->file)
             		&& $options->inlineScript->file instanceof Iterator)
             {
-	            foreach ($options->inlineScript->file as $key => $file) {
+	            foreach ($options->inlineScript->file as $key => $file) 
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	$src = isset($file->src) ? $file->src : $file;
+	            	if (false === strstr($src,'http://'))
+	            	{
+	            		$src .= '?s=' . filectime($src);
+	            	}
+	            	
 	                $inlineScript->offsetSetFile(is_numeric($key) ? ++$i : $key,
-	            							   isset($file->src) ? $file->src : $file,
+	            							   $src,
 	            							   isset($file->type) ? $file->type : null,
 	            							   (isset($file->attribs) && $file->attribs instanceof Zend_Config)
 												 	? $file->attribs->toArray() : array());
@@ -240,7 +293,28 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         	if (isset($options->inlineScript->script)
             		&& $options->inlineScript->script instanceof Iterator)
             {
-	            foreach ($options->inlineScript->script as $key => $script) {
+	            foreach ($options->inlineScript->script as $key => $script) 
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	if (isset($script->src))
+	            	{
+	            		$src = $script->src;
+	            		if (false === strstr($src,'http://'))
+		            	{
+		            		$src .= '?s=' . filectime($src);
+		            	}
+	            	} else {
+	            		$src = $script;
+	            	}
+	            	
 	                $inlineScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
 	            								 isset($script->src) ? $script->src : $script,
 												 isset($script->type) ? $script->type : null,
@@ -254,13 +328,32 @@ class KontorX_Template_Controller_Plugin_Template extends Zend_Controller_Plugin
         if (isset($options->links)) {
         	/* @var $headLink Zend_View_Helper_HeadLink */
         	$headLink = $view->getHelper('HeadLink');
-            foreach ($options->links->css->toArray() as $file) {
+            foreach ($options->links->css->toArray() as $file) 
+            {
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }
             	if (!isset($file['media'])) {
 					$file['media'] = 'screen';
 				}
+				
+				/**
+            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+            	 * gdy zostana wykonane zmiany w CSS.
+            	 * 
+            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+            	 * zatem akceptowalne
+            	 * 
+            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+            	 */
+				
+				if (false === strstr($file['href'],'http://'))
+				{
+					// ltrim jest dla kompatybilności wstecznej.. 
+					// nie moga (nie powinny) być absolutne linki wewnętrzne!
+					$file['href'] .= '?s=' . filectime(ltrim($file['href'], '/'));
+				}
+				
                 $headLink->headLink($file);
             }
         }
