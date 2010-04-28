@@ -420,9 +420,25 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
             		&& $options->script->js instanceof Iterator)
             {
             	$i = 0;
-	            foreach ($options->script->js as $file) {
+	            foreach ($options->script->js as $file)
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	$src = $file->src;
+	            	if (false === strstr($src,'http://'))
+	            	{
+	            		$src .= '?s=' . filectime($file->src);
+	            	}
+	            	
 	                $headScript->offsetSetFile(++$i,
-	            								$file->src,
+	            								$src,
 	            								isset($file->type) ? $file->type : null,
 	            								isset($file->attribs) ? $file->attribs->toArray() : array());
 	            }
@@ -445,25 +461,76 @@ class KontorX_Controller_Plugin_System extends Zend_Controller_Plugin_Abstract {
         if (isset($options->inlineScript)) {
         	/* @var $inlineScript Zend_View_Helper_InlineScript */
             $inlineScript = $view->getHelper('InlineScript');
-            $i = 0;
-            foreach ($options->inlineScript->js as $file) {
-            	$inlineScript->offsetSetFile(++$i,
-            								$file->src,
-            								isset($file->type) ? $file->type : null,
-            								isset($file->attribs) ? $file->attribs->toArray() : array());
+
+			if (isset($options->inlineScript->js)
+            		&& $options->inlineScript->js instanceof Iterator)
+            {
+            	$i = 0;
+	            foreach ($options->inlineScript->js as $file) 
+	            {
+	            	/**
+	            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+	            	 * gdy zostana wykonane zmiany w JS.
+	            	 * 
+	            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+	            	 * zatem akceptowalne
+	            	 * 
+	            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+	            	 */
+	            	$src = $file->src;
+	            	if (false === strstr($src,'http://'))
+	            	{
+	            		$src .= '?s=' . filectime($file->src);
+	            	}
+	            	
+	                $inlineScript->offsetSetFile(++$i,
+	            								$src,
+	            								isset($file->type) ? $file->type : null,
+	            								isset($file->attribs) ? $file->attribs->toArray() : array());
+	            }
+            }
+            
+        	if (isset($options->inlineScript->script)
+            		&& $options->inlineScript->script instanceof Iterator)
+            {
+	            foreach ($options->inlineScript->script as $key => $script) {
+	                $inlineScript->offsetSetScript(is_numeric($key) ? ++$i : $key,
+	            								 isset($script->src) ? $script->src : $script,
+												 isset($script->type) ? $script->type : null,
+												 (isset($script->attribs) && $script->attribs instanceof Zend_Config)
+												 	? $script->attribs->toArray() : array());
+	            }
             }
         }
 
         // link
         if (isset($options->links)) {
         	$headLink = $view->getHelper('HeadLink');
-            foreach ($options->links->css->toArray() as $file) {
+            foreach ($options->links->css->toArray() as $file)
+            {
+            	/**
+            	 * Sztuczka, która zwalnia z pamięrania by wyczyścic cache przeglądarki
+            	 * gdy zostana wykonane zmiany w CSS.
+            	 * 
+            	 * Krótki test pokazuje ze narzut na wydajność w pętli 100razy to ~ 0.0001 s
+            	 * zatem akceptowalne
+            	 * 
+            	 * Świadomie pomijam sprawdzenie czy plik istnieje by dodatkowe nie obciążąć skryptyu..
+            	 */
+            	if (false === strstr($file['href'],'http://'))
+            	{
+            		// ltrim jest dla kompatybilności wstecznej.. 
+					// nie moga (nie powinny) być absolutne linki wewnętrzne!
+					$file['href'] .= '?s=' . filectime(ltrim($file['href'], '/'));
+            	}
+
                 if (!isset($file['rel'])) {
                 	$file['rel'] = 'stylesheet';
                 }
             	if (!isset($file['media'])) {
 					$file['media'] = 'screen';
 				}
+
                 $headLink->headLink($file);
             }
         }
