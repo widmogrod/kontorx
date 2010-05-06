@@ -19,12 +19,17 @@ class KontorX_DataGrid_Filter_Order_Array extends KontorX_DataGrid_Filter_Abstra
         	$orderColumn[$key] = $value[$column];
         }
 
+    	if ($order == 'group') {
+        	$this->getColumn()->getDataGrid()->setGroupColumn($column);
+        }
+        
         if ('null' != $order) {
         	if (null !== $order) {
 	            $order = ($order != 'asc') ? SORT_DESC : SORT_ASC;
 	            array_multisort($orderColumn, $order, $data);
 	        }
         } else	         
+        // grupowanie po tej koumnie - ustawia domyślne sortowanie
     	if ($this->getColumn()->isGroup()) {
     		array_multisort($orderColumn, SORT_DESC, $data);
         }

@@ -16,10 +16,15 @@ class KontorX_DataGrid_Filter_Order_Db extends KontorX_DataGrid_Filter_Abstract 
         // set default order type
         $order = $this->getValue($this->getAttrib('order'));
 
+        if ($order == 'group') {
+        	$this->getColumn()->getDataGrid()->setGroupColumn($column);
+        }
+
         if (null !== $order) {
             $order = ($order != 'asc') ? 'desc' : $order;
             $select->order(sprintf('%s %s', $column, $order));
         } else
+        // grupowanie po tej koumnie - ustawia domyślne sortowanie
     	if ($this->getColumn()->isGroup()) {
         	$select->order(sprintf('%s %s', $column, 'desc'));
         }

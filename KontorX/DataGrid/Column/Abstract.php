@@ -21,6 +21,26 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     }
 
     /**
+     * @var KontorX_DataGrid
+     */
+    protected $_dataGrid;
+    
+    /**
+     * @param KontorX_DataGrid $dataGrid
+     * @return void
+     */
+    public function setDataGrid(KontorX_DataGrid $dataGrid) {
+    	$this->_dataGrid = $dataGrid;
+    }
+    
+    /**
+     * @return KontorX_DataGrid
+     */
+    public function getDataGrid() {
+    	return $this->_dataGrid;
+    }
+    
+    /**
      * Initialize class .. specialization purpose ..
      * @return void
      */
@@ -58,6 +78,7 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @param KontorX_DataGrid_Cell_Interface $cell
      */
     public function setCell(KontorX_DataGrid_Cell_Interface $cell) {
+    	$cell->setColumn($this);
     	$cell->setColumnName($this->getColumnName());
         $this->_cell = $cell;
     }
@@ -67,26 +88,6 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      */
     public function getCell() {
         return $this->_cell;
-    }
-
-    /**
-     * @var bool
-     */
-    protected $_group = false;
-    
-    /**
-     * @param bool $flag
-     * @return void
-     */
-    public function setGroup($flag = true) {
-    	$this->_group = (bool) $flag;
-    }
-    
-    /**
-     * @return bool
-     */
-    public function isGroup() {
-    	return $this->_group;
     }
 
     /**
@@ -267,6 +268,13 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
             ? $this->_attribs[$name] : null;
     }
 
+    /**
+     * @return bool
+     */
+    public function isGroup() {
+    	return $this->getDataGrid()->isGroupColumn($this);
+    }
+    
     /**
      * Return attrib key => value
      * @return string

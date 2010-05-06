@@ -45,7 +45,7 @@ class KontorX_DataGrid_Filter_Text extends KontorX_DataGrid_Filter_Abstract {
 
     	foreach ($select->getPart(Zend_Db_Select::COLUMNS) as $cols) {
         	list($correlationName, $col, $alias) = $cols;
-
+        	
         	if ($column == $alias) {
         		return sprintf('`%s`.`%s`', $correlationName, $col);
         	}

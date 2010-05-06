@@ -28,4 +28,9 @@ interface KontorX_DataGrid_Adapter_Interface extends Iterator, Countable {
      * @return string
      */
     public function getCellsetClass();
+
+    /**
+	 * @return array
+	 */
+	public function toArray();
 }

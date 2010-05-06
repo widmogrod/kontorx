@@ -103,4 +103,14 @@ abstract class KontorX_DataGrid_Adapter_Cellset_Abstract implements KontorX_Data
 	public function count() {
 		return $this->_count;
 	}
+	
+	public function toArray() {
+		$result = array();
+		foreach ($this as $i => $cell) {
+			/* @var $cell KontorX_DataGrid_Cell_Interface */
+			$name = $cell->getColumn()->getColumnName();
+			$result[$name] = $cell->render();
+		}
+		return $result;
+	}
 }
