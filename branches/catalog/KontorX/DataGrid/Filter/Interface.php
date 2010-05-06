@@ -23,6 +23,11 @@ interface KontorX_DataGrid_Filter_Interface {
      * @return void
      */
     public function setColumn(KontorX_DataGrid_Column_Interface $column);
+
+    /**
+     * @return KontorX_DataGrid_Column_Interface
+     */
+    public function getColumn();
     
     /**
      * Set column displayed name

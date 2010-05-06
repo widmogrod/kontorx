@@ -86,6 +86,7 @@ class KontorX_DataGrid_Cell_Editable_Db_FormSelect extends KontorX_DataGrid_Cell
 		$attribs = $this->getAttribs();
 
 		$options = $this->_fetchAll();
+		asort($options);
 
 		$view = $this->getView();
 		return $view->{$this->helper}($name, $value, $attribs, $options);		

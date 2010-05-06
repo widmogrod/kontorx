@@ -21,4 +21,9 @@ interface KontorX_DataGrid_Adapter_Cellset_Interface extends Iterator, Countable
 	 * @return bool
 	 */
 	public function hasGroupedCell();
+
+	/**
+	 * @return array
+	 */
+	public function toArray();
 }
