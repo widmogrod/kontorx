@@ -24,7 +24,13 @@ class Promotor_Model_Abstract {
 	 */
 	public function getDbTable() {
 		if (null === $this->_dbTable) {
+			if (!class_exists($this->_dbTableClass)) {
+				require_once 'Zend/Loader.php';
+				Zend_Loader::loadClass($this->_dbTableClass);
+			}
+
 			$this->_dbTable = new $this->_dbTableClass();
+
 			if (!$this->_dbTable instanceof Zend_Db_Table_Abstract) {
 				throw new Promotor_Model_Exception(sprintf('table class "%s" is not istantce of Zend_Db_Table_Abstract', $this->_dbTableClass));
 			}
@@ -123,31 +129,6 @@ class Promotor_Model_Abstract {
 	}
 	
 	/**
-	 * @param Exception $e
-	 * @param int $type
-	 * @return void
-	 */
-	public function _logException(Exception $e, $type = null) {
-		$message = sprintf('%s :: %s (%d) %s', get_class($e), $e->getMessage(), $e->getLine(), basename($e->getFile()));
-		if (null === $type) {
-			$type = Zend_Log::CRIT;
-		}
-		Zend_Registry::get('logger')->log($message, $type);
-	}
-	
-	/**
-	 * @param string $message
-	 * @param int $type
-	 * @return void
-	 */
-	public function _log($message, $type = null) {
-		if (null === $type) {
-			$type = Zend_Log::CRIT;
-		}
-		Zend_Registry::get('logger')->log($message, $type);
-	}
-	
-	/**
      * @var Zend_Cache_Core
      */
     private static $_defaultResultCache = null;
@@ -204,7 +185,7 @@ class Promotor_Model_Abstract {
         return $this->_resultCache;
     }
 
-    /**
+	/**
      * @param string|Zend_Cache_Core $cache
      * @return Promotor_Model_Abstract
      */
@@ -242,7 +223,7 @@ class Promotor_Model_Abstract {
     /**
      * Wywoluje metode keszujac rezultat jej wyniku
      * @return mixed
-     * @throws Zend_Db_Table_Exception
+     * @throws Exception
      */
     public function cache() {
         // pobieranie parametrow
@@ -252,8 +233,7 @@ class Promotor_Model_Abstract {
 		// metoda nie istnieje w tablicy zdefiniowanej przez użytkownika
 		if (!in_array($method, $this->_cachedMethods)) {
 			$message = "Method '$method' is not enabled as cached method";
-			require_once 'Zend/Db/Table/Exception.php';
-			throw new Zend_Db_Table_Exception($message);
+			throw new Exception($message);
 		}
 
         $resultCache = $this->getResultCache();
@@ -261,7 +241,7 @@ class Promotor_Model_Abstract {
         if (!$resultCache instanceof Zend_Cache_Core) {
             $message = "Cache object is not instanceof Zend_Cache_Core or is not set";
             require_once 'Zend/Db/Table/Exception.php';
-            throw new Zend_Db_Table_Exception($message);
+            throw new Exception($message);
         }
 
         // identyfikator cache
@@ -271,20 +251,17 @@ class Promotor_Model_Abstract {
 
         // keszowanie
         if (false === ($result = $resultCache->load($cacheId))) {
-        	
-        	$this->_cacheSave = null;
-        	
         	try {
-        		// łapę błędy - jeżeli występują żuć wyjątek!
+        		// łapę błędy - jeżeli występują żuć wyjątek! {@see _cacheErorHandler}
         		set_error_handler(array($this, '_cacheErrorHandler'));
         		$result = call_user_func_array(array($this, $method), $params);
+                if (null !== $this->_cacheErrorHandler) {
+                    $error = vsprintf('ERROR %d :: %s (%s [%d])', (array) $this->_cacheErrorHandler);
+                    $this->_cacheErrorHandler = null;
+                }
         		restore_error_handler();
-				
-        		// Zapisz cache jeżeli chachowana metoda na to pozwala
-        		if ($this->_cacheSave !== self::NO_CACHE)
-        		{
-        			$resultCache->save($result, $cacheId, $tags);
-        		}
+
+        		$resultCache->save($result, $cacheId, $tags);
         	} catch (Exception $e) {
         		$this->_addException($e);
         	}
@@ -292,16 +269,11 @@ class Promotor_Model_Abstract {
 
         return $result;
     }
-    
-    /**
-     * @var string
-     */
-    const NO_CACHE = 'NO_CACHE';
 
     /**
-     * @var mixed
+     * @var array
      */
-    protected $_cacheSave;
+    protected $_cacheErrorHandler = null;
 
     /**
      * @param $errno
@@ -309,16 +281,11 @@ class Promotor_Model_Abstract {
      * @param $errfile
      * @param $errline
      * @return void
-     * @throws Exception
      */
     private function _cacheErrorHandler($errno, $errstr, $errfile, $errline) {
-    	// opcjonalnie.. i tach Exception zostanie przechwycone!
-    	$this->_cacheSave = self::NO_CACHE;
-
-    	$error = sprintf('ERROR %d :: %s (%s [%d])', $errno, $errstr, basename($errfile), $errline);
-    	throw new Exception($error);
+        $this->_cacheErrorHandler = array($errno, $errstr, basename($errfile), $errline);
     }
-    
+
     /**
      * Zwraca cache id.
      * @return string
@@ -373,94 +340,4 @@ class Promotor_Model_Abstract {
             return call_user_func_array(array($this, 'cache'), $params);
         }
     }
-    
-/**
-	 * @param array $data
-	 * @return void
-	 */
-	public function editableUpdate(array $data) {
-		$table = $this->getDbTable();
-		$db = $table->getAdapter();
-
-		$primaryKey = $table->info(Zend_Db_Table::PRIMARY);
-
-		$db->beginTransaction();
-		try {
-			foreach ($data as $key => $values) {
-				$where = array();
-				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
-				foreach ($primaryKey as $i => $column) {
-					if (isset($primaryValues[$i-1])) {
-						$where[] = $db->quoteInto($column . ' = ?', $primaryValues[$i-1]);
-					}
-				}
-
-				// update tylko gdy są dane
-				if (count($where)) {
-					$where = implode(' AND ', $where);
-					$table->update($values, $where);
-				}
-			}
-
-			$db->commit();
-
-			// notify observers
-			$this->_noticeObserver('post_editableUpdate');
-
-			$this->_setStatus(self::SUCCESS);
-		} catch (Zend_Db_Table_Exception $e) {
-			$db->rollBack();
-			$this->_setStatus(self::FAILURE);
-			$this->_addMessage($e->getMessage());
-		}
-	}
-	
-	/**
-	 * @param array $data
-	 * @return void
-	 */
-	public function editableDelete(array $data) {
-		$table = $this->getDbTable();
-		$db = $table->getAdapter();
-
-		$primaryKey = $table->info(Zend_Db_Table::PRIMARY);
-
-		$db->beginTransaction();
-		try {
-			foreach ($data as $key => $values) {
-				$where = array();
-				$primaryValues = explode(KontorX_DataGrid_Cell_Editable_Abstract::SEPARATOR, $key);
-
-				if (is_array($values) && !current($values)) {
-					continue;
-				} else
-				if (!(bool)$values) {
-					continue;
-				} 
-				
-				foreach ($primaryKey as $i => $column) {
-					if (isset($primaryValues[$i-1])) {
-						$where[] = $db->quoteInto($column . ' = ?', $primaryValues[$i-1]);
-					}
-				}
-
-				// delete tylko gdy są dane
-				if (count($where)) {
-					$where = implode(' AND ', $where);
-					$table->delete($where);
-				}
-			}
-
-			$db->commit();
-			
-			// notify observers
-			$this->_noticeObserver('post_editableDelete');
-
-			$this->_setStatus(self::SUCCESS);
-		} catch (Zend_Db_Table_Exception $e) {
-			$db->rollBack();
-			$this->_setStatus(self::FAILURE);
-			$this->_addMessage($e->getMessage());
-		}
-	}
 }
