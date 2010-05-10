@@ -367,8 +367,8 @@ class KontorX_Payments_Platnosci
 				);
 				break;
 
-			default:
-				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty "'.$procedura.'"');
+//			default:
+//				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty "'.$procedura.'"');
 		}
 
 		return join('/', $data);
