@@ -860,5 +860,28 @@ class KontorX_Payments_Platnosci
 		return md5($key);
 	}
 
+	/**
+	 * Podpisywanie parametrów przekazywanych do nowej płatności
+	 * 
+	 * Opcjonalnie aplikacja Sklepu może dodać do formularza nowej płatności (NewPayment) 
+	 * sumę kontrolną wszystkich przekazywanych parametrów.
+	 */
+	public function getSig($type = null)
+	{
+		switch ($type)
+		{
+			case self::ACTION_NEW;
+				/*
+					md5(pos id + pay type + session id + pos auth key + amount + desc + desc2
+					+trsDesc + order id + f irst name + last name + payback login
+					+street + street hn + street an + city + post code + country
+					+email + phone + language + client ip + ts + key1)
+				*/
+			
+				// TODO: Brakuje_pay_type
+			
+				return md5($this->getPosId() + $this->getP);
+		}
+	}
 	
 }
