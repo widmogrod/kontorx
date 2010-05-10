@@ -54,11 +54,29 @@ class KontorX_Payments_Platnosci_Response_Xml
 			switch($this->_xml->status)
 			{
 				case 'OK': return true;
+				case 'ERROR': return false;
 				default: return false;
 			}
 		}
 
 		return $this->_xml->status;
+	}
+
+	/**
+	 * @return multitype:NULL 
+	 */
+	public function getStatusError()
+	{
+		if ($this->_xml->status == 'ERROR') 
+		{
+			$message = KontorX_Payments_Platnosci::getErrorByCode($this->_xml->error->nr);
+			return array(
+				$this->_xml->error->nr,
+				$message,
+				'nr' => $this->_xml->error->nr,
+				'message' => $message
+			);
+		}
 	}
 
 	/**
@@ -104,9 +122,16 @@ class KontorX_Payments_Platnosci_Response_Xml
 	
 	/**
 	 * aktualny status transakcji
+	 * @param bool $description - jest pobierany opis status 
+	 * 							  a nie jego numeryczna wartość
 	 */
-	public function getTransStatus()
+	public function getTransStatus($description = false)
 	{
+		if (true === $description)
+		{
+			return KontorX_Payments_Platnosci::getStatusTypes($this->_xml->trans->status);
+		}
+		
 		return $this->_xml->trans->status;
 	}
 	

@@ -14,7 +14,7 @@ class KontorX_Payments_Platnosci
 	 * Kody błędów
 	 * @var array
 	 */
-	protected $_errorCodes = array(
+	protected static $_errorCodes = array(
 		100 => 'brak lub błędna wartość parametru pos id',
 		101 => 'brak parametru session id',
 		102 => 'brak parametru ts',
@@ -74,7 +74,7 @@ class KontorX_Payments_Platnosci
 	 * Statusy transakcji
 	 * @var array
 	 */
-	protected $_statuses = array(
+	protected static $_statuses = array(
 		1 => 'nowa',
 		2 => 'anulowana',
 		3 => 'odrzucona',
@@ -142,16 +142,38 @@ class KontorX_Payments_Platnosci
 	 * Pobranie treści błedu na podstawie jego kodu
 	 * @return string|null 
 	 */
-	public function getErrorByCode($code)
+	public static function getErrorByCode($code)
 	{
-		if (isset($this->_errorCodes[$code]))
+		$code = (string) $code;
+		if (isset(self::$_errorCodes[$code]))
 		{
-			return $this->_errorCodes[$code];
+			return self::$_errorCodes[$code];
 		}
 
 		return null;
 	}
 	
+	/**
+	 * Pobiera opisy statusow lub opis pojedyńczego satatusu.
+	 * Gdy przekazany typ statusu nie istnieje zwracane jest null
+	 * 
+	 * @return array|string|null 
+	 */
+	public static function getStatusTypes($type = null)
+	{
+		if (null === $type)
+		{
+			return self::$_statuses;
+		}
+		
+		if (isset(self::$_statuses[$type]))
+		{
+			return self::$_statuses[$type];
+		}
+		
+		return null;
+	}
+
 	/**
 	 * Zwrucenie informacji o formach płatności
 	 * @return array 
