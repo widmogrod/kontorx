@@ -445,7 +445,7 @@ class KontorX_Payments_Platnosci
 		$http->setParameterPost('session_id', $this->getSessionId());
 		$http->setParameterPost('ts', $time);
 		$http->setParameterPost('sig', $sig);
-
+		
 		$response = $http->request(Zend_Http_Client::POST);
 
 		switch($this->_formatDanych)
