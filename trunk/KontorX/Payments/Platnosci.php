@@ -367,8 +367,8 @@ class KontorX_Payments_Platnosci
 				);
 				break;
 
-//			default:
-//				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty "'.$procedura.'"');
+			default:
+				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty "'.$procedura.'"');
 		}
 
 		return join('/', $data);
@@ -436,7 +436,7 @@ class KontorX_Payments_Platnosci
 	public function request($actionType)
 	{
 		$url = $this->getUrlDlaProcedury($actionType);
-var_dump($url);
+
 		$time = time();
 		$sig = md5($this->getPosId() + $this->getSessionId() + $time + $this->getKey1());
 		
