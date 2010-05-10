@@ -436,7 +436,7 @@ class KontorX_Payments_Platnosci
 	public function request($actionType)
 	{
 		$url = $this->getUrlDlaProcedury($actionType);
-
+var_dump($url);
 		$time = time();
 		$sig = md5($this->getPosId() + $this->getSessionId() + $time + $this->getKey1());
 		
