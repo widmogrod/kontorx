@@ -298,11 +298,11 @@ class KontorX_Payments_Platnosci
 		return $this;
 	}
 	
-	const ACTION_GET = 'Payment/get';
-	const ACTION_CONFIRM = 'Payment/confirm';
-	const ACTION_CANCEL = 'Payment/cancel';
-	const ACTION_NEW = 'NewPayment';
-	const ACTION_PAYTYPE = 'PayType';
+	const ACTION_GET 		= 'Payment/get';
+	const ACTION_CONFIRM 	= 'Payment/confirm';
+	const ACTION_CANCEL 	= 'Payment/cancel';
+	const ACTION_NEW 		= 'NewPayment';
+	const ACTION_PAYTYPE 	= 'PayType';
 	
 	/**
 	 * UrlPlatnosci.pl/Kodowanie/NazwaProcedury/Format
@@ -313,6 +313,7 @@ class KontorX_Payments_Platnosci
 	{
 		switch($procedura)
 		{
+			case self::ACTION_GET:
 			case self::ACTION_CANCEL:
 			case self::ACTION_CONFIRM:
 			case self::ACTION_CANCEL:
@@ -345,7 +346,7 @@ class KontorX_Payments_Platnosci
 				break;
 
 			default:
-				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty');
+				throw new KontorX_Payments_Exception('niewłaściwy typ proceduty "'.$procedura.'"');
 		}
 
 		return join('/', $data);
@@ -404,7 +405,36 @@ class KontorX_Payments_Platnosci
 		$this->_urlOnline = (string) $url;
 		return $this;
 	}
-	
+
+	/**
+	 * @param string $actionType
+	 * @return KontorX_Payments_Platnosci_Response_Xml
+	 * @throws KontorX_Payments_Exception
+	 */
+	public function request($actionType)
+	{
+		$url = $this->getUrlDlaProcedury($actionType);
+
+		$time = time();
+		$sig = md5($this->getPosId() + $this->getSessionId() + $time + $this->getKey1());
+		
+		$http = new Zend_Http_Client($url);
+		$http->setParameterPost('post_id', $this->getPosId());
+		$http->setParameterPost('session_id', $this->getSessionId());
+		$http->setParameterPost('ts', $time);
+		$http->setParameterPost('sig', $sig);
+
+		$response = $http->request(Zend_Http_Client::POST);
+
+		switch($this->_formatDanych)
+		{
+			case self::FORMAT_DANYCH_XML:
+				return new KontorX_Payments_Platnosci_Response_Xml($response->getBody());
+			default:
+				throw new KontorX_Payments_Platnosci_Response_Exception('format danych "'.$this->_formatDanych.'" nie jest obsługiwany');
+		}
+	}
+
 	/**
 	 * @var integer
 	 */
@@ -606,7 +636,7 @@ class KontorX_Payments_Platnosci
 			throw new KontorX_Payments_Exception('podana wartość "amount" nie jest liczbą');
 		}
 
-		$this->_amount = (string) $amount;
+		$this->_amount = $amount;
 		return $this;
 	}
 

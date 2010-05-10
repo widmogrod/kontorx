@@ -34,11 +34,13 @@
  */
 class KontorX_Payments_Platnosci_Response_Xml
 {
-	public function __construct($respinseXML)
+	protected $_xml;
+
+	public function __construct($responseXML)
 	{
-		if (false === ($xml = simplexml_load_string($respinseXML)))
+		if (false === ($this->_xml = simplexml_load_string($responseXML)))
 		{
-			throw new KontorX_Payments_Platnosci_Response_Exception();
+			throw new KontorX_Payments_Platnosci_Response_Exception('Nierozpoznane responseXML "'.$responseXML.'"');
 		}
 	}
 
@@ -52,6 +54,7 @@ class KontorX_Payments_Platnosci_Response_Xml
 			switch($this->_xml->status)
 			{
 				case 'OK': return true;
+				default: return false;
 			}
 		}
 
@@ -65,7 +68,7 @@ class KontorX_Payments_Platnosci_Response_Xml
 	{
 		return $this->_xml->trans->id;
 	}
-	
+
 	/**
 	 * Identyfikator Posa dla jakiego utworzono transakcję
 	 */
@@ -102,7 +105,7 @@ class KontorX_Payments_Platnosci_Response_Xml
 	/**
 	 * aktualny status transakcji
 	 */
-	public function getStatus()
+	public function getTransStatus()
 	{
 		return $this->_xml->trans->status;
 	}
