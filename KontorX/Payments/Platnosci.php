@@ -648,23 +648,32 @@ class KontorX_Payments_Platnosci
 	 * Kwota w groszach
 	 * 
 	 * @param numeric $amount
+	 * @param bool $grosze
 	 * @return KontorX_Payments_Platnosci
 	 * @throws KontorX_Payments_Exception
 	 */
-	public function setAmount($amount)
+	public function setAmount($amount, $grosze = true)
 	{
 		if (!is_numeric($amount))
 		{
 			throw new KontorX_Payments_Exception('podana wartość "amount" nie jest liczbą');
 		}
-		
-		$integer = (int) $amount;
-		$float = (float) $amount;
-		
-		// czyli mamy float
-		if ($integer != $float)
+
+		if (true !== $grosze)
 		{
+			$float = (float) $amount;
 			$amount = $float * 100;
+		} else
+		if (is_string($amount))
+		{
+			$integer = (int) $amount;
+			$float = (float) $amount;
+			
+			// czyli mamy float
+			if ($integer != $float)
+			{
+				$amount = $float * 100;
+			}
 		}
 
 		$this->_amount = (int) $amount;
