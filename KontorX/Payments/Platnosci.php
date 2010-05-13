@@ -657,8 +657,17 @@ class KontorX_Payments_Platnosci
 		{
 			throw new KontorX_Payments_Exception('podana wartość "amount" nie jest liczbą');
 		}
+		
+		$integer = (int) $amount;
+		$float = (float) $amount;
+		
+		// czyli mamy float
+		if ($integer != $float)
+		{
+			$amount = $float * 100;
+		}
 
-		$this->_amount = $amount;
+		$this->_amount = (int) $amount;
 		return $this;
 	}
 
