@@ -438,7 +438,7 @@ class KontorX_Payments_Platnosci
 		$url = $this->getUrlDlaProcedury($actionType);
 
 		$time = time();
-		$sig = md5($this->getPosId() + $this->getSessionId() + $time + $this->getKey1());
+		$sig = md5($this->getPosId() . $this->getSessionId() . $time . $this->getKey1());
 		
 		$http = new Zend_Http_Client($url);
 		$http->setParameterPost('post_id', $this->getPosId());
@@ -925,7 +925,7 @@ class KontorX_Payments_Platnosci
 		// sig = md5(pos id + session id + wartosc1 + wartosc2 + ... + wartoscn + ts + key)
 
 		$key  = $this->getPosId();
-		$key += $this->getSessionId();
+		$key .= $this->getSessionId();
 
 		return md5($key);
 	}
@@ -950,7 +950,7 @@ class KontorX_Payments_Platnosci
 			
 				// TODO: Brakuje_pay_type
 			
-				return md5($this->getPosId() + $this->getP);
+				return md5($this->getPosId() . $this->getP);
 		}
 	}
 	

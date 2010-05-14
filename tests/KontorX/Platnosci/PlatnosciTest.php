@@ -73,6 +73,11 @@ class KontorX_Platnosci_PlatnosciTest extends UnitTestCase
 
 		$this->assertIdentical($value, $result, 'zamowienia nie jest w groszach');
 	}
+
+	public function testGetConnection()
+	{
+		
+	}
 }
 
 $test = new KontorX_Platnosci_PlatnosciTest();
