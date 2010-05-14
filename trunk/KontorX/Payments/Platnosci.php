@@ -1,4 +1,6 @@
 <?php
+require_once 'KontorX/Payments/Exception.php';
+
 /**
  * Integracja z płatnościami internetowymi platnosci.pl {@link https://www.platnosci.pl}
  * 
@@ -437,12 +439,22 @@ class KontorX_Payments_Platnosci
 	{
 		$url = $this->getUrlDlaProcedury($actionType);
 
-		$time = time();
-		$sig = md5($this->getPosId() . $this->getSessionId() . $time . $this->getKey1());
+		$posId 		= $this->getPosId();
+		$sessionId 	= $this->getSessionId();
+		$time 		= time();
+		$key1 		= $this->getKey1();
+		
+		// sig = md5(pos id + session id + ts + key1)
+		$sig = md5(implode(array(
+			$posId,
+			$sessionId,
+			$time,
+			$key1
+		)));
 		
 		$http = new Zend_Http_Client($url);
-		$http->setParameterPost('post_id', $this->getPosId());
-		$http->setParameterPost('session_id', $this->getSessionId());
+		$http->setParameterPost('pos_id', $posId);
+		$http->setParameterPost('session_id', $sessionId);
 		$http->setParameterPost('ts', $time);
 		$http->setParameterPost('sig', $sig);
 		
@@ -451,8 +463,10 @@ class KontorX_Payments_Platnosci
 		switch($this->_formatDanych)
 		{
 			case self::FORMAT_DANYCH_XML:
+				require_once 'KontorX/Payments/Platnosci/Response/Xml.php';
 				return new KontorX_Payments_Platnosci_Response_Xml($response->getBody());
 			default:
+				require_once 'KontorX/Payments/Platnosci/Response/Exception.php';
 				throw new KontorX_Payments_Platnosci_Response_Exception('format danych "'.$this->_formatDanych.'" nie jest obsługiwany');
 		}
 	}
@@ -637,6 +651,37 @@ class KontorX_Payments_Platnosci
 		}
 
 		return $this->_sessionId;
+	}
+	
+	/**
+	 * @var string {1,1024}
+	 */
+	protected $_orderId;
+	
+	/**
+	 * numer zamówienia
+	 * @param string {1,1024}
+	 * @throws KontorX_Payments_Exception
+	 * @return void
+	 */
+	public function setOrderId($orderId)
+	{
+		$len = strlen((string) $orderId);
+		if ($len < 1 || $len > 1024)
+		{
+			throw new KontorX_Payments_Exception('niewłaściwa wartość "order_id"');
+		}
+
+		$this->_orderId = $orderId;
+	}
+	
+	/**
+	 * numer zamówienia
+	 * @return string|null
+	 */
+	public function getOrderId()
+	{
+		return $this->_orderId;
 	}
 	
 	/**
@@ -848,6 +893,91 @@ class KontorX_Payments_Platnosci
 
 		return $this->_email;
 	}
+
+	
+	/**
+	 * @var string {0,100}
+	 */
+	protected $_city;
+	
+	/**
+	 * @param string {0,100} $city
+	 * @throws KontorX_Payments_Exception
+	 * @return void
+	 */
+	public function setCity($city)
+	{
+		$length = strlen($city);
+		if ($length < 1 || $length > 100)
+		{
+			throw new KontorX_Payments_Exception('wartość "city" jest niepoprawna');
+		}
+		$this->_city = $city;
+	}
+
+	/**
+	 * @return string 
+	 */
+	public function getCity()
+	{
+		return $this->_city;
+	}
+
+	/**
+	 * @var string {0,100}
+	 */
+	protected $_street;
+	
+	/**
+	 * @param string {0,100} $street
+	 * @throws KontorX_Payments_Exception
+	 * @return void
+	 */
+	public function setStreet($street)
+	{
+		$length = strlen($street);
+		if ($length < 1 || $length > 100)
+		{
+			throw new KontorX_Payments_Exception('wartość "street" jest niepoprawna');
+		}
+		$this->_street = $street;
+	}
+
+	/**
+	 * @return string 
+	 */
+	public function getStreet()
+	{
+		return $this->_street;
+	}
+
+	/**
+	 * @var string {0,20}
+	 */
+	protected $_postCode;
+	
+	/**
+	 * @param string {0,20} $postCode
+	 * @throws KontorX_Payments_Exception
+	 * @return void
+	 */
+	public function setPostCode($postCode)
+	{
+		$length = strlen($postCode);
+		if ($length < 1 || $length > 100)
+		{
+			throw new KontorX_Payments_Exception('wartość "post_code" jest niepoprawna');
+		}
+		$this->_postCode = $postCode;
+	}
+
+	/**
+	 * @return string 
+	 */
+	public function getPostCode()
+	{
+		return $this->_postCode;
+	}
 	
 	/**
 	 * @var string
@@ -875,7 +1005,7 @@ class KontorX_Payments_Platnosci
 		$this->_clientIp = (string) $clientIp;
 		return $this;
 	}
-
+	
 	/**
 	 * @return string
 	 * @throws KontorX_Payments_Exception
