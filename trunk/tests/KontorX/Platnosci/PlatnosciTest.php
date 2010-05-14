@@ -321,51 +321,6 @@ class KontorX_Platnosci_PlatnosciTest extends UnitTestCase
 			$this->pass();
 		}
 	}
-
-	/*public function testSID_OdPlatnosci()
-	{
-		$posId 		= '1';
-		$sessionId 	= '417419';
-		$orderId 	= '';
-		$status		= '';
-		$amount		= '';
-		$desc 		= '';
-		$ts 		= '1094205761232';
-		$ts			= '';
-		$key1 		= '';
-		$key2		= '';
-		
-		$sig1		= 'b6d68525f724a6d69fb1260874924759';
-		
-		// sig = md5(pos id + session id + order id + status + amount + desc + ts + key2)
-//		$sig2 = md5($posId + $sessionId + $ts + $key1);
-		$this->assertIdentical($sig1, $sig2, 'SID nie jest identyczny');
-	}*/
-
-	/*public function testGetConnection()
-	{
-		$this->_platnosci->setPosId('20575');
-		$this->_platnosci->setPosAuthKey('eNjTjoA');
-		$this->_platnosci->setKey1('d11ef8a28ae801e9d1889f9f662d1d42');
-		$this->_platnosci->setKey2('f7363e25d17ac6ac21262a90dbdcd4a4');
-
-		$url = $this->_platnosci->getUrlDlaProcedury(KontorX_Payments_Platnosci::ACTION_GET);
-
-		$time = time();
-		$sig = md5($this->_platnosci->getPosId() . $this->_platnosci->getSessionId() . $time . $this->_platnosci->getKey1());
-		
-		$rCurl = curl_init();
-
-		curl_setopt($rCurl, CURLOPT_HEADER, 0);
-		curl_setopt($rCurl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($rCurl, CURLOPT_VERBOSE, 1);
-		curl_setopt($rCurl, CURLOPT_REFERER, 'kwiatorchidei.pl');
-		curl_setopt($rCurl, CURLOPT_URL, $url);
-
-		$sData = curl_exec($rCurl);
-
-		curl_close($rCurl);
-	}*/
 }
 
 $test = new KontorX_Platnosci_PlatnosciTest();
