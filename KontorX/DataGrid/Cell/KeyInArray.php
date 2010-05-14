@@ -12,7 +12,6 @@ class KontorX_DataGrid_Cell_KeyInArray extends KontorX_DataGrid_Cell_Abstract
 	public function setArray(array $array)
 	{
 		$this->_array = array();
-		
 		foreach ($array as $key => $value)
 		{
 			if (is_array($value))
@@ -35,6 +34,7 @@ class KontorX_DataGrid_Cell_KeyInArray extends KontorX_DataGrid_Cell_Abstract
 	{
 		$value = $this->getValue();
 
+		
 		return (array_key_exists($value, $this->_array))
 			? $this->_array[$value]
 			: $value;
