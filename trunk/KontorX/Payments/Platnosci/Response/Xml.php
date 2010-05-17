@@ -55,7 +55,6 @@ class KontorX_Payments_Platnosci_Response_Xml
 			{
 				case 'OK': return true;
 				case 'ERROR': return false;
-				default: return false;
 			}
 		}
 
