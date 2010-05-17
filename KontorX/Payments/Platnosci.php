@@ -61,7 +61,7 @@ class KontorX_Payments_Platnosci
 	 * nie zostanie ona rozliczona (nie wpłyną środki do systemu Płatności.pl)
 	 * @var int
 	 */
-//	const STATUS_NOWA = 1;
+	const STATUS_NOWA = 1;
 	
 	/**
 	 * Status 2 - „anulowana” pojawi się automatycznie 
@@ -70,7 +70,13 @@ class KontorX_Payments_Platnosci
 	 * nie zostanie ona rozliczona (nie wpłyną środki do systemu Płatności.pl)
 	 * @var int
 	 */
-//	const STATUS_ANULOWANA = 2;
+	const STATUS_ANULOWANA = 2;
+	const STATUS_ODRZUCONA = 3;
+	const STATUS_ROZPOCZETA = 4;
+	const STATUS_OCZEKUJE_NA_ODBIOR = 5;
+	const STATUS_PLATNOSC_ODRZUCONA = 7;
+	const STATUS_PLATNOSC_ODEBRANA = 99;
+	const STATUS_BLEDNY_STATUS = 888;
 	
 	/**
 	 * Statusy transakcji
