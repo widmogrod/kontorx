@@ -30,7 +30,7 @@ class KontorX_Util_Google {
 		// lapiemy linki
 		// TODO Dodać lapanie w wynikach pola z pdf etc.
 		$aResults = array();
-		preg_match_all('@<li class="g w0"><h3 class=r><a href="([^"]+)" class=l@i', $sData, $aResults );
+		preg_match_all('@<li class=g><h3 class="r"><a href="([^"]+)" class=l@i', $sData, $aResults );
 
 		// generowanie url'a z www i bez ..
 		$aInfo = pathinfo($this->sUri);
