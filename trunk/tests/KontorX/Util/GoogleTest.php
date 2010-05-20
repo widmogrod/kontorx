@@ -21,7 +21,8 @@ class KontorX_Util_GoogleTest extends UnitTestCase
 	{
 		$google = new KontorX_Util_Google('google.pl');
 		$position = $google->position('google.pl', 10);
-		$this->assertEqual(1, $position, "pozycje nie są identyczne");
+		$this->dump($position);
+		$this->assertNotEqual(0, $position, "pozycja w google jest = 0, fail!");
 	}
 }
 
