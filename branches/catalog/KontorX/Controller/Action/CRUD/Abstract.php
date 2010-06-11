@@ -139,7 +139,7 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
                 $params[] = $this->_getParam($column);
             }
         } else {
-            $params = $this->_getParam(current($primaryKey));
+            $params[] = $this->_getParam(current($primaryKey));
         }
 
         return call_user_func_array(array($model,'find'), $params);
@@ -412,7 +412,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
 	 * Educja rekordu
 	 *
 	 */
-    public function editAction() {
+    public function editAction() 
+    {
         // wyszukanie rekordu do edycji
         try {
             $row = $this->_editFindRecord();
@@ -421,7 +422,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         }
 
         // czy rekord istnieje
-        if (false === $row || null === $row) {
+        if (!$row instanceof Zend_Db_Table_Row_Abstract)
+        {
             $this->_editOnRecordNoExsists();
             return;
         }
@@ -628,7 +630,8 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         $this->_helper->flashMessenger->addMessage($message);
 
         $referer = $this->_getParam('referer');
-        if (null !== $referer) {
+        if (null != $referer)
+        {
             $this->_helper->redirector->goToUrlAndExit($referer);
         } else {
             // tworzenie parametrow przekierowania
@@ -640,10 +643,12 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
             foreach ($primaryKey as $column) {
                 $params[$column] = $form->getValue($column);
             }
-
-            $this->_helper->redirector->goToUrlAndExit(
-                    $this->_helper->url->url($params)
-            );
+            
+            $this->_helper->redirector->goToUrlAndExit($_SERVER['HTTP_REFERER']);
+            
+//            $this->_helper->redirector->goToUrlAndExit(
+//                    $this->_helper->url->url($params)
+//            );
         }
     }
 

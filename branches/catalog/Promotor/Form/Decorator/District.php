@@ -18,7 +18,7 @@ class Promotor_Form_Decorator_District extends Zend_Form_Decorator_Abstract
 
 		$name 			 = $element->getName();
 		$mainDistrict 	 = $element->getMainDistrict();
-		$chosenDistricts = $element->getChosenDistricts();
+		$chosenDistricts = (array) $element->getChosenDistricts();
 
 		$checkbox = '<input type="checkbox" name="'.$name.'[chosen_districts][]" value="%s" %s/>';
 		$radio    = '<input type="radio"    name="'.$name.'[main_district]" value="%s" %s />';
