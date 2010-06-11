@@ -377,6 +377,8 @@ class KontorX_Update_Manager extends ArrayIterator {
 
 		// Zapisz informacje o ostatniej dezaktualizacji
 		$this->_saveInfo($lastUpdateId);
+		
+		return true;
 	}
 
 	/**

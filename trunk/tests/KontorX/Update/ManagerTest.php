@@ -57,7 +57,6 @@ class KontorX_Update_ManagerTest extends UnitTestCase {
 		);
 
 		$result = $manager->getUpdateFileList();
-		$this->dump($result);
 		$this->assertEqual($expected, $result, 'Lista aktualizacji niepoprawna');
 	}
 
