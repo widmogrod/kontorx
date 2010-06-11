@@ -55,7 +55,7 @@ class Promotor_Form_Element_District extends Zend_Form_Element
 				$this->setChosenDistricts($value['chosen_districts']);
 			}
 			
-			if (isset($value['chosen_districts']))
+			if (isset($value['main_district']))
 			{
 				$this->setMainDistrict($value['main_district']);
 			}
