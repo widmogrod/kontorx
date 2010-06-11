@@ -33,7 +33,12 @@ class KontorX_Controller_Action_Helper_Config extends Zend_Controller_Action_Hel
             ? pathinfo($filename, PATHINFO_EXTENSION)
             : $type;
 
-        $configKey = "$filename:$type";
+//		var_dump(func_get_args());
+     	if (null === $module) {
+            $module = $this->getRequest()->getModuleName();
+        }
+
+        $configKey = "$filename:$module:$type";
 
         // zapobiegu ponownemu wczytywaniu konfiguacji
         if (array_key_exists($configKey, $this->_cachedConfig)) {
