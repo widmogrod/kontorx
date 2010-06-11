@@ -20,7 +20,7 @@ class Promotor_View_Helper_CatalogPremium extends Zend_View_Helper_Abstract {
 	public function render($partial = null) {
 		$catalog = new Catalog_Model_CatalogList();
 		$catalog->setResultCache('Zend_Cache_Hour');
-		$rowset = $catalog->findAllPremiumCache(
+		$rowset = $catalog->findAllPremium(
 			$this->_district,
 			$this->_page,
 			$this->_rowCount,
