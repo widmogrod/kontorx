@@ -139,9 +139,19 @@ class KontorX_Ftp
 	 */
 	public function setDirectory($directory)
 	{
-		$this->_directory = (string) $directory;
+		$this->_directory = rtrim((string) $directory,'/');
 	}
 
+	/**
+	 * Przytuj
+	 * @param string $path
+	 * @return string
+	 */
+	protected function _preperePath($path)
+	{
+		return $this->_directory . '/' . ltrim($path, '/');
+	}
+	
 	/**
 	 * List files in given direcotry
 	 * @return array 
@@ -153,5 +163,42 @@ class KontorX_Ftp
 			: $directory;
 
 		return $this->_adapter->ls($directory);
+	}
+
+	/**
+	 * Download a file from server
+	 * @param string $localFile
+	 * @param string $remoteFile
+	 * @param mixed $model
+	 * @return bool
+	 */
+	public function get($localFile, $remoteFile, $model = null)
+	{
+		$remoteFile = $this->_preperePath($remoteFile);
+		return $this->_adapter->get($localFile, $remoteFile, $model);
+	}
+
+	/**
+	 * Upload file to the server
+	 * @param string $remoteFile
+	 * @param string $localFile
+	 * @param mixed $model
+	 * @return bool
+	 */
+	public function put($remoteFile, $localFile, $model = FTP_BINARY)
+	{
+		$remoteFile = $this->_preperePath($remoteFile);
+		return $this->_adapter->put($remoteFile, $localFile, $model);
+	}
+	
+	/**
+	 * Delete file on the server
+	 * @param string $path
+	 * @return bool
+	 */
+	public function delete($path)
+	{
+		$path = $this->_preperePath($path);
+		return $this->_adapter->delete($path);
 	}
 }
