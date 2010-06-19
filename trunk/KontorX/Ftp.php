@@ -49,7 +49,7 @@ class KontorX_Ftp
 		if (is_string($adapter))
 		{
 			// sprawdzam w prosty sposób czy nie podano url do servera 
-			if (strlen(($scheme = parse_url($adapter, PHP_URL_SCHEME))) > 3)
+			if (strlen(($scheme = parse_url($adapter, PHP_URL_SCHEME))) > 2)
 			{
 				// url do serwera został podany zatem ekstrachuje protokół
 				$options['server'] = $adapter;
