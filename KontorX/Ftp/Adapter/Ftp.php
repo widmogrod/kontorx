@@ -53,12 +53,17 @@ class KontorX_Ftp_Adapter_Ftp extends KontorX_Ftp_Adapter_Abstract
 	
 	/**
 	 * List files in given direcotry
+	 * @param string $directory
+	 * @param bool $moreInfo
 	 * @return array 
 	 */
-	public function ls($directory)
+	public function ls($directory, $moreInfo = false)
 	{
 		$this->connect();
-		return ftp_nlist($this->_connection, $directory);
+		
+		return $moreInfo 
+			? array_map(array($this,'_parseRawList'), ftp_rawlist($this->_connection, $directory))
+			: ftp_nlist($this->_connection, $directory);
 	}
 	
 	/**

@@ -13,9 +13,9 @@ class KontorX_Ftp_Adapter_FtpTest extends UnitTestCase
 	 * @var array
 	 */
 	protected $_options = array(
-		'server'   => 'ftp.example.com',
-		'username' => 'your_usernmae',
-		'password' => 'yout_password'
+		'server'   => 'ftp.widmogrod.info',
+		'username' => 'widmogrod',
+		'password' => 'for6ba!'
 	);
 
 	/**
@@ -51,6 +51,13 @@ class KontorX_Ftp_Adapter_FtpTest extends UnitTestCase
 	{
 		$result = $this->_adapter->ls('.');
 		$this->assertTrue(is_array($result), "Oczekiwana jest tablica z listą katalogów");
+	}
+	
+	public function testListDirWithMoreInfo()
+	{
+		$result = $this->_adapter->ls('.', true);
+		$this->assertTrue(is_array($result), "Oczekiwana jest tablica z listą katalogów");
+		$this->dump($result);
 	}
 	
 	public function testPutFile()

@@ -29,10 +29,12 @@ interface KontorX_Ftp_Adapter_Interface
 	
 	/**
 	 * List files in givendirecotry
+	 * @param string $directory
+	 * @param bool $moreInfo
 	 * @return array 
 	 */
-	public function ls($directory);
-	
+	public function ls($directory, $moreInfo = false);
+
 	/**
 	 * Download a file from server
 	 * @param string $localFile

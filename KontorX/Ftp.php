@@ -152,17 +152,20 @@ class KontorX_Ftp
 		return $this->_directory . '/' . ltrim($path, '/');
 	}
 	
+	
 	/**
 	 * List files in given direcotry
+	 * @param string $directory
+	 * @param bool $moreInfo
 	 * @return array 
 	 */
-	public function ls($directory = null)
+	public function ls($directory, $moreInfo = false)
 	{
 		$directory = (null === $directory)
 			? $this->_directory 
 			: $directory;
 
-		return $this->_adapter->ls($directory);
+		return $this->_adapter->ls($directory, $moreInfo);
 	}
 
 	/**
