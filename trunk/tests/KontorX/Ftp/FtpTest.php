@@ -13,9 +13,9 @@ class KontorX_Ftp_FtpTest extends UnitTestCase
 	 * @var array
 	 */
 	protected $_options = array(
-		'server'   => 'ftp.example.com',
-		'username' => 'your_usernmae',
-		'password' => 'yout_password'
+		'server'   => 'ftp.widmogrod.info',
+		'username' => 'widmogrod',
+		'password' => 'for6ba!'
 	);
 	
 	public function setUp() 
@@ -128,6 +128,79 @@ class KontorX_Ftp_FtpTest extends UnitTestCase
 		$path = 'httpdocs/remoteTestPutFile.txt';
 		$result = $ftp->delete($path);
 		$this->assertTrue($result, 'Wystąpił błąd w trakcie usuwania pliku na serwera');
+	}
+	
+	public function testListRawParse()
+	{
+		$rawList = array(
+			"drwxr-xr-x 3 gabriel gabriel 4096 2010-06-12 16:22 Adapter",
+			"-rw-r--r-- 1 gabriel gabriel 4338 2010-06-21 22:11 FtpTest.php",
+			"-rw-r--r-- 1 gabriel gabriel   11 2010-06-12 16:22 testPutFile.txt",
+			"drwxr-x--- 5 widmogrod 504   4096 Oct        1     2009 anon_ftp"
+		);
+
+		$result = array();
+
+		foreach($rawList as $list) {
+			// to nie jest najlepsze rozwiązanie ale zawsze ogranicza pole błędu
+			if (preg_match('#(\d{4}-\d{2}-\d{2})#', $list, $matched)) {
+				$info = sscanf($list, "%s %d %s %s %d %s %s %s");
+				list($permisions, $size, $user, $group, $filesize, $date, $hour, $filename) = $info;
+			} else {
+				$info = sscanf($list, "%s %d %s %s %d %s %d %s %s");
+				list($permisions, $size, $user, $group, $filesize, $month, $day, $year, $filename) = $info;
+				$date = $month . ' ' . $day . ' ' . $year;
+				$hour = '';
+			}
+
+			$result[] = array(
+				'type' => ((substr($permisions,0,1) == 'd') ? 'DIR' : 'FILE'),
+				'filesize' => $filesize,
+				'permisions' => $permisions,
+				'user' => $user,
+				'group' => $group,
+				'time' => strtotime("$date, $hour")
+			);
+		}
+
+		var_dump($result);
+
+		$success = array(
+		  array (
+			"type"=> "DIR",
+			"filesize"=> 4096,
+			"permisions"=> "drwxr-xr-x",
+			"user"=> "gabriel",
+			"group"=>"gabriel",    
+			"time"=>1276352520
+		  ),                   
+		  array (
+			"type"=> "FILE",
+			"filesize"=> 4338,
+			"permisions"=> "-rw-r--r--",
+			"user"=> "gabriel",
+			"group"=>"gabriel",    
+			"time"=>1277151060
+		  ),
+		  array (
+			"type"=> "FILE",
+			"filesize"=> 11,
+			"permisions"=> "-rw-r--r--",
+			"user"=> "gabriel",
+			"group"=>"gabriel",    
+			"time"=>1276352520
+		  ),
+		  array (
+			"type"=> "DIR",
+			"filesize"=> 4096,
+			"permisions"=> "drwxr-x---",
+			"user"=> "widmogrod",
+			"group"=>"504",    
+			"time"=>1254348000
+		  )
+		);
+
+		$this->assertIdentical($result, $success, 'Wartości sparsowane "rawList" nie są identyczne!');
 	}
 }
 
