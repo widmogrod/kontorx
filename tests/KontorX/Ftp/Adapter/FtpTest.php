@@ -13,9 +13,9 @@ class KontorX_Ftp_Adapter_FtpTest extends UnitTestCase
 	 * @var array
 	 */
 	protected $_options = array(
-		'server'   => 'ftp.widmogrod.info',
-		'username' => 'widmogrod',
-		'password' => 'for6ba!'
+		'server'   => 'ftp.example.com',
+		'username' => 'root',
+		'password' => '********'
 	);
 
 	/**
