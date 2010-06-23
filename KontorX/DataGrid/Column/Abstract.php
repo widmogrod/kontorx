@@ -288,6 +288,12 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
      * @return string
      */
     public function __toString() {
-        return $this->render();
+    	try {
+    		return $this->render();
+    	} catch (Exception $e) {
+    		trigger_error($e->getMessage(), E_USER_WARNING);
+    	}
+
+        return '';
     }
 }
