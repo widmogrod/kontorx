@@ -2,37 +2,62 @@
 require_once 'KontorX/DataGrid/Renderer/Abstract.php';
 
 /**
- * @author gabriel
- * @todo może - dodać default partial datagrid file!
+ * @author Gabriel
  */
-class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abstract {
+class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abstract 
+{
+	const STYLE_DEFAULT = 'defaultDataGrid.phtml';
 
 	public function render($partial = null, $module = null) {
-		if (is_string($partial)) {
+		$grid = $this->getDataGrid();
+
+		// Setup default ViewRender
+		if (null === $partial)
+		{
+			require_once 'Zend/View.php';
+			$view = new Zend_View();
+			$view->setScriptPath(dirname(__FILE__) . '/HtmlTable');
+			$view->assign($grid->getVars());
+
+			$partialStyle = $this->getPartial();
+			switch ($partialStyle)
+			{
+				case null:
+					return $view->render(self::STYLE_DEFAULT);
+
+				case self::STYLE_DEFAULT:
+					return $view->render($partialStyle);
+
+				default:
+					// continue
+			}
+		}
+
+		if (is_string($partial))
 			$this->setPartial($partial);
-		}
-		if (is_string($module)) {
+
+		if (is_string($module))
 			$this->setPartial($module);
-		}
 		
 		$partial = $this->getPartial();
 		$module  = $this->getModule();
 
 		/* @var $view Zend_View */
 		$view = $this->getView();
-		if(!$view->getHelperPath('KontorX_View_Helper_')) {
+		if (!$view->getHelperPath('KontorX_View_Helper_'))
         	$view->addHelperPath('KontorX/View/Helper', 'KontorX_View_Helper_');
-        }
 
         // wywolanie helpera widoku @see KontorX_View_Helper_DataGrid
-        return $view->dataGrid($this->getDataGrid(), $partial, $module);
+        $result = $view->dataGrid($grid, $partial, $module);
+        
+        return $result;
 	}
 
 	/**
      * Default name of partial file @see Zend_View_Helper_Partial
      * @var string
      */
-    private $_partial = '_partial/dataGrid.phtml';
+    private $_partial;
 
     /**
      * Set name of partial file @see Zend_View_Helper_Partial

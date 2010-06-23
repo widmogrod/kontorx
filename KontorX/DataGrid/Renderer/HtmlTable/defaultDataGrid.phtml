@@ -1,0 +1,128 @@
+<!-- KontorX_DataGrid_Renderer_HtmlTable defaultDataGrid.phtml-->
+<?php
+	/* @var $placeholder Zend_View_Helper_Placeholder */
+	$placeholder = $this->getHelper('Placeholder');
+?>
+<table class="kx_datagrid">
+	<thead>
+		<tr class="kx_columns">
+			<?php
+				$isSetFilterFilter = false;
+				$groupColumn = null;
+				/* @var $column KontorX_DataGrid_Column_Interface */
+				foreach ($this->columns as $column):
+				
+					/**
+					 * Sprawdzam czy są ustawione jakiekolwiek filtry,
+					 * jeżeli nie ma blok z filtrami nie będzie wyświetlany
+					 */
+					if (false === $isSetFilterFilter) {
+						$isSetFilterFilter = (bool) count($column->getFilters());
+					}
+			?>
+				<?php if (!$column->isGroup()):?>
+					<td class="kx_column <?php print $column->class ?>" rowspan="<?php print $column->rowspan ?>" style="<?php print $column->style ?>"><?php print $column ?></td>
+				<?php else:?>
+					<?php $groupColumn = $column;?>
+				<?php endif;?>
+			<?php endforeach; ?>
+		</tr>
+	
+		<?php if (true === $isSetFilterFilter):?>
+		<tr class="kx_filters">
+			<?php
+				foreach ($this->columns as $i => $column):
+					$filters = $column->getFilters();
+
+			?>
+
+				<?php $placeholder->placeholder("filter-$i")->captureStart();?>
+				
+					<?php
+						/* @var $filter KontorX_DataGrid_Filter_Interface */
+						foreach ($filters as $filter):
+					?>
+					<span class="kx_filter"><?php print $filter?></span>
+					<?php endforeach; ?>
+				
+				<?php $placeholder->placeholder("filter-$i")->captureEnd();?>
+
+				<?php 
+
+					// sprawdz, czy jest ustawione filtrowanie
+					if ($column->isGroup()) {
+						// sprawdz, czy filter nalerzy do kolumny zgrupowanej
+						// filt(er|ry) - miejsca w wierszu zgrupowania
+						$placeholder->placeholder('filter-group')
+							->set($placeholder->placeholder("filter-$i"));
+	
+					} else {
+						// filt(er|ry) - tutaj jest ich miejsce :)
+						print '<td class="kx_filter_set">' . $placeholder->placeholder("filter-$i") . '</td>';
+					}
+				?>
+
+			<?php endforeach; ?>
+		</tr>
+		<?php endif;?>
+		
+		<?php if ($this->paginator): ?>
+		<tr class="kx_pagination">
+			<td colspan="<?php print count($this->columns) ?>">
+				<?php print $paginationControl = $this->paginationControl($this->paginator, 'Sliding','defaultPagination.phtml', array('valuesQuery' => $this->valuesQuery)); ?>
+			</td>
+		</tr>
+		<?php endif;?>
+		
+	</thead>
+	<tbody class="kx_rows">
+		
+	
+		<?php $this->rowset->rewind()?>
+		<?php
+			/* @var $cellset KontorX_DataGrid_Adapter_Cellset_Interface */
+			foreach ($this->rowset as $cellset): ?>
+
+		<?php if ($cellset->hasGroupedCell()): ?>
+		<tr class="kx_group_cell">
+			<td colspan="<?php print count($cellset)?>">
+				<div class="kx_column">
+					<?php print $groupColumn?>
+				</div>
+
+				<div class="kx_column_value">
+				<?php
+					print $cellset->getGroupCell();
+				?>
+				</div>
+				<div class="kx_filters_set">
+				<?php
+					// miejsca na filt(er|ry)
+					print $placeholder->placeholder('filter-group');
+			?>
+				</div>
+			</td>
+		</tr>
+		<?php endif; ?>
+
+		<tr class="<?php print $this->cycle(array('odd','even'))?>">
+			<?php
+				/* @var $cell KontorX_DataGrid_Cell_Interface */
+				foreach ($cellset as $cell): ?>
+			<td><?php print $cell;?></td>
+			<?php endforeach; ?>
+		</tr>
+		
+		<?php endforeach; ?>
+	</tbody>
+
+	<?php if ($this->paginator):?>
+	<tfoot>
+		<tr class="kx_pagination">
+			<td colspan="<?php print count($this->columns) ?>">
+				<?php print $paginationControl ?>
+			</td>
+		</tr>
+	</tfoot>
+	<?php endif;?>
+</table>
