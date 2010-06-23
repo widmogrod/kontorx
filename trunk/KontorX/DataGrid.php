@@ -536,6 +536,14 @@ class KontorX_DataGrid {
      * @return array
      */
     public function getColumns() {
+    	if (count($this->_columns) < 1 &&
+    			$this->_autoColumns)
+    	{
+    		 $adapter = $this->getAdapter();
+    		 $columns = $adapter->getRawColumnsInfo();
+    		 $this->setColumns($columns);
+    	}
+
         return $this->_columns;
     }
 
@@ -547,6 +555,22 @@ class KontorX_DataGrid {
         $this->_columns = array();
     }
 
+    protected $_autoColumns = true;
+    
+    /**
+     * @param bool $flag
+     */
+    public function setAutoColumns($flag = true) {
+    	$this->_autoColumns = $flag;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function getAutoColumns() {
+    	return $this->_autoColumns;
+    }
+    
     /**
      * Create filter object @see KontorX_DataGrid_Filter_Interface
      * @param array $options
