@@ -10,6 +10,18 @@ class KontorX_DataGrid_Adapter_Array extends KontorX_DataGrid_Adapter_Abstract {
     }
 
     /**
+     * Get raw column names & optional options
+     * @return array
+     */
+    public function getRawColumnsInfo()
+    {
+    	$data = $this->getAdaptable();
+    	$data = current($data); 	// fetch first row and
+    	$data = array_keys($data); 	// get array keys as column names
+    	return $data;
+    }
+    
+    /**
      * Wyławia szukane kolumny spełniające warunek ..
      * @return array
      */

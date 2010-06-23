@@ -38,6 +38,16 @@ class KontorX_DataGrid_Adapter_DbTable extends KontorX_DataGrid_Adapter_Abstract
         }
         return $this->_select;
     }
+    
+	/**
+     * Get raw column names & optional options
+     * @return array
+     */
+    public function getRawColumnsInfo()
+    {
+    	$columns = $this->getTable()->info(Zend_Db_Table::COLS);
+    	return $columns;
+    }
 
     /**
      * Wyławia szukane kolumny spełniające warunek ..

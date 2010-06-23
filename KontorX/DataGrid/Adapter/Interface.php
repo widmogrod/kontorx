@@ -8,6 +8,12 @@ interface KontorX_DataGrid_Adapter_Interface extends Iterator, Countable {
     public function fetchData();
 
     /**
+     * Get raw column names & optional options
+     * @return array
+     */
+    public function getRawColumnsInfo();
+
+    /**
      * Return a raw data
      * @return mixed
      */

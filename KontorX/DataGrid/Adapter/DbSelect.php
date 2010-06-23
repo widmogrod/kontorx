@@ -15,13 +15,25 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
     public function getSelect() {
         return $this->getAdaptable();
     }
+    
+	/**
+     * Get raw column names & optional options
+     * @return array
+     */
+    public function getRawColumnsInfo()
+    {
+    	$data = $this->_fetchData();
+    	$data = current($data); 	// fetch first row and
+    	$data = array_keys($data); 	// get array keys as column names
+    	return $data;
+    }
 
     /**
      * Wyławia szukane kolumny spełniające warunek ..
      * @return array
      */
     protected function _fetchData() {
-        /* @var $select Zend_Db_Select */
+    	/* @var $select Zend_Db_Select */
         $select = $this->getSelect();
 
         // czy jest paginacja
@@ -31,6 +43,7 @@ class KontorX_DataGrid_Adapter_DbSelect extends KontorX_DataGrid_Adapter_Abstrac
         }
 
         $stmt = $select->query();
-        return $this->_data = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
+        $data = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
+        return $data;
     }
 }

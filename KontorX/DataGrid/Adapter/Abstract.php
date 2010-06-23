@@ -8,11 +8,13 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 	public function fetchData() {
         if ($this->_cacheEnabled()) {
             if (false === ($this->_data = self::$_cache->load($this->_getCacheId()))) {
-            	self::$_cache->save($this->_fetchData(), $this->_getCacheId());
+            	$this->_data = $this->_fetchData();
+            	self::$_cache->save($this->_data, $this->_getCacheId());
             }
         } else {
         	$this->_data = $this->_fetchData();
         }
+
         $this->_count = count($this->_data);
 		return $this->_data;
 	}
@@ -105,6 +107,11 @@ abstract class KontorX_DataGrid_Adapter_Abstract implements KontorX_DataGrid_Ada
 		if (!isset($this->_rows[$this->_pointer])) {
 			$columns = $this->_dataGrid->getColumns();
 			/* @var $cellset KontorX_DataGrid_Adapter_Cellset_Instance */
+			if (!class_exists($this->_cellsetClass, false)) {
+				require_once 'Zend/Loader.php';
+				Zend_Loader::loadClass($this->_cellsetClass);
+			}
+			
 			$cellset = new $this->_cellsetClass;
 
 			/* @var $column KontorX_DataGrid_Column_Interface */
