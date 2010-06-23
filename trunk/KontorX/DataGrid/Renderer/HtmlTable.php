@@ -29,6 +29,7 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
 					return $view->render($partialStyle);
 
 				default:
+					return $view->render(self::STYLE_DEFAULT);
 					// continue
 			}
 		}
