@@ -130,6 +130,7 @@ class KontorX_DataGrid {
                     throw new KontorX_DataGrid_Exception(sprintf('Invalid type "%s" provided to getPluginLoader()', $type));
             }
 
+            require_once 'Zend/Loader/PluginLoader.php';
             $this->_pluginLoader[$type] = new Zend_Loader_PluginLoader(array(
                 "KontorX_$prefixSegment" => "KontorX/$pathSegment"
             ));
