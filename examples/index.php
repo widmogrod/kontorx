@@ -19,7 +19,7 @@ function getBaseUrl() {
 		$protocol = 'http';
 	}
 	
-	$scriptName = dirname($_SERVER['SCRIPT_NAME']);
+	$scriptName = ltrim(dirname($_SERVER['SCRIPT_NAME']),'/');
 
 	$baseUrl = $protocol . '://' . $host . '/' . $scriptName;
     return $baseUrl;
