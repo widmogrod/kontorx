@@ -2,6 +2,29 @@
 //inicjowanie konfiguracji
 require_once 'bootstrap.php';
 
+function getBaseUrl() {
+    if (isset($_SERVER['SERVER_NAME'])) {
+    	$host = $_SERVER['SERVER_NAME'];
+    } elseif (isset($_SERVER['HTTP_HOST'])) {
+    	$host = $_SERVER['HTTP_HOST'];
+    } else {
+    	// no host no play .. ??
+    	return '';
+    }
+
+	$protocol = isset($_SERVER['SERVER_PROTOCOL']);
+	if (false !== ($strpos = strpos($protocol,'/'))) {
+		$protocol = substr($protocol, 0, strpos($protocol,'/'));
+	} else {
+		$protocol = 'http';
+	}
+	
+	$scriptName = dirname($_SERVER['SCRIPT_NAME']);
+
+	$baseUrl = $protocol . '://' . $host . '/' . $scriptName;
+    return $baseUrl;
+}
+
 class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 {
 	public function accept() {
@@ -41,7 +64,7 @@ $rdi = new PhpRecursiveFilterIterator($rdi);
 require_once 'KontorX/Iterator/Reiterate/Container/DirectoryToNavigation.php';
 $container = new KontorX_Iterator_Reiterate_Container_DirectoryToNavigation();
 $container->setBasePath($path);
-$container->setBaseUrl(dirname($_SERVER['SCRIPT_NAME']));
+$container->setBaseUrl(getBaseUrl());
 
 require_once 'KontorX/Iterator/Reiterate/IteratorIterator.php';
 $rii = new KontorX_Iterator_Reiterate_IteratorIterator($rdi, RecursiveIteratorIterator::SELF_FIRST);

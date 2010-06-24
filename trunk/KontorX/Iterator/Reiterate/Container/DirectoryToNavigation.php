@@ -132,7 +132,8 @@ class KontorX_Iterator_Reiterate_Container_DirectoryToNavigation
 			return;
 
 		// przygotowywanie ściezli od pliku
-		return $this->_baseUrl . '/' . 
-				ltrim(str_replace($this->_basePath, '', $this->_path), '/');
+		$result = $this->_baseUrl . '/' .ltrim(str_replace($this->_basePath, '', $this->_path), '/');
+		
+		return $result;
 	}
 }
