@@ -35,7 +35,6 @@ class KontorX_Iterator_Reiterate_IteratorIterator extends RecursiveIteratorItera
 		$this->_parent[$this->_depth] = $this->_current = $container;
 
 		$this->rewind();
-		$this->current(); // testing
 		while ($this->valid()) {
 			$this->_depth = $this->getDepth();
 			$this->_children = $container->getInstance($this->current());
@@ -52,6 +51,7 @@ class KontorX_Iterator_Reiterate_IteratorIterator extends RecursiveIteratorItera
 	}
 
 	public function endChildren() {
-		$this->_current = $this->_parent[$this->_depth-1];
+		if (isset( $this->_parent[$this->_depth-1]))
+			$this->_current = $this->_parent[$this->_depth-1];
 	}
 }
