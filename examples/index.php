@@ -2,7 +2,7 @@
 //inicjowanie konfiguracji
 require_once 'bootstrap.php';
 
-class PhpecursiveFilterIterator extends RecursiveFilterIterator
+class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 {
 	public function accept() {
 		$filename = $this->current()->getFilename();
@@ -36,7 +36,7 @@ class PhpecursiveFilterIterator extends RecursiveFilterIterator
 // Budowanie drzewa przykładów
 $path = dirname(__FILE__);
 $rdi = new RecursiveDirectoryIterator($path);
-$rdi = new PhpecursiveFilterIterator($rdi);
+$rdi = new PhpRecursiveFilterIterator($rdi);
 
 require_once 'KontorX/Iterator/Reiterate/Container/DirectoryToNavigation.php';
 $container = new KontorX_Iterator_Reiterate_Container_DirectoryToNavigation();
