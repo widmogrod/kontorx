@@ -5,6 +5,7 @@ ini_set('display_startup_error',1);
 
 set_include_path(implode(PATH_SEPARATOR, array(
 	'/usr/share/php/Zend/1.10.4/',
+	'/usr/share/php/KontorX/trunk/',
 	'/usr/share/php/',
-	dirname(__FILE__) . '/../' // KontroX
+	// dirname(__FILE__) . '/../' // KontroX - optional if KontorX is not in '/usr/share/php/KontorX/trunk/'
 )));
