@@ -102,7 +102,7 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	 */
 	public function prepare($current) {
 		if (is_object($current)) {
-			if (method_exsist($current, 'toArray'))
+			if (method_exists($current, 'toArray'))
 				$current = $current->toArray();
 		}
 
