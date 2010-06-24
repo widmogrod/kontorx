@@ -283,7 +283,6 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		}
 		
 		
-		
 		$grid = KontorX_DataGrid::factory($model->selectList(), $options);
 		$grid->setValues($this->_getAllParams());
 

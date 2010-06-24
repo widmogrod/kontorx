@@ -1,5 +1,7 @@
 <?php
-class Promotor_Navigation_Recursive_Visitor_Site implements KontorX_Navigation_Recursive_Visitor_Interface {
+require_once 'KontorX/Navigation/Recursive/Visitor/Interface.php';
+class Promotor_Navigation_Recursive_Visitor_Site implements KontorX_Navigation_Recursive_Visitor_Interface 
+{
 	public function prepare(array $current) {
 		$current['label'] = @$current['name'];
 		$current['resetParams'] = true;
