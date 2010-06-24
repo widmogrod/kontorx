@@ -97,14 +97,19 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	}
 
 	/**
-	 * @param KontorX_Db_Table_Tree_Row_Abstract $current
+	 * @param mixed $current
 	 * @return array
 	 */
-	public function prepare(KontorX_Db_Table_Tree_Row_Abstract $current) {
-		$current = $current->toArray();
+	public function prepare($current) {
+		if (is_object($current)) {
+			if (method_exsist($current, 'toArray'))
+				$current = $current->toArray();
+		}
+
 		if (null !== $this->_visitor) {
 			$current = $this->_visitor->prepare($current);
 		}
+
 		return $current;
 	}
 	

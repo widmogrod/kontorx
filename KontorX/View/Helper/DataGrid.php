@@ -16,7 +16,7 @@ class KontorX_View_Helper_DataGrid extends Zend_View_Helper_Abstract {
         if (null === $partial) {
         	/* @var $renderer KontorX_DataGrid_Renderer_HtmlTable */
         	$renderer = $grid->getRenderer();
-        	if ($renderer instanceof KontorX_DataGrid_Renderer_Interface) {
+        	if ($renderer instanceof KontorX_DataGrid_Renderer_HtmlTable) {
         		$partial = $renderer->getPartial();
         	}
 
