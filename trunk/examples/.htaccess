@@ -1,1 +1,3 @@
-AddHandler application/x-httpd-php-source phps
+<IfModule mod_mime.c>
+	AddType application/x-httpd-php-source .phps .phtmls
+</IfModule>
