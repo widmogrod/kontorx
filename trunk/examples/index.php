@@ -66,13 +66,13 @@ $navigation->setContainer($container);
 <script type="text/javascript">
 <!--
 $(document).ready(function(){
-	$('a').live('click',function(e){
+	$('#wrapper').find('a').live('click',function(e){
 		e.preventDefault();
 
 		$.get(this.href, function(data){
 			$('#content').html(data);
 		});
-		$.get(this.href + 's', function(data){
+		$.get(this.href.replace('.php','.phps'), function(data){
 			$('#source').html(data);
 		});
 	});
@@ -83,17 +83,26 @@ $(document).ready(function(){
 <body>
 <div class="container_16">
 	<div class="clearfix">
-		<h1>KontorX</h1>
-		<h2>extensions library for Zend Framework</h2>
+		<h1><a href="index.php">KontorX <em>extensions library for Zend Framework</em></a></h1>
 	</div>
-	<div class="grid_4" id="sitebar">
-		<?php print $navigation->menu();?>
+	<div id="wrapper">
+		<div class="grid_4" id="sitebar">
+			<?php print $navigation->menu();?>
+		</div>
+	
+		<div class="grid_12">
+			<h3>Visual example:</h3>
+			<div id="content" class="clearfix"></div>
+			
+			<h3>Source code:</h3>
+			<div id="source" class="clearfix"></div>
+		</div>
 	</div>
-
-	<div class="grid_12">
-		<div id="content" class="clearfix"></div>
-		<div id="source" class="clearfix"></div>
+	
+	<div class="grid_16">
+		<p class="footer">&copy; 2010 <a href="http://blog.widmogrod.info/">Gabriel Habryn</a>, Code license: GNU General Public License v3, Hosted on: Google Code <a href="http://code.google.com/p/kontorx/">http://code.google.com/p/kontorx/</a></p>
 	</div>
 </div>
+
 </body>
 </html>
