@@ -62,7 +62,7 @@ class KontorX_Ftp_Adapter_Ftp extends KontorX_Ftp_Adapter_Abstract
 		$this->connect();
 		
 		return $moreInfo 
-			? array_map(array($this,'_parseRawList'), ftp_rawlist($this->_connection, $directory))
+			? array_map(array($this,'_parseRawList'), (array) ftp_rawlist($this->_connection, $directory))
 			: ftp_nlist($this->_connection, $directory);
 	}
 	
