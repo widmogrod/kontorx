@@ -3,19 +3,34 @@ a:focus{outline:1px dotted}
 hr{border:0 #ccc solid;border-top-width:1px;clear:both;height:0}
 h1{font-size:25px}
 h2{font-size:23px}
-h3{font-size:21px}
-h4{font-size:19px}
-h5{font-size:17px}
-h6{font-size:15px}
+h3{font-size:18px; display: block; border-bottom: 1px solid #eee;}
 ol{list-style:decimal}
 ul{list-style:disc}
 li{margin-left:10px}
 p,dl,hr,h1,h2,h3,h4,h5,h6,ol,ul,pre,table,address,fieldset{margin-bottom:10px}
 
-.navigation {}
+h1,h3 {
+	font-family:"Baskerville","Georgia",serif;
+}
+
+h1 a {color: inherit; text-decoration: none;}
+h1 em {font-weight: normal; font-size: 16px; font-style: normal;}
+
+.navigation {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background-color: #eee;
+	
+     -moz-border-radius: 10px; /* FF1+ */
+  -webkit-border-radius: 10px; /* Saf3+, Chrome */
+          border-radius: 10px; /* Opera 10.5, IE 9 */
+	
+}
 .navigation ul {margin-bottom: 15px;}
 .navigation li {list-style: none; margin-left: 20px; line-height: 1.5em}
 .navigation li span,
 .navigation li a {padding: 2px 2px 2px 20px; background: transparent none 0 0 no-repeat;}
 .navigation li span {background-image: url("img/folder.png");}
 .navigation li a    {background-image: url("img/document-php.png");}
+
+.footer {padding: 5px; color: #666;}
