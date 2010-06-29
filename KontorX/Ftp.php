@@ -38,7 +38,7 @@ class KontorX_Ftp
 	}
 	
 	/**
-	 * @param unknown_type $adapter
+	 * @param string|KontorX_Ftp_Adapter_Interface $adapter
 	 * @param array|Zend_Config $options
 	 * @return KontorX_Ftp
 	 */
