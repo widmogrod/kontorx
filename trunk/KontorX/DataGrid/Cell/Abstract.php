@@ -90,12 +90,12 @@ abstract class KontorX_DataGrid_Cell_Abstract implements KontorX_DataGrid_Cell_I
         if (null === $name) {
             return $this->_data;
         }
-        return array_key_exists($name, $this->_data)
+        return array_key_exists($name, (array) $this->_data)
             ? $this->_data[$name] : null;
     }
 
     public function getValue() {
-    	return $this->_data[$this->_columnName];
+    	return @$this->_data[$this->_columnName];
     }
     
 	/**

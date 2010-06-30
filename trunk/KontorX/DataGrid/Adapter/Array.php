@@ -17,7 +17,7 @@ class KontorX_DataGrid_Adapter_Array extends KontorX_DataGrid_Adapter_Abstract {
     {
     	$data = $this->getAdaptable();
     	$data = current($data); 	// fetch first row and
-    	$data = array_keys($data); 	// get array keys as column names
+    	$data = array_keys((array)$data); 	// get array keys as column names
     	return $data;
     }
     

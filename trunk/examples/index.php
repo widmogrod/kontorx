@@ -52,7 +52,13 @@ class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 		
 		
 		$fileExtension = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
-		return 'php' === $fileExtension;
+		if ('php' !== $fileExtension)
+			return false;
+		
+		if (strstr($filename, '_s.php'))
+			return false;
+		
+		return true;
 	}
 }
 
@@ -84,6 +90,7 @@ $navigation->setContainer($container);
 <link rel="stylesheet" href="resources/css/960.css" type="text/css" />
 <link rel="stylesheet" href="resources/css/text.css" type="text/css" />
 <link rel="stylesheet" href="resources/css/datagrid.css" type="text/css" />
+<link rel="stylesheet" href="resources/css/form.css" type="text/css" />
 
 <script type="text/javascript" src="resources/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript">
@@ -92,13 +99,21 @@ $(document).ready(function(){
 	$('#wrapper').find('a').live('click',function(e){
 		e.preventDefault();
 
+		document.location.hash = this.href;
+		
 		$.get(this.href, function(data){
 			$('#content').html(data);
 		});
-		$.get(this.href.replace('.php','.phps'), function(data){
+
+		$.get(this.href.replace('.php','_s.php'), function(data){
 			$('#source').html(data);
 		});
 	});
+
+	if (document.location.hash) {
+		var hash = document.location.hash.replace('#','');
+		$('#wrapper').find('a[href='+hash+']').click();
+	}	
 });
 //-->
 </script>
