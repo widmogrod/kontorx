@@ -10,11 +10,31 @@ class KontorX_Form_Element_DataGrid extends Zend_Form_Element_Xhtml
 			self::DECORATOR
 		);
 	}
+
+	/**
+	 * @var array
+	 */
+	protected $_columns;
 	
+	/**
+	 * @param array $columns
+	 */
+	public function setColumns(array $columns)
+	{
+		$this->_columns = $columns;
+	}
+	
+	/**
+	 * @param array|Zend_Db_Table|Zend_Db_Select $model
+	 */
 	public function setModel($model)
 	{
+		$options = array(
+			'columns' => $this->_columns
+		);
+
 		require_once 'KontorX/DataGrid.php';
-		$this->_dataGrid = KontorX_DataGrid::factory($model);
+		$this->_dataGrid = KontorX_DataGrid::factory($model, $options);
 	}
 	
 	/**
@@ -38,7 +58,13 @@ class KontorX_Form_Element_DataGrid extends Zend_Form_Element_Xhtml
 	{
 		if (null === $this->_dataGrid)
 		{
-			throw new Zend_Form_Element_Exception('KontorX_DataGrid is not set');
+			if (!is_array($value = $this->getValue()))
+			{
+				require_once 'Zend/Form/Element/Exception.php';
+				throw new Zend_Form_Element_Exception('KontorX_DataGrid is not set');
+			} else {
+				$this->setModel($value);
+			}
 		}
 
 		return $this->_dataGrid;
@@ -55,10 +81,12 @@ class KontorX_Form_Element_DataGrid extends Zend_Form_Element_Xhtml
         if (empty($decorators))
         {
             $this->addDecorator('DataGrid')
+            	->addDecorator('Errors')
+            	->addDecorator('Description', array('tag' => 'p', 'class' => 'description'))
             	->addDecorator('HtmlTag', array('tag' => 'dd',
                                                 'id'  => $this->getName() . '-element'))
-                ->addDecorator('Description', array('tag' => 'p', 'class' => 'description'))
-                ->addDecorator('Label', array('tag' => 'dt'));
+                
+                ->addDecorator('Label', array('tag' => 'dt'));                
         }
 	}
 

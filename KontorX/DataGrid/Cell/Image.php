@@ -49,7 +49,11 @@ class KontorX_DataGrid_Cell_Image extends KontorX_DataGrid_Cell_ViewHelper {
      * @return string
      */
     public function render() {
-    	$src   = rtrim($this->_src, '/') . '/' . $this->getValue();
+    	$src   = (null === $this->_src)
+    		? rtrim($this->_src, '/') . '/' : '';
+
+    	$src = $this->getValue();
+
     	$image = sprintf('<img src="%s" alt="%s" />', $src, $this->_alt);
 		$image = preg_replace("/{([\wd_\-^}]+)}/ie", "\$this->getData('$1')", $image);
         return $image;
