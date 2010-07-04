@@ -99,9 +99,10 @@ abstract class KontorX_Ftp_Adapter_Abstract implements KontorX_Ftp_Adapter_Inter
 
 	/**
 	 * @param string $rawOutput
+	 * @param string $directory
 	 * @result array
 	 */
-	protected function _parseRawList($rawOutput)
+	protected function _parseRawList($rawOutput, $directory)
 	{
 		// to nie jest najlepsze rozwiązanie ale zawsze ogranicza pole błędu
 		if (preg_match('#(\d{4}-\d{2}-\d{2})#', $rawOutput, $matched)) {
@@ -116,9 +117,24 @@ abstract class KontorX_Ftp_Adapter_Abstract implements KontorX_Ftp_Adapter_Inter
 			$hour = '';
 		}
 
+		// czy to jest plik czy katalog
+		$filetype = ((substr($permissions,0,1) == 'd') ? 'DIR' : 'FILE');
+
+		// jeżeli mamy do czynienia z katalogiem pomniejsz jego rozmiar o 2
+		// odpowiada to dwum katalogom "." i ".."
+		// TODO: Tutaj można by było dodać kobsługę parametru isDot?
+		if ($filetype == 'DIR')
+			$files -= 2;
+
+		// przygotuj scieżkę do pliku
+		$pathname = !!$directory
+			? rtrim($directory,'/') . '/' . $filename
+			: $filename;
+
 		$result = array(
 			'filename' => $filename,
-			'filetype' => ((substr($permissions,0,1) == 'd') ? 'DIR' : 'FILE'),
+			'pathname' => $pathname,
+			'filetype' => $filetype,
 			'files' => $files,
 			'filesize' => $filesize,
 			'permissions' => $permissions,
