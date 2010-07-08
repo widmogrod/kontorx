@@ -268,22 +268,6 @@ class KontorX_Sisi
         if ($className = $this->_loadClass($this->_action, self::ACTION))
             $actionInstance = new $className;
         
-#        if (!class_exists($actionClass))
-##        && !file_exists($actionClassFile) ) 
-#        {
-#            $response->addMessage(sprintf('Akcja "%s" nie istnieje', $this->_action));
-#            return;
-#        }
-#        
-#        require_once $actionClassFile;
-
-#        if (!class_exists($actionClass)) {
-#            $response->addMessage(sprintf('Klasa akcji "%s" nie istnieje', $this->_action));
-#            return;
-#        }
-        
-#        $actionInstance = new $actionClass();
-
         if (!($actionInstance instanceof KontorX_Sisi_Action_Interface)) {
             $response->addMessage(sprintf('Akcja "%s" nie implementuje interfejsu "KontorX_Sisi_Action_Interface"', $this->_action));
             return;
