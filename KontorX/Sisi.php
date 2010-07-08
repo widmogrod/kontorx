@@ -5,6 +5,9 @@
  */
 class KontorX_Sisi
 {
+	const RESPONSE = 'RESPONSE';
+	const ACTION = 'ACTION';
+
     /**
      * @var KontorX_Sisi_Response_Abstract
      */
@@ -21,6 +24,21 @@ class KontorX_Sisi
     protected $_params = array();
     
     /**
+     * @var array
+     */
+    protected $_paths = array(
+    	self::RESPONSE => array(),
+    	self::ACTION => array()
+    );
+    
+    /**
+     * @var array
+     */
+    protected $_restrictedOptionKeys = array(
+    	'prefxpath'
+    );
+    
+    /**
      * @var bool
      */
     protected static $_testing = false;
@@ -29,6 +47,10 @@ class KontorX_Sisi
      * @param array|null $options 
      */
     public function __construct($options = null) {
+    	$this->setPrefixPaths(array(
+    		'KontorX_Sisi'
+    	));
+
         if (is_array($options))
             $this->setOptions($options);
     }
@@ -57,31 +79,120 @@ class KontorX_Sisi
      */
     public function setOptions(array $options) {
         foreach($options as $key => $value) {
+        	if (in_array(strtolower($key), $this->_restrictedOptionKeys))
+        		continue;
+
             $method = 'set'. ucfirst($key);
             if (method_exists($this, $method))
                 $this->$method($value);
+            else
+            	$this->setParam($key, $value);
         }
     }
     
+    /**
+	 * @param array $paths
+     */
+    public function setPrefixPaths(array $paths) {
+    	$this->clearPrefixPath();
+
+    	foreach($paths as $path)
+    		$this->addPrefixPath($path);
+    }
+
+    /**
+     * @param string $prefix
+     * @param string $path
+     * @param string $type
+     */
+    public function addPrefixPath($prefix, $path = null, $type = null) {
+    	$prefix = rtrim($prefix,'_');
+    	
+    	if (null === $path)
+    		$path = str_replace('_','/', $prefix);
+
+		$path = str_replace(array('..','//'), '', $path);
+		$path = rtrim($path, '/');
+
+		$pathInfo = array(
+			'prefix' => $prefix,
+			'path' => $path,
+		);
+
+		switch($type) {
+			case self::RESPONSE:
+			case self::ACTION:
+				array_unshift($this->_paths[$type], $pathInfo);
+				break;
+
+			default:
+				$responsePathInfo = $pathInfo;
+				$responsePathInfo['prefix'] .= '_Response';
+				$responsePathInfo['path'] .= '/Response';
+				
+				array_unshift($this->_paths[self::RESPONSE], $responsePathInfo);
+				
+				$actionPathInfo = $pathInfo;
+				$actionPathInfo['prefix'] .= '_Action';
+				$actionPathInfo['path'] .= '/Action';
+				array_unshift($this->_paths[self::ACTION], $actionPathInfo);		
+		}
+    }
+
+	/**
+	 * 
+     */
+    public function clearPrefixPath() {
+    	$this->_paths = array(
+			self::RESPONSE => array(),
+			self::ACTION => array()
+		);
+    }
+    
+    /**
+     * Sprawdź czy plik istnieje w ścieżce plików.
+	 * Działa na zasadzie LIFO
+	 *
+	 * @param string $anme
+	 * @param string $type
+	 * @return string|null
+     */
+	protected function _loadClass($name, $type) {
+		$name = basename($name);
+		$name = ucfirst($name);
+		
+		$includePaths = (array) get_include_path();
+		
+		foreach($this->_paths[$type] as $pathInfo) {
+			$className = $pathInfo['prefix'] . '_' . $name;
+			
+			if (class_exists($className, false))
+				return $className;
+
+			$path = $pathInfo['path'];
+			$path .= '/' . $name . '.php';
+
+			foreach ($includePaths as $includePath)
+				if (!is_file($includePath . '/' . $path))
+					continue;
+				
+			require_once $path;
+
+			if (!class_exists($className))
+				throw new Exception(sprintf('Response class "%s" do not exsist in path "%s"', $className, $pathInfo['path']));
+
+			return $className;
+		}
+	}
+
     /**
      * @param KontorX_Sisi_Response_Abstract|string $response
      */
     public function setResponse($response) {
         if (is_string($response))
         {
-            $name  = ucfirst(basename($response));
-            $class = 'KontorX_Sisi_Response_' . $name;
-            $file  = str_replace('_','/', $class) . '.php';
-            
-            if (!class_exists($class)) {
-            	// TODO: Dodać sprawdzanie czy plik istnieje
-                require_once $file;
-
-                if (!class_exists($class))
-                    throw new Exception(sprintf('Response class "%s" do not exsist', $class));
-            }
-            
-            $response = new $class;
+			if ($className = $this->_loadClass($response, self::RESPONSE))
+	            $response = new $className;
         }
         
         if (!$response instanceof KontorX_Sisi_Response_Abstract)
@@ -154,24 +265,24 @@ class KontorX_Sisi
             return;
         }
         
-        $actionClass = 'KontorX_Sisi_Action_' . $this->_action;
-        $actionClassFile = LIB_PATHNAME . '/' . str_replace('_','/',$actionClass) . '.php';
+        if ($className = $this->_loadClass($this->_action, self::ACTION))
+            $actionInstance = new $className;
         
-        if (!class_exists($actionClass) && 
-                        !file_exists($actionClassFile)) 
-        {
-            $response->addMessage(sprintf('Akcja "%s" nie istnieje', $this->_action));
-            return;
-        }
-        
-        require_once $actionClassFile;
+#        if (!class_exists($actionClass))
+##        && !file_exists($actionClassFile) ) 
+#        {
+#            $response->addMessage(sprintf('Akcja "%s" nie istnieje', $this->_action));
+#            return;
+#        }
+#        
+#        require_once $actionClassFile;
 
-        if (!class_exists($actionClass)) {
-            $response->addMessage(sprintf('Klasa akcji "%s" nie istnieje', $this->_action));
-            return;
-        }
+#        if (!class_exists($actionClass)) {
+#            $response->addMessage(sprintf('Klasa akcji "%s" nie istnieje', $this->_action));
+#            return;
+#        }
         
-        $actionInstance = new $actionClass();
+#        $actionInstance = new $actionClass();
 
         if (!($actionInstance instanceof KontorX_Sisi_Action_Interface)) {
             $response->addMessage(sprintf('Akcja "%s" nie implementuje interfejsu "KontorX_Sisi_Action_Interface"', $this->_action));
