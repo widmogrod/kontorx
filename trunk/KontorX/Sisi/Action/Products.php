@@ -20,6 +20,11 @@ class Products
 	  * @var array
 	  */
 	 protected $_categories = null;
+	 
+ 	/**
+	 * @var string
+	 */
+	protected $_activeCategoryId = null;
 
 	/**
 	 * 
@@ -72,6 +77,29 @@ class Products
 	}
 
 	/**
+	 * Ustaw ID aktualne kategorii
+	 * @param string $id
+	 */
+	public function setActiveCategoryId($id) {
+		$this->_activeCategoryId = (string) $id;
+	}
+
+	/**
+	 * Pobierz ID aktualne kategorii
+	 * @return string
+	 */
+	public function getActiveCategoryId() {
+		if (!strlen($this->_activeCategoryId)) {
+			$categories = $this->getCategories();
+			$category = current($categories);
+    		$category = $category['id'];
+    		
+    		$this->_activeCategoryId = $category;
+		}
+		return $this->_activeCategoryId;
+	}
+
+	/**
 	 * Pobierz kategore produktu
 	 * @return array
 	 */
@@ -86,31 +114,54 @@ class Products
 				$name = basename($dir);
 				$groupName = basename(dirname($dir));
 
-				$this->_categories[$name] = array(
-					'id'   => $name,
-					'name' => $name,
-					'path' => $dir,
-					'group' => $groupName,
-					'prefix' => @$groups[$groupName],
-					'products' => $this->getProductsInfoFromPath($dir, $groupName)
-				);
+				
+				if (!isset($this->_categories[$name])) {
+					$category = array(
+						'id'   => $name,
+						'name' => $name,
+						'products' => array()
+					);
+
+					$this->_categories[$name] = $category;
+				}
+
+				$products = $this->getProductsInfoFromPath($dir, $groupName);
+				
+				$this->_categories[$name]['products'] = array_merge($this->_categories[$name]['products'], $products);
 			}
 		}
 
 		return $this->_categories;
 	}
 
-	public function getCategory($name) {
+	/**
+	 * Pobierz kategore produktu o podanym ID
+	 * @return array
+	 */
+	public function getCategory($categoryId = null) {
+		if (null === $categoryId)
+			$categoryId = $this->getActiveCategoryId();
+			
 		$categories = $this->getCategories();
 		
-		return (array_key_exists($name, $categories))
-			? $categories[$name]
-			: array();
+		return (array_key_exists($categoryId, $categories))
+			? $categories[$categoryId]
+			: null;
 	}
 
-	public function getProductsInfoFromPath($path, $groupName) {
+	/**
+	 * Wyszukaj produkty w kategorii i w określonej grupie
+	 * @param string $categoryDir
+	 * @param string $groupName
+	 * @return array
+	 */
+	public function getProductsInfoFromPath($categoryDir, $groupName) {
 		$info = array();
-		foreach(glob($path . self::GLOB_PRODUCTS, GLOB_BRACE) as $file) {
+
+		$config = $this->getConfig();
+		$groups = $config['groups'];
+		
+		foreach(glob($categoryDir . '/'. self::GLOB_PRODUCTS, GLOB_BRACE) as $file) {
 			$id = basename($file);
 			
 			// usunięcie rozszeżenia
@@ -120,7 +171,7 @@ class Products
 			
 			$info[] = array(
 				'id' => $id,
-				'name' => $name,
+				'name' => $groups[$groupName] . $name,
 				'path' => PRODUCTS_PATH . '/' . $this->_relativePath(dirname($file)) // sciezka do pliku
 			);
 		}
@@ -140,20 +191,15 @@ class KontorX_Sisi_Action_Products implements KontorX_Sisi_Action_Interface
     		$response->setScriptName('asite');
     	}
 
-		$products = new Products(PRODUCTS_PATHNAME);
-		$categories = $products->getCategories();
-
-    	$category = $sisi->getParam('category');
-    	if (!strlen($category)) {
-    		$category = current($categories);
-    		$category = $category['id'];
-    	}
-    	
-    	$category = $products->getCategory($category);
+    	$products = new Products(PRODUCTS_PATHNAME);
+    	$products->setActiveCategoryId($sisi->getParam('id'));
+    	$categories = $products->getCategories();
+    	$category = $products->getCategory();
     	
     	$result = array(
     		'categories' => $categories,
-    		'category' => $category
+    		'category' => $category,
+    		'activeId' => $products->getActiveCategoryId()
     	);
 
     	$response->setData($result);
