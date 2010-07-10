@@ -20,7 +20,10 @@ class KontorX_Form_Element_DataGrid extends Zend_Form_Element_Xhtml
 	 * @param array $columns
 	 */
 	public function setColumns(array $columns)
-	{
+	{	
+		if ($this->_dataGrid)
+			$this->_dataGrid->setColumns($columns);
+
 		$this->_columns = $columns;
 	}
 	
@@ -29,9 +32,10 @@ class KontorX_Form_Element_DataGrid extends Zend_Form_Element_Xhtml
 	 */
 	public function setModel($model)
 	{
-		$options = array(
-			'columns' => $this->_columns
-		);
+		$options = array();
+		
+		if (is_array($this->_columns))
+			$options['columns'] = $this->_columns;
 
 		require_once 'KontorX/DataGrid.php';
 		$this->_dataGrid = KontorX_DataGrid::factory($model, $options);
