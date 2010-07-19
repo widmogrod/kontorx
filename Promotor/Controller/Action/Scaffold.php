@@ -175,7 +175,7 @@ class Promotor_Controller_Action_Scaffold extends Promotor_Controller_Action {
 		{
 			case 'next':
 				if (false !== ($id = $rq->getParam('id', false))) {
-					$params['id'] = $id;
+					$params['prevId'] = $id;
 				}
 
 				$this->_helper->redirector->goTo('add', null, null, $params);
