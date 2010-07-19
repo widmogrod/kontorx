@@ -5,7 +5,7 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 	/**
 	 * @var array
 	 */
-	protected $_primaryKey = null;
+	protected $_primaryKey = array();
 	
 	/**
 	 * @param array|string $primaryKey
@@ -20,11 +20,6 @@ class KontorX_DataGrid_Cell_Url extends KontorX_DataGrid_Cell_ViewHelper {
 	 * @throws KontorX_DataGrid_Exception
 	 */
 	public function getPrimaryKey() {
-		if (null === $this->_primaryKey) {
-			require_once 'KontorX/DataGrid/Exception.php';
-			throw new KontorX_DataGrid_Exception('Primary key is not set');
-		}
-
 		return $this->_primaryKey;
 	}
 
