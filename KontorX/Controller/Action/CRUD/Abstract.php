@@ -274,9 +274,9 @@ abstract class KontorX_Controller_Action_CRUD_Abstract extends KontorX_Controlle
         $options 		= $this->_addGetFormOptions();
         $ignoreColumns 	= $this->_addGetFormDbTableIgnoreColumns();
 
-	/**
-        	 * @see KontorX_Form_DbTable
-        	 */
+		/**
+		 * @see KontorX_Form_DbTable
+		 */
         require_once 'KontorX/Form/DbTable.php';
         /* @var Zend_Form */
         $form = new KontorX_Form_DbTable($model, $options, $ignoreColumns);
