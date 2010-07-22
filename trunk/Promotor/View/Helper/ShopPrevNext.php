@@ -11,9 +11,13 @@
  */
 class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 {
-	const PRODUCT = 'Product';
-	const CATEGORY = 'Category';
-	const TAG = 'Tag';
+	const PRODUCT 	= 'Product';
+	const TAG 		= 'ProductTag';
+	const CATEGORY 	= 'Category';
+	
+	// TODO manufacturer
+	// TODO search
+	
 	
 	/**
 	 * @var int
@@ -31,9 +35,14 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	protected $_model;
 	
 	/**
+	 * @var Shop_Model_Product_PrevNext_Interface
+	 */
+	protected $_data;
+	
+	/**
 	 * @var string
 	 */
-	protected $_type = self::PRODUCT;
+	protected $_type;
 	
 	/**
 	 * Dostępne typy akcji z wskazaniem na nazwe wywoływanej metody
@@ -41,22 +50,83 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * @var array
 	 */
 	protected $_methodTypes = array(
-		self::PRODUCT 	=> 'getPrevNext',
+		self::PRODUCT 	=> 'getPrevNextProduct',
 		self::CATEGORY 	=> 'getPrevNextCategory',
 		self::TAG 		=> 'getPrevNextTag',
 	);
 	
 	/**
-	 * Pobierz obiekt modelu
-	 * 
-	 * @return Shop_Model_Product
+	 * @var array
 	 */
-	public function getData() {
+	protected $_typeName = array(
+		self::PRODUCT 	=> '',
+		self::CATEGORY 	=> 'wzoru',
+		self::TAG 		=> 'motywu',
+	);
+	
+	/**
+	 * Zwróć czytelną nazwę typu produktu,
+	 * w/g którego są "przewijane" produkty
+	 *  
+	 * @return string|null
+	 */
+	public function getTypeName() 
+	{
+		return isset($this->_typeName[$this->_type])
+			? $this->_typeName[$this->_type]
+			: null;
+	}
+	
+	/**
+	 * Pobiera nazwę grupy z danych dostarczonych przez model
+	 * 
+	 * @return string|null
+	 */
+	public function getGroupName() 
+	{
+		$data = $this->getData();
+		return $data->getGroupName();
+	}
+	
+	/**
+	 * Pobierz obiekt modelu 
+	 * i wywołaj na nim odpowiednią metodę 
+	 * w celu pobrania danych
+	 * 
+	 * @return Shop_Model_Product_PrevNext_Interface
+	 */
+	public function getData() 
+	{
+		if (null !== $this->_data)
+			return $this->_data;
+
 		if (null === $this->_model)
 			$this->_model = new Shop_Model_Product();
-			
+
+		// gdy identyfikator grupy jest pusty wtedy 
+		// uruchomiana jest metoda z grupy self::PRODUCT
+		// dlatego że jako jedyna nie wymaga parametru
+		if (null === $this->_groupId)
+			$this->setType(self::PRODUCT);
+					
 		$methodName = $this->_methodTypes[$this->_type] . 'Cache';
-		return $this->_model->$methodName($this->_productId, $this->_groupId);
+
+		// call..
+		$this->_data = $this->_model->$methodName($this->_productId, $this->_groupId);
+		
+		return $this->_data;
+	}
+	
+	/**
+	 * Czyszczenie wszystkich zmiennych
+	 * 
+	 * @return void
+	 */
+	public function reset() 
+	{
+		$this->_data = null;
+		$this->_groupId = null;
+		$this->_type = self::PRODUCT;
 	}
 
 	/**
@@ -64,7 +134,8 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * 
 	 * @param string $type
 	 */
-	public function setType($type) {
+	public function setType($type) 
+	{
 		$type = ucfirst($type);
 		if (array_key_exists($type, $this->_methodTypes))
 			$this->_type = $type;
@@ -78,7 +149,8 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * @param integer $productId
 	 * @return Promotor_View_Helper_ShopPrevNext
 	 */
-	public function setProductId($productId) {
+	public function setProductId($productId) 
+	{
 		$this->_productId = (int) $productId;
 		return $this;
 	}
@@ -88,11 +160,12 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * - poprzedni i nasępnu produkt w kategorii
 	 * - poprzedni i nasępnu produkt w etykiecie
 	 * 
-	 * @param integer $groupId
+	 * @param integer|string $groupId
 	 * @return Promotor_View_Helper_ShopPrevNext
 	 */
-	public function setGroupId($groupId) {
-		$this->_groupId = (int) $groupId;
+	public function setGroupId($groupId) 
+	{
+		$this->_groupId = $groupId;
 		return $this;
 	}
 	
@@ -104,7 +177,10 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * @param string $groupId
 	 * @return Promotor_View_Helper_ShopPrevNext
 	 */
-	public function shopPrevNext($productId, $type = null, $groupId = null) {
+	public function shopPrevNext($productId, $type = null, $groupId = null) 
+	{
+		$this->reset();
+
 		$this->setProductId($productId);
 		
 		if (null !== $type)
@@ -119,7 +195,8 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	/**
 	 * Wyświetlenia produktów.
 	 */
-	public function render() {
+	public function render() 
+	{
 		$result = '';
 		
 		$templateExists	= '<li class="%s"><a href="%s" title="%s"><img src="%s" alt="%s"/><span>%s</span></a></li>';
@@ -127,7 +204,12 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 
 		$data = $this->getData();
 
-		foreach ((array) $data as $key => $value)
+		$d = array(
+			'prev' => $data->getPrevData(),
+			'next' => $data->getNextData()
+		);
+
+		foreach ((array) $d as $key => $value)
 		{
 			$class 	= $key;
 				
@@ -160,7 +242,8 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString() 
+	{
 		try {
 			return (string) $this->render();
 		} catch (Exception $e) {
