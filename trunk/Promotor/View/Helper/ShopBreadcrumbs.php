@@ -1,15 +1,5 @@
 <?php
-/**
- * Wyświetlanie poprzedniego i następnego produktu
- * - poprzedni i nasępnu produkt
- * - poprzedni i nasępnu produkt w kategorii
- * - poprzedni i nasępnu produkt w etykiecie
- * 
- * 
- * @author $Author$
- * @version $Id$
- */
-class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
+class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 {
 	const PRODUCT 	= 'Product';
 	const TAG 		= 'ProductTag';
@@ -17,6 +7,7 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	
 	// TODO manufacturer
 	// TODO search
+	
 	
 	/**
 	 * @var int
@@ -115,7 +106,7 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 		
 		return $this->_data;
 	}
-	
+
 	/**
 	 * Czyszczenie wszystkich zmiennych
 	 * 
@@ -167,16 +158,16 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 		$this->_groupId = $groupId;
 		return $this;
 	}
-	
+
 	/**
 	 * Głowna metoda incjująca działanie helpera
 	 * 
 	 * @param integer $productId
 	 * @param string $type
 	 * @param string $groupId
-	 * @return Promotor_View_Helper_ShopPrevNext
+	 * @return Promotor_View_Helper_ShopBreadcrumbs
 	 */
-	public function shopPrevNext($productId, $type = null, $groupId = null) 
+	public function shopBreadcrumbs($productId, $type = null, $groupId = null) 
 	{
 		$this->reset();
 		$this->setProductId($productId);
@@ -190,66 +181,5 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 		$this->setGroupId($groupId);
 		
 		return $this;
-	}
-
-	/**
-	 * Wyświetlenia produktów.
-	 */
-	public function render() 
-	{
-		$result = '';
-		
-		$templateExists	= '<li class="%s"><a href="%s" title="%s"><img src="%s" alt="%s"/><span>%s</span></a></li>';
-		$templateNoName = '<li class="%s end"><img src="%s" alt="%s"/><span>%s</span></li>';
-
-		$data = $this->getData();
-
-		$d = array(
-			'prev' => $data->getPrevData(),
-			'next' => $data->getNextData()
-		);
-
-		foreach ((array) $d as $key => $value)
-		{
-			$class 	= $key;
-				
-			if (count($value)) {
-				// przygotowywanie danych istniejącego rekordu
-				$href 	= $this->view->url($value, 'shop-product');
-				$title 	= $value['name'];
-				$src 	= 'upload/shop/product/small_width/' . $value['image'];
-				
-				$description = ($key == 'prev')
-					? '&laquo; poprzedni'
-					: 'następny &raquo;';
-				
-				$result .= sprintf($templateExists, $class, $href, $title, $src, $title, $description);
-			} else {
-				// przygotowywanie danych "noname"
-				$src 	= 'upload/shop/small_crop/prevNext-end.jpg';
-				
-				$description = ($key == 'prev')
-					? 'początek'
-					: 'koniec';
-				
-				$result .= sprintf($templateNoName, $class, $src, $description, $description);
-			}
-		}
-		
-		return '<ul class="browser">' . $result . '</ul>';
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function __toString() 
-	{
-		try {
-			return (string) $this->render();
-		} catch (Exception $e) {
-			$error = sprintf('%s::%s[%d]', get_class($e), $e->getMessage(), $e->getLine());
-			trigger_error($error, E_USER_WARNING);
-		}
-		return '';
 	}
 }
