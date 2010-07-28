@@ -49,9 +49,9 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 * @var array
 	 */
 	protected $_typeName = array(
-		self::PRODUCT 	=> '',
-		self::CATEGORY 	=> 'wzoru',
-		self::TAG 		=> 'motywu',
+		self::PRODUCT 	=> 'wszystkie produkty',
+		self::CATEGORY 	=> 'układ kalendarza',
+		self::TAG 		=> 'motyw na kalendarzu',
 	);
 	
 	/**
@@ -66,7 +66,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 			? $this->_typeName[$this->_type]
 			: null;
 	}
-	
+
 	/**
 	 * Pobiera nazwę grupy z danych dostarczonych przez model
 	 * 
@@ -83,7 +83,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 * i wywołaj na nim odpowiednią metodę 
 	 * w celu pobrania danych
 	 * 
-	 * @return Shop_Model_Product_PrevNext_Interface
+	 * @return getNavigation
 	 */
 	public function getData() 
 	{
@@ -126,7 +126,6 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 */
 	public function setType($type) 
 	{
-		$type = ucfirst($type);
 		if (array_key_exists($type, $this->_methodTypes))
 			$this->_type = $type;
 			
@@ -171,15 +170,47 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	{
 		$this->reset();
 		$this->setProductId($productId);
+
+		if (null === $type) {
+			$type = $this->view->getHelper('ShopHistory')->type;
+			$this->setType($type);
+		}
 		
-		if (null !== $type)
-			$type = $typeName = $this->view->getHelper('ShopHistory')->type;
-		$this->setType($type);
-		
-		if (null !== $groupId)
-			$groupId = $typeName = $this->view->getHelper('ShopHistory')->id;
-		$this->setGroupId($groupId);
+		if (null === $groupId) {
+			$groupId = $this->view->getHelper('ShopHistory')->id;
+			$this->setGroupId($groupId);
+		}
 		
 		return $this;
+	}
+
+	/**
+	 * Wyświetlenia nawigacji
+	 * @return Zend_Navigation
+	 */
+	public function render() 
+	{
+		$container = $this->getData();
+
+		$breadcrumbs = $this->view->getHelper('navigation')
+			->setContainer($container)
+			->menu()
+			->setPartial('_partial/breadcrumbs.phtml');
+
+		return $breadcrumbs;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function __toString() 
+	{
+		try {
+			return (string) $this->render();
+		} catch (Exception $e) {
+			$error = sprintf('%s::%s[%d]', get_class($e), $e->getMessage(), $e->getLine());
+			trigger_error($error, E_USER_WARNING);
+		}
+		return '';
 	}
 }

@@ -181,13 +181,15 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 		$this->reset();
 		$this->setProductId($productId);
 		
-		if (null !== $type)
+		if (null === $type) {
 			$type = $typeName = $this->view->getHelper('ShopHistory')->type;
-		$this->setType($type);
+			$this->setType($type);
+		}
 		
-		if (null !== $groupId)
+		if (null === $groupId) {
 			$groupId = $typeName = $this->view->getHelper('ShopHistory')->id;
-		$this->setGroupId($groupId);
+			$this->setGroupId($groupId);
+		}
 		
 		return $this;
 	}
