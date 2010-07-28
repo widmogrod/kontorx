@@ -40,9 +40,9 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 * @var array
 	 */
 	protected $_methodTypes = array(
-		self::PRODUCT 	=> 'getPrevNextProduct',
-		self::CATEGORY 	=> 'getPrevNextCategory',
-		self::TAG 		=> 'getPrevNextTag',
+		self::PRODUCT 	=> 'getBreadcrumbsProduct',
+		self::CATEGORY 	=> 'getBreadcrumbsCategory',
+		self::TAG 		=> 'getBreadcrumbsTag',
 	);
 	
 	/**
