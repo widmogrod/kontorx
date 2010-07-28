@@ -18,20 +18,29 @@ class Promotor_View_Helper_ShopHistory extends Zend_View_Helper_Abstract
 	 */
 	protected $_controllerPlugin;
 
+	public function __construct()
+	{
+		if (null === $this->_controllerPlugin) 
+		{
+			$front = Zend_Controller_Front::getInstance();
+
+			$plugin = $front->getPlugin('Promotor_Controller_Plugin_ShopHistory');
+
+			if (is_array($plugin))
+				$plugin = $plugin[0];
+			
+			if (!($plugin instanceof Promotor_Controller_Plugin_ShopHistory))
+				throw new Exception('Controller plugin "Promotor_Controller_Plugin_ShopHistory" is not loaded!');
+
+			$this->_controllerPlugin = $plugin;
+		}
+	}
+
 	/**
 	 * @return void|Promotor_View_Helper_ShopHistory
 	 */
 	public function shopHistory() 
 	{
-		if (null === $this->_controllerPlugin) {
-			$front = Zend_Controller_Front::getInstance();
-			
-			if (!$front->hasPlugin('Promotor_Controller_Plugin_ShopHistory'))
-				return $this;
-				
-			$this->_controllerPlugin = $front->getPlugin('Promotor_Controller_Plugin_ShopHistory');
-		}
-
 		return $this;
 	}
 
@@ -41,5 +50,11 @@ class Promotor_View_Helper_ShopHistory extends Zend_View_Helper_Abstract
 		return isset($session->$name)
 			? $session->$name
 			: null;
+	}
+
+	public function toArray() 
+	{
+		$session = $this->_controllerPlugin->getSession();
+		return $session->getIterator()->getArrayCopy();
 	}
 }

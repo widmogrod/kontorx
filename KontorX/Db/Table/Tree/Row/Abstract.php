@@ -142,7 +142,8 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
          * @param bool                                  $thisRowIncluded
          * @return KontorX_Db_Table_Tree_Rowset
          */
-        public function findDescendant(Zend_Db_Table_Select $select = null, $thisRowIncluded = false) {
+        public function findDescendant(Zend_Db_Table_Select $select = null, $thisRowIncluded = false) 
+        {
                 // rekord musi byc zapisany w bazie danych
                 if (empty($this->_cleanData)) {
                         $message = 'Current row is not stored in database';
@@ -166,9 +167,6 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
                         ? $this->select()
                         : $select;
 
-//              foreach ($descendans as $descendantKey) {
-//                      $select->orWhere("$primary = ?", $descendantKey);
-//              }
                 // czy wyłowić z aktualnym rekordem ?
                 if (true === $thisRowIncluded) {
                         array_push($descendans,$this->$primary);
