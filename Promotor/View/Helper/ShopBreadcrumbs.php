@@ -196,7 +196,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 			->setContainer($container)
 			->menu()
 			->setPartial('_partial/breadcrumbs.phtml');
-
+			
 		return $breadcrumbs;
 	}
 	
