@@ -1,6 +1,7 @@
 <?php
 require_once 'Zend/View/Helper/FormSelect.php';
-class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect {
+class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect 
+{
 
 	public function formSelectTree($name, $value = null, $attribs = null,
 		$options = null, $listsep = "<br />\n")

@@ -100,7 +100,8 @@ class Promotor_View_Helper_ShopCart extends Zend_View_Helper_Abstract {
 		return $partial->partial($this->_partial, $this->_module, $model);
 	}
 
-	public function _toString() {
+	public function _toString() 
+	{
 		try {
 			return $this->render();
 		} catch (Exception $e) {
