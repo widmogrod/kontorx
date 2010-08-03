@@ -127,7 +127,7 @@ class Promotor_Model_Abstract {
 		$this->_exception[] = $exception;
 		return $this;
 	}
-	
+
 	/**
      * @var Zend_Cache_Core
      */
@@ -339,5 +339,108 @@ class Promotor_Model_Abstract {
             // wywolanie metody "cache"
             return call_user_func_array(array($this, 'cache'), $params);
         }
+    }
+    
+    /**
+     * @var Zend_Log
+     */
+    protected static $_log;
+
+    /**
+     * Obiekt logujący zdarzenia w modelu
+     * @return Zend_Log
+     */
+    public static function getLog() {
+    	if (null === self::$_log) {
+    		if (Zend_Registry::isRegistered('Zend_Log')) {
+    			self::$_log = Zend_Registry::get('Zend_Log');
+    		}
+    	}
+
+    	return self::$_log;
+    }
+    
+    /**
+     * Ustaw obiekt logujacy
+     * @param Zend_Log $log
+     */
+    public static function setLog(Zend_Log $log) {
+    	self::$_log = $log;
+    }
+    
+    /**
+     * @var number
+     */
+    protected static $_priority;
+    
+    /**
+     * @param number $priority
+     */
+    public static function setLogPriority($priority) {
+    	self::$_priority = $priority;
+    }
+    
+    /**
+     * @return number
+     */
+    public static function getLogPriority() {
+    	if (null === self::$_priority)
+    		self::$_priority = Zend_Log::DEBUG;
+    		
+    	return self::$_priority;
+    }
+    
+    /**
+     * @var bool
+     */
+    protected static $_debug = false;
+    
+	/**
+	 * Czy włączyć debugowanie (logowanie zdarzeń)
+	 * @param bool $flag
+	 */
+	public static function setDebug($flag = true) {
+		self::$_debug = (bool) $flag;
+	}
+    
+    /**
+     * Sprawdź czy jest włączone logowanie
+     * @return boolean
+     */
+    public static function isDebug() 
+    {
+    	return self::$_debug && null !== self::$_log;
+    }
+
+    /**
+     * @param string $message
+     * @param number $priority
+     */
+    public function _log($message, $priority = null) 
+    {
+    	if (!self::isDebug())
+    		return;
+
+    	if (null === $priority)
+    		$priority = self::getLogPriority();
+
+    	$log = self::getLog();
+    	$log->log($message, $priority);
+    }
+
+    /**
+     * Destuktor obiektu gdy jest włączone debugowanie
+     * Zanotuje wszystkie wiadomości jakie miały miejsce w trakcie zycia obiektu
+     */
+    public function __destruct() 
+    {
+    	if (!self::isDebug())
+    		return;
+    	
+    	$log 	  = self::getLog();
+    	$priority = self::getLogPriority();
+
+    	foreach ($this->getMessages(true) as $message)
+    		$log->log($message, $priority);
     }
 }
