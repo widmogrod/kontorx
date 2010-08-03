@@ -83,7 +83,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 * i wywołaj na nim odpowiednią metodę 
 	 * w celu pobrania danych
 	 * 
-	 * @return getNavigation
+	 * @return Promotor_Shop_Breadcrumbs_Data
 	 */
 	public function getData() 
 	{
@@ -183,21 +183,47 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 		
 		return $this;
 	}
+	
+	/**
+	 * @return Zend_View_Helper_Navigation_Links
+	 */
+	public function hasSuggestions() 
+	{
+		$container = $this->getData()->getSuggestion();
+		return !!count($container);
+	}
 
+	/**
+	 * @return Zend_View_Helper_Navigation_Links
+	 */
+	public function getSuggestions()
+	{
+		$container = $this->getData()->getSuggestion();
+
+		$navigation = $this->view->getHelper('navigation')
+			->findHelper('menu')
+			->setContainer($container)
+			->setMinDepth(0)
+			->setPartial('_partial/suggestions.phtml');
+
+		return $navigation;
+	}
+	
 	/**
 	 * Wyświetlenia nawigacji
 	 * @return Zend_Navigation
 	 */
 	public function render() 
 	{
-		$container = $this->getData();
+		$container = $this->getData()->getBreadcrumbs();
 
-		$breadcrumbs = $this->view->getHelper('navigation')
+		$navigation = $this->view->getHelper('navigation')
+			->findHelper('menu')
 			->setContainer($container)
-			->menu()
+			->setMinDepth(0)
 			->setPartial('_partial/breadcrumbs.phtml');
 			
-		return $breadcrumbs;
+		return $navigation;
 	}
 	
 	/**
