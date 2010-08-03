@@ -58,6 +58,7 @@ class Promotor_Model_Abstract {
 	 */
 	protected function _setStatus($status) {
 		$this->_status = $status;
+		$this->_log($status, null, __METHOD__);
 	}
 	
 	/**
@@ -95,6 +96,7 @@ class Promotor_Model_Abstract {
 	 */
 	protected function _addMessage($message) {
 		$this->_messages[] = $message;
+		$this->_log($message, null, __METHOD__);
 		return $this;
 	}
 	
@@ -125,6 +127,7 @@ class Promotor_Model_Abstract {
 	 */
 	protected function _addException(Exception $exception) {
 		$this->_exception[] = $exception;
+		$this->_log($exception->getMessage(), null, __METHOD__);
 		return $this;
 	}
 
@@ -416,10 +419,12 @@ class Promotor_Model_Abstract {
      * @param string $message
      * @param number $priority
      */
-    public function _log($message, $priority = null) 
+    public function _log($message, $priority = null, $method = null) 
     {
     	if (!self::isDebug())
     		return;
+
+    	$message = '(' . __CLASS__ . '::' . $method . '), ' . $message;
 
     	if (null === $priority)
     		$priority = self::getLogPriority();
@@ -428,19 +433,19 @@ class Promotor_Model_Abstract {
     	$log->log($message, $priority);
     }
 
-    /**
-     * Destuktor obiektu gdy jest włączone debugowanie
-     * Zanotuje wszystkie wiadomości jakie miały miejsce w trakcie zycia obiektu
-     */
-    public function __destruct() 
-    {
-    	if (!self::isDebug())
-    		return;
-    	
-    	$log 	  = self::getLog();
-    	$priority = self::getLogPriority();
-
-    	foreach ($this->getMessages(true) as $message)
-    		$log->log($message, $priority);
-    }
+//    /**
+//     * Destuktor obiektu gdy jest włączone debugowanie
+//     * Zanotuje wszystkie wiadomości jakie miały miejsce w trakcie zycia obiektu
+//     */
+//    public function __destruct() 
+//    {
+//    	if (!self::isDebug())
+//    		return;
+//
+//    	$log 	  = self::getLog();
+//    	$priority = self::getLogPriority();
+//
+//    	foreach ($this->getMessages(true) as $message)
+//    		$log->log($message, $priority);
+//    }
 }

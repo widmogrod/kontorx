@@ -233,11 +233,12 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 
 			// aktualny poziom zagnieżdżenia
 			$level = $this->__get($this->_level);
+			$root  = ('' == $level);
 
 			// zabespieczenie gdy dzialamy na root
 			// TODO Jak appendujemy roota to w przyszlosci
 			// dodac mozliwosc dodania kolumny sortujacej!
-			$levelChildrens = ($level == '')
+			$childrensLevel = ($root)
 		        ? $this->__get(current($this->_primary))
 		        : $level . $this->_separator . $this->__get(current($this->_primary));
 
@@ -245,12 +246,12 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 
 			// zapytanie wyszukujące dzieci dla rodzica
 			if (is_integer($depthLevel)) {
-				$levelRegexp = $this->_regexpDepthLevelChildrens($depthLevel, $depthLevel);
+				$levelRegexp = $this->_regexpDepthLevelChildrens($depthLevel, $childrensLevel, $root);
 				$select->where("$this->_level REGEXP '^$levelRegexp$'");
 			} else {
-				$select->where("$this->_level LIKE ?", "$levelChildrens%");
+				$select->where("$this->_level LIKE ?", "$childrensLevel%");
 			}
-               
+
 			return $this->_table->fetchAll($select);
         }
 
@@ -270,21 +271,21 @@ abstract class KontorX_Db_Table_Tree_Row_Abstract extends KontorX_Db_Table_Row i
 				throw new KontorX_Db_Table_Tree_Row_Exception($message);
 			}
 	
-			$db = $this->_getTable()->getAdapter();
-			
 			// aktualny poziom zagnieżdżenia
 			$level = $this->__get($this->_level);
 	
 			$select = (null === $select) ? $this->select() : $select;
-			$select->where($db->quoteInto("$this->_level = ?", $levelRegexp));
+
+			$select->where("$this->_level = ?", $level);
 	
 			if (!$includedSelf) 
 			{
 				$where = array();
 	
+				$db = $this->_getTable()->getAdapter();
 				$info = $this->_getTable()->info();
 	        	$metadata = $info[Zend_Db_Table_Abstract::METADATA];
-				
+
 				$primaryKey = $this->_getPrimaryKey();
 				foreach ($primaryKey as $column => $value)
 				{
