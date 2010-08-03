@@ -34,7 +34,7 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	protected $_model;
 	
 	/**
-	 * @var Shop_Model_Product_PrevNext_Interface
+	 * @var Promotor_Shop_PrevNext_Data
 	 */
 	protected $_data;
 	
@@ -92,7 +92,7 @@ class Promotor_View_Helper_ShopPrevNext extends Zend_View_Helper_Abstract
 	 * i wywołaj na nim odpowiednią metodę 
 	 * w celu pobrania danych
 	 * 
-	 * @return Shop_Model_Product_PrevNext_Interface
+	 * @return Promotor_Shop_PrevNext_Data
 	 */
 	public function getData() 
 	{
