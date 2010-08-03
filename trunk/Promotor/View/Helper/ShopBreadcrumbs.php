@@ -140,7 +140,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 	 */
 	public function setProductId($productId) 
 	{
-		$this->_productId = (int) $productId;
+		$this->_productId = $productId;
 		return $this;
 	}
 	
@@ -175,7 +175,7 @@ class Promotor_View_Helper_ShopBreadcrumbs extends Zend_View_Helper_Abstract
 			$type = $this->view->getHelper('ShopHistory')->type;
 			$this->setType($type);
 		}
-		
+
 		if (null === $groupId) {
 			$groupId = $this->view->getHelper('ShopHistory')->id;
 			$this->setGroupId($groupId);
