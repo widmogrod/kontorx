@@ -12,7 +12,8 @@ class Promotor_View_Helper_ShopTags extends Zend_View_Helper_Abstract
 	 */
 	protected $_model;
 	
-	public function getModel() {
+	public function getModel() 
+	{
 		if (null === $this->_model) {
 			$this->_model = new Shop_Model_ProductTag();
 		}
@@ -22,7 +23,8 @@ class Promotor_View_Helper_ShopTags extends Zend_View_Helper_Abstract
 
 	protected $_tags;
 	
-	public function getTags() {
+	public function getTags() 
+	{
 		if (null === $this->_tags)
 			$this->_tags = $this->getModel()->findAllForTag();
 			
@@ -34,10 +36,10 @@ class Promotor_View_Helper_ShopTags extends Zend_View_Helper_Abstract
 	 * 
 	 * @return Zend_Tag_Cloud
 	 */
-	public function shopTags() {
+	public function shopTags() 
+	{
 		$tags = $this->getTags();
-//Zend_Tag_Cloud_Decorator_HtmlTag
-//Zend_Tag_Cloud_Decorator_HtmlCloud
+
 		$cloud = new Zend_Tag_Cloud();
 		$cloud->setTags($tags);
 		$cloud->setCloudDecorator('htmlCloud');

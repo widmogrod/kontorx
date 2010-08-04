@@ -70,7 +70,7 @@ class Promotor_Controller_Plugin_ShopHistory extends Zend_Controller_Plugin_Abst
     	{
     		$session = $this->getSession();
     		$session->type = $this->_avalibleControllers[$controllerName];
-    		$session->id = $request->getParam('id', $request->getParam('alias'));
+    		$session->id = $request->getParam('id', $request->getParam('title', $request->getParam('alias')));
     	}
     }
 }
