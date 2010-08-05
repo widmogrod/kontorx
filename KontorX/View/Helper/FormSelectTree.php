@@ -37,6 +37,24 @@ class KontorX_View_Helper_FormSelectTree extends Zend_View_Helper_FormSelect
 			}
 			unset($attribs['firstNull']);
 		}
+		
+		/**
+		 * Przekazywanie atrybutów
+		 * INFO: wiem że troszeczkę przekombinowane... ale cuz :P
+		 */
+		if (array_key_exists('labelCol', $attribs)) {
+			$options['labelCol'] = $attribs['labelCol'];
+			unset($attribs['labelCol']);
+		}
+		if (array_key_exists('valueCol', $attribs)) {
+			$options['valueCol'] = $attribs['valueCol'];
+			unset($attribs['valueCol']);
+		}
+		if (array_key_exists('depthCol', $attribs)) {
+			$options['depthCol'] = $attribs['depthCol'];
+			unset($attribs['depthCol']);
+		}
+			
 
 		if ($rowset instanceof RecursiveIterator) {
 			$result += $this->_setupOptionsFromRecursiveIterator($rowset, $options, $result);
