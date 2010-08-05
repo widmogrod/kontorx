@@ -424,7 +424,7 @@ class Promotor_Model_Abstract {
     	if (!self::isDebug())
     		return;
 
-    	$message = '(' . __CLASS__ . '::' . $method . '), ' . $message;
+    	$message = '(' . get_class($this) . '::' . $method . '), ' . $message;
 
     	if (null === $priority)
     		$priority = self::getLogPriority();
