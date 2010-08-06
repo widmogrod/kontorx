@@ -6,11 +6,13 @@ form p.description {color: #333; padding: 5px;}
 
 .zend_form {
 	text-shadow:0 1px 0 #ddd;
+	margin: 20px;
+	padding: 20px;
+	border: 1px solid #ccc;
 }
 .zend_form dt,
-.zend_form dd {float: left;}
-.zend_form dt {clear: left; width:150px; text-align: right; padding-right: 20px;}
-.zend_form dd {}
+.zend_form dd {display:block;}
+.zend_form dt {padding: 5px 0;}
 
 .zend_form label {font-weight: bold; font-size: 14px;}
 .zend_form fieldset {
@@ -42,3 +44,5 @@ form p.description {color: #333; padding: 5px;}
   -webkit-border-radius: 5px; /* Saf3+, Chrome */
           border-radius: 5px; /* Opera 10.5, IE 9 */
 }
+
+.zend_form table {width:auto;}
