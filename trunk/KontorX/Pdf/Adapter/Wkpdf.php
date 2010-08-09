@@ -32,7 +32,9 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 		if (null === $this->_scriptName) {
 			$this->_scriptName = 'wkhtmltopdf';
 
-			if (`grep -i amd /proc/cpuinfo` != '') {
+			if (`grep -i amd /proc/cpuinfo` != '' ||
+				`uname -m | grep x86_64` != '') 
+			{
 				$this->_scriptName .= '-amd64';
 			} elseif (`grep -i intel /proc/cpuinfo` != '') {
 				$this->_scriptName .= '-i386';
