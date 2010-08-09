@@ -39,7 +39,7 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 			} elseif (`grep -i intel /proc/cpuinfo` != '') {
 				$this->_scriptName .= '-i386';
 			} else {
-				$message = 'WKPDF couldn\'t determine CPU ("'.`grep -i vendor_id /proc/cpuinfo`.'").';
+				$message = 'Wkpdf couldn\'t determine CPU.';
 				require_once 'KontorX/Pdf/Exception.php';
 				throw new KontorX_Pdf_Exception($message);
 			}
