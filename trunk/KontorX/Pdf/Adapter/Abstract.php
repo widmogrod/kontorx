@@ -2,6 +2,12 @@
 abstract class KontorX_Pdf_Adapter_Abstract
 {
 	abstract public function output();
+
+	public function __construct(array $options = null)
+	{
+		if (is_array($options))
+			$this->setOptions($options);
+	}
 	
 	public function setOptions(array $options)
 	{
