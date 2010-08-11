@@ -14,19 +14,28 @@ require_once 'KontorX/Pdf/Adapter/Abstract.php';
  */
 class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract 
 {
-	public function __construct(array $options = null)
-	{
-		if (is_array($options))
-			$this->setOptions($options);
-	}
-
+	/**
+	 * Ścieżka lub nazwa do pliku wykonującego `wkhtmltopdf`
+	 * @var string
+	 */
 	protected $_scriptName;
 	
+	/**
+	 * Można zdefiniować własną nazwę/ścieżkę do pliku `wkhtmltopdf`
+	 * @param string $scriptName
+	 */
 	public function setScriptName($scriptName)
 	{
 		$this->_scriptName = $scriptName;
 	}
 	
+	/**
+	 * Zwraca nazwę pliku wykonywanego jeżeli nie została ona zdefiniowana przez uzytkownika.
+	 * Sprawdzana jest architektóra sprzętowa i na jej podstawie wybierana jest nazwa biblioteki.
+	 * 
+	 * @throws KontorX_Pdf_Exception
+	 * @return string
+	 */
 	public function getScriptName()
 	{
 		if (null === $this->_scriptName) {
@@ -48,13 +57,31 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 		return $this->_scriptName;
 	}
 
+	/**
+	 * Ścieżka do katalogu z plikami tymczasowymi
+	 * @var string
+	 */
 	protected $_tempDir;
 	
+	/**
+	 * Ścieżka do katalogu w którym mają być przechowywane tymczasowe pliki
+	 * potrzebne do wygenerowania dokumentu PDF
+	 * 
+	 * @param string $tempDir
+	 */
 	public function setTempDir($tempDir)
 	{
 		$this->_tempDir = $tempDir;
 	}
 	
+	/**
+	 * Zwaca ścieżkę do katalogu przechowywującego pliki tymczasowe
+	 * 
+	 * Jeżeli nie zostanie zdefiniowany katalog TEMP to jest ustawiany
+	 * jako domyślny systemowy katalog TEMP 
+	 * 
+	 * @return string
+	 */
 	public function getTempDir()
 	{
 		if (null === $this->_tempDir)
@@ -62,14 +89,31 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 
 		return $this->_tempDir;
 	}
-	
+
+	/**
+	 * @var string
+	 */
 	protected $_inputFilepath;
 	
+	/**
+	 * Ustaw ścieżkę do pliku, który jest dokumentem HTML,
+	 * który ma zostać uzyty do wygenerowania dokumentu PDF
+	 * 
+	 * @param string $inputFilepath
+	 */
 	public function setInputFilepath($inputFilepath)
 	{
 		$this->_inputFilepath = $inputFilepath;
 	}
 	
+	/**
+	 * Zwraca ścieżkę do pliku, który ma przechowywać HTML
+	 *
+	 * Jeżeli nie zostanie podana nazwa pliku, 
+	 * zostanie wygenerowana nazwa pliku.
+	 * 
+	 * @return string
+	 */
 	public function getInputFilepath()
 	{
 		if (null === $this->_inputFilepath) {
@@ -80,24 +124,47 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 		return $this->_inputFilepath;
 	}
 	
+	/**
+	 * @var string
+	 */
 	protected $_outputFilepath;
 	
+	/**
+	 * Ścieżka do pliku gdzie ma być zapisany wygenerowany dokument PDF
+	 * 
+	 * @param string $outputFilepath
+	 */
 	public function setOutputFilepath($outputFilepath)
 	{
 		$this->_outputFilepath = $outputFilepath;
 	}
 	
+	/**
+	 * Zwróć ścieżkę do pliku, który ma przechowywać dokument PDF
+	 * 
+	 * Jeżeli nazwa pliku nie została wcześniej podana 
+	 * to zostabie wygenerowana nazwa automatycznie
+	 *  
+	 * @return string
+	 */
 	public function getOutputFilepath()
 	{
-		if (null === $this->_outputFilepath)
-		$this->_outputFilepath = $this->getInputFilepath() . '.pdf';
+		if (null === $this->_outputFilepath) {
+			$this->_outputFilepath = $this->getInputFilepath();
+			$this->_outputFilepath .= '.pdf';
+		}
 
 		return $this->_outputFilepath;
 	}
 	
+	/**
+	 * Rozszeżenie metody nadklasy @see KontorX_Pdf_Adapter_Abstract::setHtml()
+	 * o specyficzne dla tego adaptera zachowanie podczas podania kodu HTML
+	 * do przetworzenia na dokument PDF
+	 */
 	public function setHtml($html)
 	{
-		// zapisz html do pliku
+		
 		$inputFile = $this->getInputFilepath();
 		$outputFile = $this->getOutputFilepath();
 		
@@ -107,6 +174,7 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 		chmod($inputFile, 0666);
 		chmod($outputFile, 0666);
 		
+		// zapisz HTML do pliku
 		file_put_contents($inputFile, $html);
 		
 		parent::setHtml($html);
@@ -154,6 +222,13 @@ class KontorX_Pdf_Adapter_Wkpdf extends KontorX_Pdf_Adapter_Abstract
 		unlink($output);
 	}
 
+	/**
+	 * Execute a command and open file pointers for input/output
+	 *  
+	 * @param string $cmd
+	 * @param string $input
+	 * @return multitype:string
+	 */
 	private static function _pipeExec($cmd, $input = '')
 	{
 		$proc = proc_open($cmd, array(array('pipe','r'),array('pipe','w'),array('pipe','w')), $pipes);
