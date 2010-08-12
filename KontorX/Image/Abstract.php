@@ -326,7 +326,9 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function grayscale() {
-        imagefilter($this->_image, IMG_FILTER_GRAYSCALE);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_GRAYSCALE);
+
         return $this;
     }
 
@@ -334,7 +336,9 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function brightness($iLevel) {
-        imagefilter($this->_image, IMG_FILTER_BRIGHTNESS, $iLevel);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_BRIGHTNESS, $iLevel);
+
         return $this;
     }
 
@@ -342,7 +346,8 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function emboss() {
-        imagefilter($this->_image, IMG_FILTER_EMBOSS);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_EMBOSS);
         return $this;
     }
 
@@ -350,7 +355,8 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function negate() {
-        imagefilter($this->_image, IMG_FILTER_NEGATE);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_NEGATE);
         return $this;
     }
 
@@ -358,7 +364,8 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function smooth() {
-        imagefilter($this->_image, IMG_FILTER_SMOOTH, $iLevel);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_SMOOTH, $iLevel);
         return $this;
     }
 
@@ -366,15 +373,17 @@ abstract class KontorX_Image_Abstract {
      * @return KontorX_Image_Abstract
      */
     public function colorize($iRed = 0, $iGreen = 0, $iBlue = 0) {
-        imagefilter($this->_image, IMG_FILTER_COLORIZE, $iRed, $iGreen, $iBlue);
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_COLORIZE, $iRed, $iGreen, $iBlue);
         return $this;
     }
 
     /**
      * @return KontorX_Image_Abstract
      */
-    public function edgeDetect() {
-        imagefilter($this->_image, IMG_FILTER_EDGEDETECT);
+    public function edgedetect() {
+    	if (function_exists('imagefilter'))
+        	imagefilter($this->_image, IMG_FILTER_EDGEDETECT);
         return $this;
     }
 

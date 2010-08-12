@@ -133,6 +133,53 @@ class KontorX_Image_Resizer {
     public function getHeight() {
         return $this->_height;
     }
+    
+    /**
+     * Lista dostępnych filtrów
+     * @var arary
+     */
+    protected $_availibleFilters = array(
+    	'grayscale',
+    	'emboss',
+    	'negate',
+    	'smooth',
+    	'brightness',
+    	'edgedetect'
+    );
+    
+    /**
+     * Wykorzystywany filtr 
+     * @var string
+     */
+    protected $_filters;
+    
+    public function setFilters($filters) 
+    {
+    	$this->clearFilters();
+    	foreach ($filters as $filter)
+    		$this->addFilter($filter);
+    }
+    
+	public function getFilters() 
+	{
+		return $this->_filters;
+	}
+    
+	public function clearFilters() {
+		$this->_filters = array();
+	}
+	
+	public function setFilter($filter) 
+    {
+    	$this->addFilter($filter);
+    }
+    
+	public function addFilter($filter) 
+    {
+    	$filter = strtolower($filter);
+    	if (in_array($this->_availibleFilters, $filter))
+    		$this->_filters[] = $filter;
+    }
 
     /**
      * @var string
@@ -341,11 +388,27 @@ class KontorX_Image_Resizer {
         	foreach ($this->getChains() as $chain) {
         		$this->setOptions($chain);
         		$this->_resize();
+        		$this->_filter();
         	}
         	$this->clearChains();
         }
+        $image = $this->_getImage();
+        $image->grayscale();
 
         return $this->_getImage();
+    }
+    
+    protected function _filter() 
+    {
+    	$image = $this->_getImage();
+    	
+    	foreach ($this->getFilters() as $filter) 
+    	{
+    		if (method_exists($image, $filter))
+    			$image->$filter();
+    	}
+
+    	$this->clearFilters();
     }
 
     protected function _resize() {
