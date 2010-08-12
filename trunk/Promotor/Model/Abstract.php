@@ -101,6 +101,17 @@ class Promotor_Model_Abstract {
 	}
 	
 	/**
+	 * @param bumber $errno
+	 * @param string $errstr
+	 * @param string $errfile
+	 * @param string $errline
+	 */
+	protected function _addErrorMessage($errno, $errstr, $errfile, $errline) {
+		$message = sprintf('[%s:%s] %s, %s', $errno, $errline,  $errstr, $errfile);
+		$this->_addMessage($message);
+	}
+	
+	/**
 	 * @param array $messages
 	 * @return Promotor_Model_Abstract
 	 */
