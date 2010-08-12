@@ -177,7 +177,7 @@ class KontorX_Image_Resizer {
 	public function addFilter($filter) 
     {
     	$filter = strtolower($filter);
-    	if (in_array($this->_availibleFilters, $filter))
+    	if (in_array($filter, $this->_availibleFilters))
     		$this->_filters[] = $filter;
     }
 
@@ -384,16 +384,17 @@ class KontorX_Image_Resizer {
 
         $this->_resize();
 
-        if ($this->hasChains()) {
-        	foreach ($this->getChains() as $chain) {
+        if ($this->hasChains()) 
+        {
+        	foreach ($this->getChains() as $chain) 
+        	{
         		$this->setOptions($chain);
+        		
         		$this->_resize();
         		$this->_filter();
         	}
         	$this->clearChains();
         }
-        $image = $this->_getImage();
-        $image->grayscale();
 
         return $this->_getImage();
     }
