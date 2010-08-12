@@ -19,6 +19,13 @@ class Promotor_Controller_Plugin_PDF extends Zend_Controller_Plugin_Abstract
 	 * @var string
 	 */
 	const ENABLED_PARAM_KEY = '__generatePDF';
+	
+	protected $_responseToPdf = false;
+
+	public function setResponseToPdf($flag = true)
+	{
+		$this->_responseToPdf = (bool) $flag;
+	}
 
 	public function postDispatch(Zend_Controller_Request_Abstract $request)
     {
@@ -36,7 +43,7 @@ class Promotor_Controller_Plugin_PDF extends Zend_Controller_Plugin_Abstract
          * TODO: Zastanowić się czy nie przełożyć włączania
          * generowania PDF do pomocnika akcji
          */
-        $enabled = $request->getParam(self::ENABLED_PARAM_KEY);
+        $enabled = $request->getParam(self::ENABLED_PARAM_KEY, $this->_responseToPdf);
         if (!$enabled)
         	return;
 
