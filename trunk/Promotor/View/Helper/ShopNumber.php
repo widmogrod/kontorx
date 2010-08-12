@@ -29,9 +29,9 @@ class Promotor_View_Helper_ShopNumber extends Zend_View_Helper_Abstract
 	 * @param string $number
 	 * @return string
 	 */
-	public function encode($number) 
+	public static function encode($number) 
 	{
-		$number = $this->decode($number);
+		$number = self::decode($number);
 
 		$number = trim($number);
 		$number = self::PREFIX . $number;
@@ -44,7 +44,7 @@ class Promotor_View_Helper_ShopNumber extends Zend_View_Helper_Abstract
 	 * @param string $number
 	 * @return string
 	 */
-	public function decode($number) 
+	public static function decode($number) 
 	{
 		$number = str_replace(array(self::PREFIX),'',$number);
 		return $number; 
@@ -55,6 +55,6 @@ class Promotor_View_Helper_ShopNumber extends Zend_View_Helper_Abstract
 	 */
 	public function __toString()
 	{
-		return $this->encode($this->_number);
+		return self::encode($this->_number);
 	}
 }
