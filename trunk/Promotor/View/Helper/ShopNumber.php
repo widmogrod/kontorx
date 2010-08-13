@@ -32,7 +32,7 @@ class Promotor_View_Helper_ShopNumber extends Zend_View_Helper_Abstract
 	public static function encode($number) 
 	{
 		$number = self::decode($number);
-
+		$number = strip_tags($number);
 		$number = trim($number);
 		$number = self::PREFIX . $number;
 
