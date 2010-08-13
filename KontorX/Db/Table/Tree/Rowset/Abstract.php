@@ -4,7 +4,8 @@ require_once 'Zend/Db/Table/Rowset/Abstract.php';
 /**
  * KontorX_Db_Table_Rowset_Tree_Abstract
  */
-class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstract implements RecursiveIterator {
+class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstract implements RecursiveIterator 
+{
 	/**
      * Nazwa kolumny poziomu zagnieżdżenia
      * @var string
@@ -71,21 +72,11 @@ class KontorX_Db_Table_Tree_Rowset_Abstract extends Zend_Db_Table_Rowset_Abstrac
 		foreach ($this->_data as $pointer => $data) 
 		{
 			if ($pointer === $this->_pointer) 
-			{
 				continue;
-			}
-			
-//			$thisKey = $this->_getLevelKey($data);
-
-			
-			// Tutaj jest błąd co jeżeli rodzic jest 1 a dziecko 12
-			// 12 posiada 1 na początku a nie jest jego rodzicem!
-			// sprawdz czy poczatek $data[$this->_level] jest identyczny z kluczem
-			// jeśli tak, to jest to dziecko
-//			if ($key == substr($data[$this->_level], 0, strlen($key)))
 
 			// sprawcz czy klucz rodzica jest identyczny jak dziecka
-			if ($key == $data[$this->_level]) 
+			$pattern = vsprintf('#^%s#', preg_quote($key,'#'));
+			if (preg_match($pattern, $data[$this->_level], $matches)) 
 			{
 				$this->_childrens[$key][] = $data;
 				unset($this->_data[$pointer]);
