@@ -50,7 +50,7 @@ class KontorX_DataGrid_Cell_Image extends KontorX_DataGrid_Cell_ViewHelper {
      */
     public function render() {
     	$src   = (null === $this->_src)
-    		? rtrim($this->_src, '/') . '/' : '';
+    		? '' : rtrim($this->_src, '/') . '/';
 
     	$src .= $this->getValue();
 
