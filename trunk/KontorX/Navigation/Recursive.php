@@ -79,7 +79,7 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 			$this->next();
 		}
 
-		return $this->_parent[0];
+		return $this->getNavigation();
 	}
 
 	/**
@@ -119,6 +119,7 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 	}
 	
 	public function endChildren() {
-		$this->_current = $this->_parent[$this->_depth-1];
+		if (isset( $this->_parent[$this->_depth-1]))
+			$this->_current = $this->_parent[$this->_depth-1];
 	}
 }
