@@ -51,7 +51,10 @@ class KontorX_Iterator_Reiterate_IteratorIterator extends RecursiveIteratorItera
 	}
 
 	public function endChildren() {
-		if (isset( $this->_parent[$this->_depth-1]))
-			$this->_current = $this->_parent[$this->_depth-1];
+		// sprawdzam czy mogę zamknąć tą głębokość drzewa
+		if (isset($this->_parent[$this->_depth-1])) {
+			// domykam tą głęgokość
+			$this->_current = $this->_parent[--$this->_depth];
+		}
 	}
 }
