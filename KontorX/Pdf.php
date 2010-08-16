@@ -132,7 +132,11 @@ class KontorX_Pdf
 	 */
 	public function setFilename($fileame)
 	{
-		$this->_fileame = $fileame;
+		$this->_fileame = basename($fileame);
+		// pozbawienie rozszeżenia
+		$this->_fileame = str_replace(pathinfo($this->_fileame, PATHINFO_EXTENSION),'', $this->_fileame);
+		$this->_fileame = trim($fileame, ' .');
+		$this->_fileame .= '.pdf';
 	}
 	
 	/**
@@ -142,9 +146,7 @@ class KontorX_Pdf
 	public function getFilename()
 	{
 		if (null === $this->_fileame)
-		{
-			return 'document.pdf';
-		}
+			$this->setFilename('Document');
 
 		return $this->_fileame;
 	}

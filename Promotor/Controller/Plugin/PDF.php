@@ -20,13 +20,34 @@ class Promotor_Controller_Plugin_PDF extends Zend_Controller_Plugin_Abstract
 	 */
 	const ENABLED_PARAM_KEY = '__generatePDF';
 	
+	/**
+	 * @var bool
+	 */
 	protected $_responseToPdf = false;
 
+	/**
+	 * Ustaw flagę że można generować PDF
+	 * @param bool $flag
+	 */
 	public function setResponseToPdf($flag = true)
 	{
 		$this->_responseToPdf = (bool) $flag;
 	}
+	
+	/**
+	 * @var string
+	 */
+	protected $_filename;
 
+	/**
+	 * Ustaw nazwę pliku
+	 * @param string $filename
+	 */
+	public function setFilename($filename)
+	{
+		$this->_filename = $filename;
+	}
+	
 	public function postDispatch(Zend_Controller_Request_Abstract $request)
     {
     	$response = $this->getResponse();
@@ -61,6 +82,10 @@ class Promotor_Controller_Plugin_PDF extends Zend_Controller_Plugin_Abstract
         
 		$pdf = KontorX_Pdf::factory('Wkpdf', $options);
 		$pdf->setHtml($html);
+		
+		if (null !== $this->_filename)
+			$pdf->setFilename($this->_filename);
+		
 		$pdf->output();
 	}
 }
