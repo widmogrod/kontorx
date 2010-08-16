@@ -72,7 +72,7 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 
 			$current = $this->current();
 			$current = $this->prepare($current);
-
+			
 			$this->_children = Zend_Navigation_Page::factory($current);
 			
 			$this->_current->addPage($this->_children);
@@ -112,14 +112,17 @@ class KontorX_Navigation_Recursive extends RecursiveIteratorIterator {
 
 		return $current;
 	}
-	
+
 	public function beginChildren() {
 		$this->_parent[$this->_depth] = $this->_current;
 		$this->_current = $this->_children;
 	}
-	
+
 	public function endChildren() {
-		if (isset( $this->_parent[$this->_depth-1]))
-			$this->_current = $this->_parent[$this->_depth-1];
+		// sprawdzam czy mogę zamknąć tą głębokość drzewa
+		if (isset($this->_parent[$this->_depth-1])) {
+			// domykam tą głęgokość
+			$this->_current = $this->_parent[--$this->_depth];
+		}
 	}
 }
