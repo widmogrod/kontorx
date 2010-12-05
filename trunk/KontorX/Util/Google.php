@@ -32,6 +32,18 @@ class KontorX_Util_Google
 		$this->aProxiesFaild = array();
 	}
 	
+	protected $_shuffle = true;
+	
+	public function setShuffle($flag = true)
+	{
+		$this->_shuffle = (bool) $flag;
+	}
+	
+	public function isShuffle()
+	{
+		return $this->_shuffle;
+	}
+	
 	public function setProxies(array $proxies)
 	{
 		$this->aProxies = $proxies;
@@ -83,6 +95,10 @@ class KontorX_Util_Google
 
 		if (count($this->aProxies))
 		{
+			if ($this->isShuffle()) {
+				shuffle($this->aProxies);
+			}
+			
 			// while ($sProxy = array_pop($this->aProxies)) 
 			foreach($this->aProxies as $key => $sProxy)
 			{
