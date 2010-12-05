@@ -1,4 +1,30 @@
 <?php
+require_once 'Zend/Application/Resource/ResourceAbstract.php';
+
+/**
+ * Zas—b inicjuje Doctrine ORM w wersji 1.2.
+ * 
+ * Przyk¸adowa konfiguracja pliku application.ini
+ * <code> 
+ *  resources.doctrine.load_models = true
+ *  ;# Jeýeli wy¸ˆczona opcja: "doctrine_path" to - biblioteka jest szukana w include_path
+ *  ;resources.doctrine.setup.doctrine_path	= APPLICATION_PATH "/../library"
+ *  resources.doctrine.setup.data_fixtures_path = APPLICATION_PATH "/resources/fixtures"
+ *  resources.doctrine.setup.models_path = APPLICATION_PATH "/orm"
+ *  resources.doctrine.setup.migrations_path = APPLICATION_PATH "/resources/migrations"
+ *  resources.doctrine.setup.sql_path = APPLICATION_PATH "/resources/sql"
+ *  resources.doctrine.setup.yaml_schema_path = APPLICATION_PATH "/resources/schema"
+ *  
+ *  resources.doctrine.attribute.0.name = Doctrine_Core::ATTR_VALIDATE
+ *  resources.doctrine.attribute.0.key = Doctrine_Core::VALIDATE_ALL
+ *  
+ *  resources.doctrine.attribute.1.name = Doctrine_Core::ATTR_MODEL_LOADING
+ *  resources.doctrine.attribute.1.key = Doctrine_Core::MODEL_LOADING_CONSERVATIVE
+ * </code>
+ * 
+ * @author $Author$
+ * @version $Id$
+ */
 class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_ResourceAbstract
 {
 	protected $_defaultGenerateModelsOptions = array(
