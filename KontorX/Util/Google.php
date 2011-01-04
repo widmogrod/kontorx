@@ -86,6 +86,13 @@ class KontorX_Util_Google
 
 		fclose($handle);
 	}
+	
+	protected $_useProxies = true;
+	
+	public function setUseProxies($flag = true)
+	{
+		$this->_useProxies = (bool) $flag;
+	}
 
 	public function position($sWord, $iCount = null)
 	{
@@ -93,7 +100,8 @@ class KontorX_Util_Google
 		$this->iCount = is_integer($iCount)
 			? $iCount : 100;
 
-		if (count($this->aProxies))
+		if (count($this->aProxies) && true === $this->_useProxies
+		)
 		{
 			if ($this->isShuffle()) {
 				shuffle($this->aProxies);
@@ -173,6 +181,7 @@ class KontorX_Util_Google
 
 		if (null !== $sProxy) {
 			curl_setopt($rCurl, CURLOPT_PROXY, $sProxy);
+			curl_setopt($rCurl, CURLOPT_TIMEOUT, 30);
 		}
 
 		$sData = curl_exec($rCurl);
