@@ -93,6 +93,18 @@ class KontorX_Util_Google
 	{
 		$this->_useProxies = (bool) $flag;
 	}
+	
+	protected $_timeout = 30;
+	
+	public function setTimeout($timeout)
+	{
+		$this->_timeout = abs((int) $timeout;
+	}
+	
+	public function getTimeout()
+	{
+		return $this->_timeout;
+	}
 
 	public function position($sWord, $iCount = null)
 	{
@@ -178,10 +190,10 @@ class KontorX_Util_Google
 		curl_setopt($rCurl, CURLOPT_VERBOSE, 0);
 		curl_setopt($rCurl, CURLOPT_REFERER, 'www.google.pl');
 		curl_setopt($rCurl, CURLOPT_URL, sprintf( 'http://www.google.pl/search?hl=pl&q=%s&num='.$this->iCount, urlencode($this->sWord)));
+		curl_setopt($rCurl, CURLOPT_TIMEOUT, $this->getTimeout());
 
 		if (null !== $sProxy) {
 			curl_setopt($rCurl, CURLOPT_PROXY, $sProxy);
-			curl_setopt($rCurl, CURLOPT_TIMEOUT, 30);
 		}
 
 		$sData = curl_exec($rCurl);
