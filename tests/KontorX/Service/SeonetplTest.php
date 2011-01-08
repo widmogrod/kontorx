@@ -105,7 +105,7 @@ class KontorX_Service_SeonetplTest extends UnitTestCase {
 		$linkSetId = 91794; // 2rsystem.com.pl
 
 		$result = $this->_seonetpl->setLinksMax($max, $linkId, $linkSetId);
-		$this->assertTrue($result, 'Can\'t set $max do link');
+		$this->assertTrue($result == $max, 'Can\'t set $max do link');
 	}
 	
 	public function testSetLinksPerdaySuccess() 
@@ -115,7 +115,7 @@ class KontorX_Service_SeonetplTest extends UnitTestCase {
 		$linkSetId = 91794; // 2rsystem.com.pl
 
 		$result = $this->_seonetpl->setLinksPerday($perday, $linkId, $linkSetId);
-		$this->assertTrue($result, 'Can\'t set perday do link');
+		$this->assertTrue($result == $perday, 'Can\'t set perday do link');
 	}
 	
 	public function testSetLinksPrioritySuccess() 
@@ -125,7 +125,7 @@ class KontorX_Service_SeonetplTest extends UnitTestCase {
 		$linkSetId = 91794; // 2rsystem.com.pl
 
 		$result = $this->_seonetpl->setLinksPriority($priority, $linkId, $linkSetId);
-		$this->assertTrue($result, 'Can\'t set $priority do link');
+		$this->assertTrue($result == $priority, 'Can\'t set $priority do link');
 	}
 	
 //	public function testDeleteLinkSuccess() 

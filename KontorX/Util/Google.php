@@ -8,6 +8,9 @@
  */
 class KontorX_Util_Google 
 {
+	const TYPE_XPATH = 'TYPE_XPATH';
+	const TYPE_DEFAULT = 'TYPE_DEFAULT';
+	
 	private
 		$sUri = null,
 		$iCount = 100,
@@ -94,16 +97,37 @@ class KontorX_Util_Google
 		$this->_useProxies = (bool) $flag;
 	}
 	
-	protected $_timeout = 30;
+	protected $_timeout = 10;
 	
 	public function setTimeout($timeout)
 	{
-		$this->_timeout = abs((int) $timeout;
+		$this->_timeout = abs((int) $timeout);
 	}
 	
 	public function getTimeout()
 	{
 		return $this->_timeout;
+	}
+	
+	protected $_type = self::TYPE_DEFAULT;
+	
+	public function setType($type)
+	{
+		switch ($type)
+		{
+			case self::TYPE_DEFAULT:
+			case self::TYPE_XPATH:
+				$this->_type = $type;
+				break;
+
+			default:
+				throw new Exception('Undefined type "'.$type.'"');
+		}
+	}
+	
+	public function getType()
+	{
+		return $this->_type;
 	}
 
 	public function position($sWord, $iCount = null)
@@ -112,8 +136,7 @@ class KontorX_Util_Google
 		$this->iCount = is_integer($iCount)
 			? $iCount : 100;
 
-		if (count($this->aProxies) && true === $this->_useProxies
-		)
+		if (count($this->aProxies) && true === $this->_useProxies)
 		{
 			if ($this->isShuffle()) {
 				shuffle($this->aProxies);
@@ -134,9 +157,6 @@ class KontorX_Util_Google
 					++$this->aProxiesFaild[$key];					
 				}
 			}
-			if (false === $sData) {
-				$sData = $this->getData();
-			}
 		} else {
 			$sData = $this->getData();
 		}
@@ -144,40 +164,77 @@ class KontorX_Util_Google
 		if (!$sData)
 			return false;
 
-		// lapiemy linki
-		// TODO Dodać lapanie w wynikach pola z pdf etc.
-		$aResults = array();
-		preg_match_all('@<li class=g><h3 class="r"><a href="([^"]+)" class=l@i', $sData, $aResults );
-
 		// generowanie url'a z www i bez ..
 		$aInfo = pathinfo($this->sUri);
 		$sUri = strpos( $this->sUri, '://www') === false
 			? $aInfo['dirname'] . 'www.' . $aInfo['basename']
 			: $aInfo['dirname'] . '//' . substr( strrchr( $aInfo['basename'],'www.'), 2 );
+			
+			
 
-		// lementy pod kluczem 1 zawieraja tylko linki do strony
-		$aResults = (array) @$aResults[1];
+    	switch($this->getType())
+    	{
+    		case self::TYPE_XPATH:
+	    		require_once 'Zend/Dom/Query.php';
+		    	$query = new Zend_Dom_Query($sData);
 		
-		if (count($aResults) == 0) {
-			return false;
-		}
+		    	$elements = $query->queryXpath('//li[contains(normalize-space(@class), \'g\')]'.
+		    								   '//h3[contains(normalize-space(@class), \'r\')]'.
+		    								   '//a[contains(normalize-space(@class), \'l\')]');
+		
+		    	if (!count($elements))
+		    	{
+		    		return false;
+		    	}
+		    	
+		    	$position = false;
+		    	foreach($elements as $key => /* @var $element DOMElement */ $element)
+		    	{
+		    		$href = $element->getAttribute('href');
 
-		$aReturn = array($this->sUri => false, $sUri=>false);
+		    		$sString = strip_tags($href);
+					if(strpos($sString, $this->sUri) !== false)
+						return $key+1;
+		
+					if(strpos($sString, $sUri) !== false)
+						return $key+1;
+		    	}
+    			break;
 
-		// szuka pozycje w google.pl
-		foreach($aResults as $iKey => $sRowUrl)
-		{
-			$sString = strip_tags($sRowUrl);
-			if(strpos($sString, $this->sUri) !== false)
-				$aReturn[$this->sUri] = $iKey+1;
-
-			if(strpos($sString, $sUri) !== false)
-				$aReturn[$sUri] = $iKey+1;
-		}
-
-		// zwroc najwieksza pozycje
-		arsort($aReturn);
-		return (int) array_shift( $aReturn );
+    		default:
+    		case self::TYPE_DEFAULT:
+    			// lapiemy linki
+				// TODO Dodać lapanie w wynikach pola z pdf etc.
+				$aResults = array();
+				preg_match_all('@<li class=g><h3 class="r"><a href="([^"]+)" class=l@i', $sData, $aResults );
+		
+				// lementy pod kluczem 1 zawieraja tylko linki do strony
+				$aResults = (array) @$aResults[1];
+				
+				if (count($aResults) == 0) {
+					return false;
+				}
+		
+				$aReturn = array($this->sUri => false, $sUri=>false);
+		
+				// szuka pozycje w google.pl
+				foreach($aResults as $iKey => $sRowUrl)
+				{
+					$sString = strip_tags($sRowUrl);
+					if(strpos($sString, $this->sUri) !== false)
+						$aReturn[$this->sUri] = $iKey+1;
+		
+					if(strpos($sString, $sUri) !== false)
+						$aReturn[$sUri] = $iKey+1;
+				}
+		
+				// zwroc najwieksza pozycje
+				arsort($aReturn);
+				return (int) array_shift( $aReturn );
+    			break;
+    	}
+    	
+    	return false;
 	}
 	
 	public function getData($sProxy = null)
