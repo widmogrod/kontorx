@@ -506,10 +506,19 @@ class KontorX_Service_Seonetpl
     	$client->setMethod(Zend_Http_Client::GET);
 
     	$request = $client->request();
+    	$body = $request->getBody();
+
+    	require_once 'Zend/Dom/Query.php';
+    	$query = new Zend_Dom_Query($body);
     	
-    	// TODO: doda sprawdzanie czy result zawiera zmienionˆ wartoæ max 
+    	$result = $query->queryXpath('//td[@id="max_'.$linkId.'"]//option[@selected]');
+    	if (!count($result)) {
+    		return false;
+    	}
     	
-    	return true;
+    	/* @var $element DOMElement */
+    	$element = $result->current();
+    	return (int) $element->nodeValue;
 
     	// http://seo.net.pl/?module=swl&action=set_links_max&link_id=5441603&max=400&set_id=91794&orderby=undefined
 		/*
@@ -539,10 +548,19 @@ class KontorX_Service_Seonetpl
     	$client->setMethod(Zend_Http_Client::GET);
 
     	$request = $client->request();
-    	
-    	// TODO: doda sprawdzanie czy result zawiera zmienionˆ wartoæ $perday
+    	$body = $request->getBody();
 
-    	return true;
+    	require_once 'Zend/Dom/Query.php';
+    	$query = new Zend_Dom_Query($body);
+    	
+    	$result = $query->queryXpath('//td[@id="perday_'.$linkId.'"]//option[@selected]');
+    	if (!count($result)) {
+    		return false;
+    	}
+    	
+    	/* @var $element DOMElement */
+    	$element = $result->current();
+    	return (int) $element->nodeValue;
     	
     	// http://seo.net.pl/?module=swl&action=set_links_perday&link_id=5441603&perday=11&set_id=91794&orderby=undefined
 		/*
@@ -572,10 +590,19 @@ class KontorX_Service_Seonetpl
     	$client->setMethod(Zend_Http_Client::GET);
 
     	$request = $client->request();
-    	
-    	// TODO: doda sprawdzanie czy result zawiera zmienionˆ wartoæ $priority
+    	$body = $request->getBody();
 
-    	return true;
+    	require_once 'Zend/Dom/Query.php';
+    	$query = new Zend_Dom_Query($body);
+    	
+    	$result = $query->queryXpath('//td[@id="priority_'.$linkId.'"]//option[@selected]');
+    	if (!count($result)) {
+    		return false;
+    	}
+
+    	/* @var $element DOMElement */
+    	$element = $result->current();
+    	return (int) $element->nodeValue;
     	
     	// http://seo.net.pl/?module=swl&action=set_link_priority&link_id=5441595&priority=6&set_id=91794&orderby=undefined
 		/*
