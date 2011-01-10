@@ -2,7 +2,8 @@
 //inicjowanie konfiguracji
 require_once 'bootstrap.php';
 
-function getBaseUrl() {
+function getBaseUrl() 
+{
     if (isset($_SERVER['SERVER_NAME'])) {
     	$host = $_SERVER['SERVER_NAME'];
     } elseif (isset($_SERVER['HTTP_HOST'])) {
@@ -27,9 +28,11 @@ function getBaseUrl() {
 
 class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 {
-	public function accept() {
+	public function accept() 
+	{
 		$filename = $this->current()->getFilename();
-		if ($this->current()->isDir()) {
+		if ($this->current()->isDir()) 
+		{
 			switch($filename) 
 			{
 				case '.svn':
@@ -81,9 +84,11 @@ $view = new Zend_View();
 $navigation = $view->getHelper('Navigation');
 $navigation->setContainer($container);
 ?>
-<html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="pl">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
 <title>KontorX - extensions library for Zend Framework -  examples</title>
 
 <link rel="stylesheet" href="resources/css/reset.css" type="text/css" />
@@ -91,6 +96,7 @@ $navigation->setContainer($container);
 <link rel="stylesheet" href="resources/css/text.css" type="text/css" />
 <link rel="stylesheet" href="resources/css/datagrid.css" type="text/css" />
 <link rel="stylesheet" href="resources/css/form.css" type="text/css" />
+
 
 <script type="text/javascript" src="resources/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript">
@@ -100,9 +106,15 @@ $(document).ready(function(){
 		e.preventDefault();
 
 		document.location.hash = this.href;
-		
-		$.get(this.href, function(data){
-			$('#content').html(data);
+
+		$.ajax({
+			url: this.href,
+			type:'get',
+			dataType:'script',
+			success: function(data)
+			{
+				$('#content').html(data);
+			}
 		});
 
 		$.get(this.href.replace('.php','_s.php'), function(data){
@@ -117,6 +129,17 @@ $(document).ready(function(){
 });
 //-->
 </script>
+
+<!-- ** CSS ** -->
+<!-- base library -->
+<link rel="stylesheet" type="text/css" href="resources/js/ext/resources/css/ext-all.css" />
+
+<!-- ** Javascript ** -->
+<!-- ExtJS library: base/adapter -->
+<script type="text/javascript" src="resources/js/ext/adapter/ext/ext-base.js"></script>
+<!-- ExtJS library: all widgets -->
+<script type="text/javascript" src="resources/js/ext/ext-all.js"></script>
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

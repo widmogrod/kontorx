@@ -7,8 +7,9 @@ require_once 'KontorX/Ext/Data/Store/Interface.php';
  *
  */
 class KontorX_Ext_Data_Store
-		extends KontorX_Ext_Abstract 
-		implements KontorX_Ext_Data_Store_Interface {
+	extends KontorX_Ext_Abstract 
+	implements KontorX_Ext_Data_Store_Interface 
+{
 
 	/**
 	 * @param Zend_Config|array $options

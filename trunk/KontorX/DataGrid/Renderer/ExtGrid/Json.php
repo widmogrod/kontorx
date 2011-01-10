@@ -1,23 +1,30 @@
 <?php
 require_once 'KontorX/DataGrid/Renderer/ExtGrid/Abstract.php';
 
+require_once 'KontorX/JavaScript/Expresion.php';
+
 /**
  * @author gabriel
  *
  */
-class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_ExtGrid_Abstract {
-
+class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_ExtGrid_Abstract 
+{
 	protected $_readerClass = 'KontorX_Ext_Data_Reader_Json';
 	
-	public function render($renderToId = null) {
-		$varStore 	  = 'kx_dataGrid_ExtStore_'.$renderToId;
+	public function render($renderToId = null) 
+	{
+		$renderToId = $this->getRenderToId();
+		
+		# przygotowanie nazw zmiennuch JS
+		$varExtStore  = 'kx_dataGrid_ExtStore_'.$renderToId;
 		$varGridPanel = 'kx_dataGrid_ExtGridPanel_'.$renderToId;
+		$varJsonData = 'kx_dataGrid_Data_'.$renderToId;
 
 		$grid = $this->getDataGrid();
 
 		// setup pagination
 		if ($grid->enabledPagination()) {
-			$this->_setupPegination($varStore);
+			$this->_setupPegination($varExtStore);
 		}
 		
 		list($columns, $fields) = $this->_getColumnsAndFields();
@@ -34,21 +41,19 @@ class KontorX_DataGrid_Renderer_ExtGrid_Json extends KontorX_DataGrid_Renderer_E
 				$reader->setId($this->getId());
 				$reader->setFields($fields);
 
-		$varStore = 'kx_dataGrid_ExtStore_'.$renderToId;
-		$js->addVar($varStore, $store);
+		$js->addVar($varExtStore, $store);
 		
 			$panel = $this->getGridPanel();
 			$panel->setColumns($columns);
-			$panel->setStore(new KontorX_JavaScript_Expresion($varStore));
+			$panel->setStore(new KontorX_JavaScript_Expresion($varExtStore));
 			$panel->setRenderId($renderToId);
 
-		$varGridPanel = 'kx_dataGrid_ExtGridPanel_'.$renderToId;
 		$js->addVar($varGridPanel, $panel);
 
 		if ($grid->enabledPagination()) {
-			$js->callMethod($varStore.'.load({params:{start: 0, limit: '.$grid->getItemCountPerPage().'}});');
+			$js->callMethod($varExtStore.'.load({params:{start: 0, limit: '.$grid->getItemCountPerPage().'}});');
 		} else {
-			$js->callMethod($varStore.'.load();');
+			$js->callMethod($varExtStore.'.load();');
 		}
 
 		return $js->toJavaScript();

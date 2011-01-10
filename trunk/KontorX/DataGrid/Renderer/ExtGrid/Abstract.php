@@ -171,6 +171,18 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 		}
 		return $this->_pagingToolbar;
 	}
+	
+	protected $_renderToId;
+	
+	public function setRenderToId($renderToId)
+	{
+		$this->_renderToId = $renderToId;
+	}
+	
+	public function getRenderToId()
+	{
+		return $this->_renderToId;
+	}
 
 	/**
 	 * @return array array($columns, $fileds)
