@@ -34,24 +34,24 @@ class KontorX_Util_GoogleTest extends UnitTestCase
 		$this->assertNotEqual(0, $position, "pozycja w google via xpath jest = 0, fail!");
 	}
 	
-	public function testGoogleResultTypeXpathTestKeyword() 
-	{
-		$link = 'fryzjerzy.krakow.pl';
-		$keyword = 'fryzjerzy krak—w';
-		
-		$google = new KontorX_Util_Google($link);
-		$google->setType(KontorX_Util_Google::TYPE_XPATH);
-		$positionA = $google->position($keyword, 200);
-		
-		$google->setType(KontorX_Util_Google::TYPE_DEFAULT);
-		$positionB = $google->position($keyword, 200);
-		
-		var_dump($positionA);
-		var_dump($positionB);
-		
-		$this->assertNotEqual(0, $positionA, "pozycja strony via xpath '".$link."' w google.pl pod s¸owem kluczowym '".$keyword."' jest nieprawid¸owa");
-		$this->assertNotEqual(0, $positionB, "pozycja strony via default '".$link."' w google.pl pod s¸owem kluczowym '".$keyword."' jest nieprawid¸owa");
-	}
+//	public function testGoogleResultTypeXpathTestKeyword() 
+//	{
+//		$link = 'fryzjerzy.krakow.pl';
+//		$keyword = 'fryzjerzy krak—w';
+//		
+//		$google = new KontorX_Util_Google($link);
+//		$google->setType(KontorX_Util_Google::TYPE_XPATH);
+//		$positionA = $google->position($keyword, 200);
+//		
+//		$google->setType(KontorX_Util_Google::TYPE_DEFAULT);
+//		$positionB = $google->position($keyword, 200);
+//		
+//		var_dump($positionA);
+//		var_dump($positionB);
+//		
+//		$this->assertNotEqual(0, $positionA, "pozycja strony via xpath '".$link."' w google.pl pod s¸owem kluczowym '".$keyword."' jest nieprawid¸owa");
+//		$this->assertNotEqual(0, $positionB, "pozycja strony via default '".$link."' w google.pl pod s¸owem kluczowym '".$keyword."' jest nieprawid¸owa");
+//	}
 }
 
 $test = new KontorX_Util_GoogleTest();
