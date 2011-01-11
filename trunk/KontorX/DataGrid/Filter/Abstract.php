@@ -134,7 +134,8 @@ abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filt
      * @return string
      */
     public function getClassName() {
-        return end(explode('_',get_class($this)));
+    	$className = explode('_',get_class($this));
+        return end($className);
     }
 
     /**
