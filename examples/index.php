@@ -55,7 +55,7 @@ class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 		
 		
 		$fileExtension = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
-		if ('php' !== $fileExtension)
+		if (!in_array($fileExtension, array('php','sql')))
 			return false;
 		
 		if (strstr($filename, '_s.php'))
