@@ -1,0 +1,52 @@
+actAs: [Timestampable]
+
+User:
+  connection: default
+  tableName: app_user
+  actAs: [Timestampable, SoftDelete]
+  columns:
+    user_id:
+      primary: true
+      autoincrement: true
+      type: integer(8)
+    username: string(50)
+    password: string(50)
+    email: string(50)
+  indexes:
+    app_user_email_password_index:
+      fields: [email, password]
+
+Group:
+  connection: default
+  tableName: app_groups
+  actAs: [Timestampable, SoftDelete]
+  columns:
+    group_id:
+      primary: true
+      autoincrement: true
+      type: integer(8)
+    name: string(255)
+
+UserGroup:
+  connection: default
+  tableName: app_user_group
+  columns:
+    fk_user_id:
+      type: integer(8)
+      primary: true
+    fk_group_id:
+      type: integer(8)
+      primary: true
+  indexes:
+    app_user_group_all_index:
+      fields: [fk_user_id, fk_group_id]
+      type: unique
+  relations:
+    User:
+      local: fk_user_id
+      foreign: user_id
+      type: one
+    Group:
+      local: fk_group_id
+      foreign: group_id
+      type: one
