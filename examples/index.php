@@ -41,7 +41,7 @@ class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 					return false;
 
 				default:
-					return true;
+				    return ('_' == $filename{0}) ? false : true;
 			}
 		} else {
 			switch ($filename)
@@ -55,7 +55,7 @@ class PhpRecursiveFilterIterator extends RecursiveFilterIterator
 		
 		
 		$fileExtension = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
-		if (!in_array($fileExtension, array('php','sql')))
+		if (!in_array($fileExtension, array('php', 'sql', 'ini')))
 			return false;
 		
 		if (strstr($filename, '_s.php'))
@@ -108,15 +108,15 @@ $(document).ready(function(){
 		document.location.hash = this.href;
 
 		$.ajax({
-			url: this.href,
-			type:'get',
-			dataType:'script',
-			success: function(data)
-			{
-				$('#content').html(data);
-			}
-		});
-
+            url: this.href,
+            type:'get',
+            dataType:'script',
+            success: function(data)
+            {
+                $('#content').html(data);
+            }
+        });
+		
 		$.get(this.href.replace('.php','_s.php'), function(data){
 			$('#source').html(data);
 		});
