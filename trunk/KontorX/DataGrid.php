@@ -26,9 +26,10 @@ class KontorX_DataGrid {
      * @param Zend_Config|array|null $options
      * @return KontorX_DataGrid
      */
-    public static function factory($data, $options = null) {
-        $instance = null;
-        if (($data instanceof Zend_Db_Table_Abstract)) {
+    public static function factory($data, $options = null) 
+    {
+        if (($data instanceof Zend_Db_Table_Abstract)) 
+        {
         	if (($data instanceof KontorX_Db_Table_Tree_Abstract)) {
         		require_once 'KontorX/DataGrid/Adapter/DbTable.php';
             	$adapter = new KontorX_DataGrid_Adapter_DbTableTree($data);
@@ -36,18 +37,24 @@ class KontorX_DataGrid {
         		require_once 'KontorX/DataGrid/Adapter/DbTable.php';
             	$adapter = new KontorX_DataGrid_Adapter_DbTable($data);
         	}
-        } else
-        if (($data instanceof Zend_Db_Select)) {
+        } 
+        elseif (($data instanceof Zend_Db_Select)) 
+        {
             require_once 'KontorX/DataGrid/Adapter/DbSelect.php';
             $adapter = new KontorX_DataGrid_Adapter_DbSelect($data);
-        }elseif (($data instanceof Doctrine_Query)) {
+        }
+        elseif (($data instanceof Doctrine_Query)) 
+        {
             require_once 'KontorX/DataGrid/Adapter/Doctrine.php';
             $adapter = new KontorX_DataGrid_Adapter_Doctrine($data);
-        }else
-        if (is_array($data)) {
+        }
+        elseif (is_array($data)) 
+        {
             require_once 'KontorX/DataGrid/Adapter/Array.php';
             $adapter = new KontorX_DataGrid_Adapter_Array($data);
-        } else {
+        }
+        else
+        {
             require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Data type is not suported");
         }
