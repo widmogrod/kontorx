@@ -153,8 +153,10 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 	/**
 	 * @return KontorX_Ext_PagingToolbar
 	 */
-	public function getPagingToolbar() {
-		if (null === $this->_pagingToolbar) {
+	public function getPagingToolbar() 
+	{
+		if (null === $this->_pagingToolbar) 
+		{
 			$grid = $this->getDataGrid();
 
 			require_once 'KontorX/Ext/PagingToolbar.php';
@@ -221,8 +223,10 @@ abstract class KontorX_DataGrid_Renderer_ExtGrid_Abstract
 	/**
 	 * @return void
 	 */
-	protected function _setupPegination($store) {
-		$gridPanel = $this->getGridPanel();
+	protected function _setupPegination($store) 
+	{
+		$gridPanel = $this->getGridPanel(); // Ext.grid.GridPanel
+		
 			$pagingToolbar = $this->getPagingToolbar();
 				require_once 'KontorX/JavaScript/Expresion.php';
 				$store = new KontorX_JavaScript_Expresion((string) $store);
