@@ -375,7 +375,7 @@ class KontorX_DataGrid {
     	if (($column instanceof KontorX_DataGrid_Column_Abstract)) {
     		$column = $column->getColumnName();
     	}
-
+    	
 		$this->_groupColumn = (string) $column;
     }
     
@@ -407,6 +407,8 @@ class KontorX_DataGrid {
     		return null !== $this->_groupColumn;
     	}
 
+    	
+    	
     	// zwraca true - jeżeli po tej kolumnie odbywa się grupowanie
     	return $column === $this->_groupColumn;
     }

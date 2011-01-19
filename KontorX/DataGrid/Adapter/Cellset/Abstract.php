@@ -1,6 +1,8 @@
 <?php
 require_once 'KontorX/DataGrid/Adapter/Cellset/Interface.php';
-abstract class KontorX_DataGrid_Adapter_Cellset_Abstract implements KontorX_DataGrid_Adapter_Cellset_Interface {
+
+abstract class KontorX_DataGrid_Adapter_Cellset_Abstract implements KontorX_DataGrid_Adapter_Cellset_Interface 
+{
 	/**
 	 * @var array of @see KontorX_DataGrid_Cell_Interface
 	 */

@@ -19,8 +19,8 @@ class KontorX_DataGrid_Filter_Order_Doctrine extends KontorX_DataGrid_Filter_Abs
         $column = $this->getColumnName();
 
         // Doctrine adapter is hydrated as HYDRATE_SCALAR so.. first '_' replaced to '.' will act as alias
-        $column = explode('_', $column);
-        $column = array_shift($column).'.'.implode('_', $column);
+        $columnForOrder = explode('_', $column);
+        $columnForOrder = array_shift($columnForOrder).'.'.implode('_', $columnForOrder);
 
         // set default order type
         $order = $this->getValue($this->getAttrib('order'));
@@ -28,14 +28,14 @@ class KontorX_DataGrid_Filter_Order_Doctrine extends KontorX_DataGrid_Filter_Abs
         if ($order == 'group') {
         	$this->getColumn()->getDataGrid()->setGroupColumn($column);
         }
-
+        
         if (null !== $order) {
             $order = ($order != 'asc') ? 'desc' : $order;
-            $query->addOrderBy(sprintf('%s %s', $column, $order));
+            $query->addOrderBy(sprintf('%s %s', $columnForOrder, $order));
         } else
         // grupowanie po tej koumnie - ustawia domyślne sortowanie
     	if ($this->getColumn()->isGroup()) {
-        	$query->addOrderBy(sprintf('%s %s', $column, 'desc'));
+        	$query->addOrderBy(sprintf('%s %s', $columnForOrder, 'desc'));
         }
     }
 
