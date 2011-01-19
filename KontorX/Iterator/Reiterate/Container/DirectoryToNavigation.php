@@ -79,6 +79,9 @@ class KontorX_Iterator_Reiterate_Container_DirectoryToNavigation
 			// droben "dziedziczenie" atrybutów
 			$instance->setBasePath($this->getBasePath());
 			$instance->setBaseUrl($this->getBaseUrl());
+			
+			$extension = pathinfo($data->getFilename(), PATHINFO_EXTENSION);
+			$instance->setClass($extension);
 		}
 		
 		return $instance;

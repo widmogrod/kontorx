@@ -9,10 +9,19 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
         {
         	require_once 'KontorX/DataGrid/Filter/Order/Db.php';
             $filter = new KontorX_DataGrid_Filter_Order_Db($this->getAttribs());
-        } elseif ($adapter instanceof KontorX_DataGrid_Adapter_Array) {
+        } 
+        elseif ($adapter instanceof KontorX_DataGrid_Adapter_Array) 
+        {
         	require_once 'KontorX/DataGrid/Filter/Order/Array.php';
         	$filter = new KontorX_DataGrid_Filter_Order_Array($this->getAttribs());
-        } else {
+        }
+        elseif ($adapter instanceof KontorX_DataGrid_Adapter_Doctrine)
+        {
+            require_once 'KontorX/DataGrid/Filter/Order/Doctrine.php';
+            $filter = new KontorX_DataGrid_Filter_Order_Doctrine($this->getAttribs());
+        } 
+        else 
+        {
         	require_once 'KontorX/DataGrid/Exception.php';
             throw new KontorX_DataGrid_Exception("Wrong filter adapter");
         }
