@@ -2,12 +2,12 @@
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
 /**
- * Zas—b inicjuje Doctrine ORM w wersji 1.2.
+ * Zasï¿½b inicjuje Doctrine ORM w wersji 1.2.
  * 
- * Przyk¸adowa konfiguracja pliku application.ini
+ * Przykï¿½adowa konfiguracja pliku application.ini
  * <code> 
  *  resources.doctrine.load_models = true
- *  ;# Jeýeli wy¸ˆczona opcja: "doctrine_path" to - biblioteka jest szukana w include_path
+ *  ;# Jeï¿½eli wyï¿½ï¿½czona opcja: "doctrine_path" to - biblioteka jest szukana w include_path
  *  ;resources.doctrine.setup.doctrine_path	= APPLICATION_PATH "/../library"
  *  resources.doctrine.setup.data_fixtures_path = APPLICATION_PATH "/resources/fixtures"
  *  resources.doctrine.setup.models_path = APPLICATION_PATH "/orm"
@@ -106,7 +106,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 	}
 
 	/**
-	 * Konfiguracja po¸ˆczeÄ z bazˆ danych.
+	 * Konfiguracja poï¿½ï¿½czeï¿½ z bazï¿½ danych.
 	 * @throws Zend_Application_Resource_Exception
 	 */
 	protected function _setupConnections()
@@ -166,7 +166,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 	}
 	
 	/**
-	 * Uruchom obs¸ug« linni polecieÄ dla Doctrine.
+	 * Uruchom obsï¿½ugï¿½ linni polecieï¿½ dla Doctrine.
 	 */
 	public function runCli()
 	{
