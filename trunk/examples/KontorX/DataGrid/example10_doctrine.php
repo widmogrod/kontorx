@@ -24,6 +24,7 @@ defined('APPLICATION_ENV')
 set_include_path(implode(PATH_SEPARATOR, array(
     '/usr/share/php/KontorX/trunk',
     '/usr/share/php/Zend/trunk',
+    '/usr/share/php/',
     get_include_path(),
 )));
 
