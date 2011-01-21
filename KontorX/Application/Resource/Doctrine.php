@@ -121,19 +121,19 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
         
         $manager = $this->getManager();
         
-        foreach ($attributes as $options) 
+        foreach ($attributes as $attribute) 
         {
-            if (!array_key_exists('name', $options)
-                && !array_key_exists('value', $options))
+            if (!array_key_exists('name', $attribute)
+                && !array_key_exists('value', $attribute))
             {
-                $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set!';
+                $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set';
                 throw new Zend_Application_Resource_Exception($message);
             }
 
-            $attribute = $options['name'];
-            $value     = $options['value'];
+            $name = $options['name'];
+            $value = $options['value'];
             
-            $manager->setAttribute($attribute, $value);
+            $manager->setAttribute($name, $value);
         }
 	}
 
