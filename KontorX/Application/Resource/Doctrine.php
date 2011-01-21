@@ -124,8 +124,8 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
         foreach ($attributes as $attribute) 
         {
             if (!is_array($attribute)
-                || (!array_key_exists('name', $attribute)
-                    && !array_key_exists('value', $attribute)))
+                && !array_key_exists('name', $attribute)
+                && !array_key_exists('value', $attribute))
             {
                 $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set';
                 throw new Zend_Application_Resource_Exception($message);
