@@ -120,7 +120,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
         }
         
         $manager = $this->getManager();
-        
+
         foreach ($attributes as $attribute) 
         {
             if (!is_array($attribute)
@@ -130,10 +130,10 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
                 $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set';
                 throw new Zend_Application_Resource_Exception($message);
             }
-
-            $name = $attribute['name'];
-            $value = $attribute['value'];
             
+            $name = constant($attribute['name']);
+            $value = constant($attribute['value']);
+
             $manager->setAttribute($name, $value);
         }
 	}
