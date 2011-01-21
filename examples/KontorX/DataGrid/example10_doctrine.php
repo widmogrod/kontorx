@@ -53,10 +53,14 @@ $application->bootstrap('FrontController');
 $front = $application->getBootstrap()->getPluginResource('FrontController')->getFrontController();
 $front->setBaseUrl($_SERVER['SCRIPT_NAME']);
 
-$application->bootstrap('Router');
+$rq = new Zend_Controller_Request_Http();
+$rq->setBaseUrl($_SERVER['SCRIPT_NAME']);
+$front->setRequest($rq);
+
 /* @var $router Zend_Controller_Router_Rewrite */
-$router = $application->getBootstrap()->getPluginResource('Router')->getRouter();
+$router = $front->getRouter();
 $router->addDefaultRoutes();
+$router->route($rq);
 
 # dodawanie rekordów
 //$collection = Doctrine_Collection::create('User');
@@ -135,9 +139,13 @@ $options = array('columns' => array(
     )
 ));
 
+$page = $rq->getParam('page');
+$itemCountPerPage = $rq->getParam('perpage', 3);
+
 # Magia KontorX_DataGrid
 
 $grid = KontorX_DataGrid::factory($query, $options);
+$grid->setPagination($page, $itemCountPerPage);
 
 /**
  * Przekazuje do DataGrid tablicę,

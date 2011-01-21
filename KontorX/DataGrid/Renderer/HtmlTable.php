@@ -8,7 +8,8 @@ class KontorX_DataGrid_Renderer_HtmlTable extends KontorX_DataGrid_Renderer_Abst
 {
 	const STYLE_DEFAULT = 'defaultDataGrid.phtml';
 
-	public function render($partial = null, $module = null) {
+	public function render($partial = null, $module = null) 
+	{
 		$grid = $this->getDataGrid();
 
 		// Setup default ViewRender
