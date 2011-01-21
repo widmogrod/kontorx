@@ -16,10 +16,10 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  *  resources.doctrine.setup.yaml_schema_path = APPLICATION_PATH "/resources/schema"
  *  
  *  resources.doctrine.attribute.0.name = Doctrine_Core::ATTR_VALIDATE
- *  resources.doctrine.attribute.0.key = Doctrine_Core::VALIDATE_ALL
- *  
+ *  resources.doctrine.attribute.0.value = Doctrine_Core::VALIDATE_ALL
+ *     
  *  resources.doctrine.attribute.1.name = Doctrine_Core::ATTR_MODEL_LOADING
- *  resources.doctrine.attribute.1.key = Doctrine_Core::MODEL_LOADING_CONSERVATIVE
+ *  resources.doctrine.attribute.1.value = Doctrine_Core::MODEL_LOADING_CONSERVATIVE
  * </code>
  * 
  * @author $Author$
@@ -42,6 +42,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 		spl_autoload_register(array('Doctrine', 'modelsAutoload'));
 		spl_autoload_register(array('Doctrine', 'extensionsAutoload'));
 		
+		$this->_setupAttributes();
 		$this->_setupConnections();
 
 		$options = $this->getOptions();
@@ -102,7 +103,38 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 			require_once rtrim($setup['doctrine_path'],'\\/') . '/Doctrine.php';
 		} else {
 			require_once 'Doctrine.php';
-		}	
+		}
+	}
+	
+	/**
+	 * Ustawienie atrybutów 
+	 */
+	protected function _setupAttributes()
+	{
+	    $options = $this->getOptions();
+	    $attributes = (array) @$options['attribute'];
+        
+        if (!count($attributes))
+        {
+            return;
+        }
+        
+        $manager = $this->getManager();
+        
+        foreach ($attributes as $options) 
+        {
+            if (!array_key_exists('name', $options)
+                && !array_key_exists('value', $options))
+            {
+                $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set!';
+                throw new Zend_Application_Resource_Exception($message);
+            }
+
+            $attributes = $options['name'];
+            $value = $options['value'];
+            
+            $manager->setAttribute($attribute, $value);
+        }
 	}
 
 	/**
