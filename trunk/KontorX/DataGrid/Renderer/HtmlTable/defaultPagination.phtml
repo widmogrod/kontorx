@@ -1,26 +1,26 @@
-<?php if ($this->pageCount): ?> 
-<div class="paginationControl">
+<?php if (!$this->pageCount) return; ?>
+ 
+<div class="kx_pagination">
 <!-- Previous page link --> 
 <?php if (isset($this->previous)): ?> 
- <a href="<?= $this->url(array('page' => $this->previous)) . "?$this->valuesQuery&page=$this->previous"; ?>">&lt; Poprzedni</a>  
+    <a href="<?php echo $this->url(array('page' => $this->previous)) . $this->valuesQuery; ?>">&laquo;</a>  
 <?php else: ?> 
-  <span class="disabled">&lt; Poprzedni</span> 
+    <span class="disabled">&laquo;</span> 
 <?php endif; ?> 
 
 <!-- Numbered page links -->
 <?php foreach ($this->pagesInRange as $page): ?> 
-  <?php if ($page != $this->current): ?>
-    <a href="<?= $this->url(array('page' => $page)) . "?$this->valuesQuery&page=$page"; ?>"><?= $page; ?></a> 
-  <?php else: ?>
-    <span class="selected"><?= $page; ?></span>
-  <?php endif; ?>
+    <?php if ($page != $this->current): ?>
+        <a href="<?php echo $this->url(array('page' => $page)) . $this->valuesQuery; ?>"><?php echo $page; ?></a> 
+    <?php else: ?>
+        <span class="selected"><?php echo $page; ?></span>
+    <?php endif; ?>
 <?php endforeach; ?>
 
 <!-- Next page link --> 
 <?php if (isset($this->next)): ?> 
-  <a href="<?= $this->url(array('page' => $this->next)) . "?$this->valuesQuery&page=$this->next"; ?>">Następny &gt;</a>
+    <a href="<?php echo $this->url(array('page' => $this->next)) . $this->valuesQuery; ?>">&raquo;</a>
 <?php else: ?> 
-  <span class="disabled">Następny &gt;</span>
+    <span class="disabled">&raquo;</span>
 <?php endif; ?>
 </div>
-<?php endif; ?>

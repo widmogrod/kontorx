@@ -46,14 +46,9 @@ class KontorX_DataGrid_Adapter_Doctrine extends KontorX_DataGrid_Adapter_Abstrac
         if ($this->_dataGrid->enabledPagination()) 
         {
             list($pageNumber, $itemCountPerPage) = $this->_dataGrid->getPagination();
-            
-            $page = $this->_dataGrid->getPageNumber();
-            
-            $count  = (int) $rowCount;
-            $offset = (int) $rowCount * ($page - 1);
 
-            $query->limit($count);
-            $query->offset($offset);
+            $query->limit($itemCountPerPage);
+            $query->offset($pageNumber);
         }
 
         $data = $query->execute(array(), Doctrine::HYDRATE_SCALAR);

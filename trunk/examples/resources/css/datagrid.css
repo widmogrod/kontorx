@@ -23,10 +23,10 @@
 */
 .kx_datagrid .kx_column,
 .kx_datagrid .kx_filters td,
-.kx_datagrid .kx_pagination td {border: 0;}
+.kx_datagrid tr.kx_pagination td {border: 0;}
 
 .kx_datagrid .kx_columns,
-.kx_datagrid .kx_pagination {
+.kx_datagrid tr.kx_pagination {
 	height: 30px;
 }
 
@@ -111,9 +111,37 @@
 			margin-right: 5px;
 		}
 
-.kx_datagrid .kx_pagination {
+/*
+    stronicowanie
+*/
+
+.kx_datagrid tr.kx_pagination td {
 	background: #636077 url("datagrid/bg-kx_pagination.jpg") 0 0 repeat-x;
 }
+
+.kx_datagrid tr.kx_pagination td {
+    text-align: center;
+    padding-top:8px;
+}
+    .kx_datagrid .kx_pagination span,
+    .kx_datagrid .kx_pagination a {
+        color:#fff; 
+        text-decoration:none;
+        padding: 2px 3px;
+    }
+    
+    .kx_datagrid .kx_pagination .disabled {
+        cursor: pointer;
+    }
+    .kx_datagrid .kx_pagination .selected {
+        background-color: #fff;
+        color: #000;
+    }
+    
+    .kx_datagrid .kx_pagination span {}
+    .kx_datagrid .kx_pagination a:hover {
+        background-color: #ccc
+    }
 
 /*
 	Wiersze
@@ -177,7 +205,7 @@
 	margin-right: 10px;
 }
 
-.kontorc_datagrid_filter_grouplink > a {
+.kontorx_datagrid_filter_grouplink > a {
 	display:inline-block;
 
 	margin: 3px;
@@ -200,8 +228,8 @@
 	-khtml-border-radius: 3px;
 	-moz-border-radius: 3px;
 }
-.kontorc_datagrid_filter_grouplink > a:hover,
-.kontorc_datagrid_filter_grouplink.selected > a {
+.kontorx_datagrid_filter_grouplink > a:hover,
+.kontorx_datagrid_filter_grouplink.selected > a {
 	padding: 7px;
 	border-color:#333;
 	background-color: #fff;
@@ -215,6 +243,6 @@
 	-webkit-box-shadow: 0 0 5px 1px #333;
 }
 
-.kontorc_datagrid_filter_grouplink > a:hover {
+.kontorx_datagrid_filter_grouplink > a:hover {
 	background-color: #d2d2d2;
 }

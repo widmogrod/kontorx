@@ -707,13 +707,15 @@ class KontorX_DataGrid {
             $columns = $this->getColumns();
 			$filters = $this->getFilters();
         	$adapter = $this->getAdapter();
+        	
+        	$httpQuery = urldecode(http_build_query($this->getValues()->toArray()));
 
             $this->_vars = array(
                 'columns' => $columns,
                 'filters' => $filters,
                 'rowset'  => $adapter,
                 'paginator' => ($this->enabledPagination() ? $this->_createPaginator() : null),
-                'valuesQuery' => urldecode(http_build_query($this->getValues()->toArray()))
+                'valuesQuery' => empty($httpQuery) ? '' : $httpQuery
             );
         }
         return $this->_vars;
@@ -765,7 +767,7 @@ class KontorX_DataGrid {
      * @return KontorX_DataGrid
      */
     public function setPagination($pageNumber, $itemCountPerPage) {
-        $this->_pagination = array($pageNumber, $itemCountPerPage);
+        $this->_pagination = array((int) $pageNumber, (int) $itemCountPerPage);
         return $this;
     }
     
@@ -826,17 +828,27 @@ class KontorX_DataGrid {
      * Return @see Zend_Paginator
      * @return Zend_Paginator
      */
-    public function getPaginator() {
-        if (null === $this->_paginator) {
+    public function getPaginator() 
+    {
+        if (null === $this->_paginator) 
+        {
 			require_once 'Zend/Paginator.php';
 
             $adapter = Zend_Paginator::INTERNAL_ADAPTER;
             $adaptable = $this->getAdapter()->getAdaptable();
-            if ($adaptable instanceof Zend_Db_Table_Abstract) {
-            	// hack, for Zend_Db_Table_Abstract pagination
-            	Zend_Paginator::addAdapterPrefixPath('KontorX_Paginator_Adapter','KontorX/Paginator/Adapter/');
-            	$adapter = 'DbTable';
+            if ($adaptable instanceof Zend_Db_Table_Abstract) 
+            {
+                // hack, for Zend_Db_Table_Abstract pagination
+                Zend_Paginator::addAdapterPrefixPath('KontorX_Paginator_Adapter','KontorX/Paginator/Adapter/');
+                $adapter = 'DbTable';
             }
+            elseif ($adaptable instanceof Doctrine_Query) 
+            {
+                // hack, for Zend_Db_Table_Abstract pagination
+                Zend_Paginator::addAdapterPrefixPath('KontorX_Paginator_Adapter','KontorX/Paginator/Adapter/');
+                $adapter = 'Doctrine';
+            }
+            
             $this->_paginator = Zend_Paginator::factory($adaptable, $adapter);
         }
         return $this->_paginator;
@@ -846,7 +858,8 @@ class KontorX_DataGrid {
      * Create @see Zend_Paginator object instance
      * @return Zend_Paginator
      */
-    private function _createPaginator() {
+    private function _createPaginator() 
+    {
         $paginator = $this->getPaginator();
 
         list($pageNumber, $itemCountPerPage) = $this->getPagination();
