@@ -130,8 +130,8 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
                 throw new Zend_Application_Resource_Exception($message);
             }
 
-            $attributes = $options['name'];
-            $value = $options['value'];
+            $attribute = $options['name'];
+            $value     = $options['value'];
             
             $manager->setAttribute($attribute, $value);
         }
