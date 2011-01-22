@@ -715,7 +715,7 @@ class KontorX_DataGrid {
                 'filters' => $filters,
                 'rowset'  => $adapter,
                 'paginator' => ($this->enabledPagination() ? $this->_createPaginator() : null),
-                'valuesQuery' => empty($httpQuery) ? '' : $httpQuery
+                'valuesQuery' => empty($httpQuery) ? '' : '?' . $httpQuery
             );
         }
         return $this->_vars;
