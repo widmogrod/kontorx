@@ -1,14 +1,43 @@
 <?php
 require_once 'KontorX/DataGrid/Filter/Interface.php';
-abstract class KontorX_DataGrid_Filter_Abstract implements KontorX_DataGrid_Filter_Interface {
+
+abstract class KontorX_DataGrid_Filter_Abstract 
+    implements KontorX_DataGrid_Filter_Interface 
+{
 
     /**
      * @param array $options
      */
-    public function __construct(array $options = null) {
+    public function __construct(array $options = null) 
+    {
         if (null != $options) {
             $this->setOptions($options);
         }
+    }
+    
+    /**
+     * @var boolean
+     */
+    protected $_isRenderable = true;
+    
+    /**
+     * It's going to be rendered?
+     * @return boolean
+     */
+    public function isRenderable()
+    {
+        return $this->_isRenderable;
+    }
+
+    /**
+     * Set falg if it's going to be renderable
+     * @param boolean $flag
+     * @return KontorX_DataGrid_Filter_Abstract
+     */
+    public function setIsRenderable($flag = true)
+    {
+        $this->_isRenderable = (bool) $flag;
+        return $this;
     }
 
     /**

@@ -1,8 +1,10 @@
 <?php
 require_once 'KontorX/DataGrid/Filter/Abstract.php';
-class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
 
-    public function filter(KontorX_DataGrid_Adapter_Interface $adapter) {
+class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract 
+{
+    public function filter(KontorX_DataGrid_Adapter_Interface $adapter) 
+    {
         if ($adapter instanceof KontorX_DataGrid_Adapter_DbTable
         		|| $adapter instanceof KontorX_DataGrid_Adapter_DbTableTree
         		|| $adapter instanceof KontorX_DataGrid_Adapter_DbSelect)
@@ -37,8 +39,14 @@ class KontorX_DataGrid_Filter_Order extends KontorX_DataGrid_Filter_Abstract {
         // filtruj
         $filter->filter($adapter);
     }
+    
+    public function isRenderable()
+    {
+        return false;
+    }
 
-    public function render() {
+    public function render() 
+    {
     	// filter nic nie renderuje
         return '';
     }

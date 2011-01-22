@@ -48,6 +48,12 @@ interface KontorX_DataGrid_Column_Interface {
      * @return KontorX_DataGrid_Filter_Interface
      */
     public function getFilters();
+    
+    /**
+     * Return array of renderabre filter objects @see KontorX_DataGrid_Filter_Interface
+     * @return array
+     */
+    public function getRenderableFilters();
 
     /**
      * @param KontorX_DataGrid_Cell_Interface $filter

@@ -17,7 +17,7 @@
 					 * jeżeli nie ma blok z filtrami nie będzie wyświetlany
 					 */
 					if (false === $isSetFilterFilter) {
-						$isSetFilterFilter = (bool) count($column->getFilters());
+						$isSetFilterFilter = (bool) count($column->getRenderableFilters());
 					}
 			?>
 				<?php if (!$column->isGroup()):?>
@@ -32,7 +32,7 @@
 		<tr class="kx_filters">
 			<?php
 				foreach ($this->columns as $i => $column):
-					$filters = $column->getFilters();
+					$filters = $column->getRenderableFilters();
 
 			?>
 
