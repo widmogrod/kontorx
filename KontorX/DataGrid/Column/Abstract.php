@@ -1,6 +1,9 @@
 <?php
 require_once 'KontorX/DataGrid/Column/Interface.php';
-abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Column_Interface {
+
+abstract class KontorX_DataGrid_Column_Abstract 
+    implements KontorX_DataGrid_Column_Interface 
+{
 
     /**
      * @param string $columnName;
@@ -47,26 +50,47 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     protected function _init() {}
 
     /**
-     * @var arary
+     * @var array
      */
     private $_filters = array();
+    
+    /**
+     * @var array
+     */
+    protected $_renderableFilters = array();
 
     /**
      * Add filter instance @see KontorX_DataGrid_Filter_Interface
      * @param KontorX_DataGrid_Filter_Interface $filter
      */
-    public function addFilter(KontorX_DataGrid_Filter_Interface $filter) {
+    public function addFilter(KontorX_DataGrid_Filter_Interface $filter) 
+    {
     	$filter->setColumn($this);
     	$filter->setColumnName($this->getColumnName());
         $this->_filters[] = $filter;
+
+        if ($filter->isRenderable()) {
+            $this->_renderableFilters[] = $filter;
+        }
     }
 
     /**
      * Return array of filter objects @see KontorX_DataGrid_Filter_Interface
      * @return array
      */
-    public function getFilters() {
+    public function getFilters() 
+    {
         return $this->_filters;
+    }
+    
+    
+    /**
+     * Return array of renderabre filter objects @see KontorX_DataGrid_Filter_Interface
+     * @return array
+     */
+    public function getRenderableFilters()
+    {
+        return $this->_renderableFilters;
     }
 
     /**
@@ -77,7 +101,8 @@ abstract class KontorX_DataGrid_Column_Abstract implements KontorX_DataGrid_Colu
     /**
      * @param KontorX_DataGrid_Cell_Interface $cell
      */
-    public function setCell(KontorX_DataGrid_Cell_Interface $cell) {
+    public function setCell(KontorX_DataGrid_Cell_Interface $cell) 
+    {
     	$cell->setColumn($this);
     	$cell->setColumnName($this->getColumnName());
         $this->_cell = $cell;

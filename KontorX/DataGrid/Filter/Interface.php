@@ -1,11 +1,18 @@
 <?php
-interface KontorX_DataGrid_Filter_Interface {
+interface KontorX_DataGrid_Filter_Interface 
+{
     /**
      * Setup adapter filtering
      * @param KontorX_DataGrid_Adapter_Interface $adapter
      */
     public function filter(KontorX_DataGrid_Adapter_Interface $adapter);
 
+    /**
+     * It's going to be rendered?
+     * @return boolean
+     */
+    public function isRenderable();
+    
     /**
      * Return a context as a html/text string
      * @return string
