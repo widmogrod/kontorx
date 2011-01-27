@@ -306,20 +306,26 @@ class KontorX_DataGrid {
      * @param string $type
      * @return void
      */
-    public function setRequestValues($type = null) {
+    public function setRequestValues($type = null) 
+    {
         $type = strtoupper($type);
-        switch ($type) {
+        switch ($type) 
+        {
             default:
             case 'GET':
                 $values = $_GET;
             case 'POST':
                 $values = $_POST;
+            case 'ALL':
+                $values = (array) $_GET + (array) $_POST;
                 break;
         }
 
         /**
          * @todo Filtrowanie parametrów XSS itp.
          */
+        $filter = new KontorX_Filter_MagicQuotes();
+        $values = $filter->filter($values);
 
         if (isset($values['filter'])) {
             $this->setValues((array) $values['filter']);
@@ -334,7 +340,8 @@ class KontorX_DataGrid {
      * 
      * @return Zend_Config
      */
-    public function getValues() {
+    public function getValues() 
+    {
         if (null === $this->_values) {
             $this->_values = new Zend_Config(array(), true);
         }
@@ -346,13 +353,16 @@ class KontorX_DataGrid {
      * 
      * @return void
      */
-    private function _initValues() {
+    private function _initValues() 
+    {
         $values = $this->getValues();
-		foreach ($this->getColumns() as $column) {
+		foreach ($this->getColumns() as $column) 
+		{
 			/* @var $column KontorX_DataGrid_Column_Interface */
 			$column->setValues($values);
 
-			foreach ($column->getFilters() as $filter) {
+			foreach ($column->getFilters() as $filter) 
+			{
 				/* @var $filter KontorX_DataGrid_Filter_Interface */
 				$filter->setValues($values);
 			}
@@ -697,8 +707,10 @@ class KontorX_DataGrid {
      * Return array of vars neaded to render html table
      * @return array
      */
-    public function getVars() {
-        if (null === $this->_vars) {
+    public function getVars() 
+    {
+        if (null === $this->_vars) 
+        {
             $this->_initValues();
             $this->_initFilters();
 
@@ -707,7 +719,7 @@ class KontorX_DataGrid {
             $columns = $this->getColumns();
 			$filters = $this->getFilters();
         	$adapter = $this->getAdapter();
-        	
+
         	$httpQuery = urldecode(http_build_query($this->getValues()->toArray()));
 
             $this->_vars = array(
