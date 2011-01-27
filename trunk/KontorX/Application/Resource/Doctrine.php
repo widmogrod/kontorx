@@ -124,10 +124,22 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
         foreach ($attributes as $attribute) 
         {
             if (!is_array($attribute)
-                && !array_key_exists('name', $attribute)
-                && !array_key_exists('value', $attribute))
+                || !array_key_exists('name', $attribute)
+                || !array_key_exists('value', $attribute))
             {
                 $message = '"KontorX_Application_Resource_Doctrine" has no valid attribute name-value set';
+                throw new Zend_Application_Resource_Exception($message);
+            }
+            
+            if (!defined($attribute['name'])) 
+            {
+                $message = 'constant do not exists "'.$attribute['name'].'"';
+                throw new Zend_Application_Resource_Exception($message);
+            }
+            
+            if (!defined($attribute['value'])) 
+            {
+                $message = 'constant do not exists "'.$attribute['name'].'"';
                 throw new Zend_Application_Resource_Exception($message);
             }
             
@@ -139,7 +151,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 	}
 
 	/**
-	 * Konfiguracja po��cze� z baz� danych.
+	 * Konfiguracja połączenia z bazą danych.
 	 * @throws Zend_Application_Resource_Exception
 	 */
 	protected function _setupConnections()
