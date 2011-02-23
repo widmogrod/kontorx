@@ -13,9 +13,9 @@ class KontorX_Ftp_FtpTest extends UnitTestCase
 	 * @var array
 	 */
 	protected $_options = array(
-		'server'   => 'ftp.example.com',
-		'username' => 'root',
-		'password' => '********'
+		'server'   => 'widmogrod.info',
+		'username' => 'widmogrod',
+		'password' => 'for6ba!'
 	);
 	
 	public function setUp() 
@@ -111,6 +111,28 @@ class KontorX_Ftp_FtpTest extends UnitTestCase
 		$this->assertTrue($result, 'Wystąpił błąd w trakcie pobierania pliku z serwera');
 	}
 	
+    public function testRenameAFile()
+    {
+        $ftp = KontorX_Ftp::factory('ftp', $this->_options);
+
+        $currentFilename = 'httpdocs/remoteTestPutFile.txt';
+        $newFilename = $currentFilename.'.bak';
+        
+        $result = $ftp->rename($currentFilename, $newFilename);
+        $this->assertTrue($result, 'Wystąpił błąd w trakcie zmiany nazwy pliku na serwera');
+    }
+    
+    public function testRenameBFile()
+    {
+        $ftp = KontorX_Ftp::factory('ftp', $this->_options);
+
+        $currentFilename = 'httpdocs/remoteTestPutFile.txt.bak';
+        $newFilename = 'httpdocs/remoteTestPutFile.txt';
+
+        $result = $ftp->rename($currentFilename, $newFilename);
+        $this->assertTrue($result, 'Wystąpił błąd w trakcie zmiany nazwy pliku na serwera');
+    }
+	
 	public function testEqualPutAndGetFile()
 	{
 		$putLocalFile = 'testPutFile.txt';
@@ -121,14 +143,14 @@ class KontorX_Ftp_FtpTest extends UnitTestCase
 		unlink($getLocalFile);
 	}
 	
-	public function testDeleteFile()
-	{
-		$ftp = KontorX_Ftp::factory('ftp', $this->_options);
+    public function testDeleteFile()
+    {
+        $ftp = KontorX_Ftp::factory('ftp', $this->_options);
 
-		$path = 'httpdocs/remoteTestPutFile.txt';
-		$result = $ftp->delete($path);
-		$this->assertTrue($result, 'Wystąpił błąd w trakcie usuwania pliku na serwera');
-	}
+        $path = 'httpdocs/remoteTestPutFile.txt';
+        $result = $ftp->delete($path);
+        $this->assertTrue($result, 'Wystąpił błąd w trakcie usuwania pliku na serwera');
+    }
 	
 	public function testListRawParse()
 	{

@@ -204,4 +204,16 @@ class KontorX_Ftp
 		$path = $this->_preperePath($path);
 		return $this->_adapter->delete($path);
 	}
+	
+	/**
+     * Reneme file on the server
+     * @param string $currentFile
+     * @param string $newFile
+     */
+	public function rename($currentFile, $newFile)
+	{
+	    $currentFile = $this->_preperePath($currentFile);
+	    $newFile = $this->_preperePath($newFile);
+        return $this->_adapter->rename($currentFile, $newFile);
+	}
 }
