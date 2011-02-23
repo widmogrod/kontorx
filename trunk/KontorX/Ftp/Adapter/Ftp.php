@@ -123,4 +123,16 @@ class KontorX_Ftp_Adapter_Ftp extends KontorX_Ftp_Adapter_Abstract
 		$this->connect();
 		return ftp_delete($this->_connection, $path);
 	}
+	
+	/**
+     * Reneme file on the server
+     * @param string $currentFilename
+     * @param string $newFilename
+     * @return bool
+     */
+	public function rename($currentFile, $newFile)
+	{
+	    $this->connect();
+        return ftp_rename($this->_connection, $currentFile, $newFile);
+	}
 }

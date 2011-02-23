@@ -59,4 +59,11 @@ interface KontorX_Ftp_Adapter_Interface
 	 * @return bool
 	 */
 	public function delete($path);
+	
+	/**
+	 * Reneme file on the server
+	 * @param string $currentFile
+	 * @param string $newFile
+	 */
+	public function rename($currentFile, $newFile);
 }
