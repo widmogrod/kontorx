@@ -86,7 +86,10 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 
 		if (!defined('DATA_FIXTURES_PATH') && isset($setup['data_fixtures_path']))
 			define('DATA_FIXTURES_PATH', $setup['data_fixtures_path']);
-			
+
+		if (!defined('MODELS_GENERATED_PATH') && isset($setup['models_generated_path']))
+            define('MODELS_GENERATED_PATH', $setup['models_generated_path']);
+
 		if (!defined('MODELS_PATH') && isset($setup['models_path']))
 			define('MODELS_PATH', $setup['models_path']);
 			
@@ -196,6 +199,7 @@ class KontorX_Application_Resource_Doctrine extends Zend_Application_Resource_Re
 			
 			$config = array(
 			    'data_fixtures_path'  =>  DATA_FIXTURES_PATH,
+			    'models_generated_path'         =>  MODELS_GENERATED_PATH,
 			    'models_path'         =>  MODELS_PATH,
 			    'migrations_path'     =>  MIGRATIONS_PATH,
 			    'sql_path'            =>  SQL_PATH,
