@@ -82,4 +82,18 @@ class KontorX_Gdata_Analytics_DataFeed extends Zend_Gdata_Feed
 //        $this->_timezone = $value;
 //        return $this;
 //    }
+
+    public function toArray()
+    {
+        $result = array();
+        
+        $this->rewind();
+        while ($this->valid()) 
+        {
+            $result[] = $this->current()->toArray();
+            $this->next();
+        }
+        
+        return $result;
+    }
 }
