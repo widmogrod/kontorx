@@ -10,15 +10,15 @@ class KontorX_Gdata_Analytics_DataEntry extends Zend_Gdata_Kind_EventEntry
 
     /**
      * one element for each metric in the query 
-     * @var KontorX_Gdata_Analytics_Extension_Metric
+     * @var array od @see KontorX_Gdata_Analytics_Extension_Metric
      */
-    protected $_metric;
+    protected $_metrics = array();
     
     /**
      * one element for each metric in the query 
-     * @var KontorX_Gdata_Analytics_Extension_Property
+     * @var array of @see KontorX_Gdata_Analytics_Extension_Dimension
      */
-    protected $_dimension;
+    protected $_dimensions = array();
     
     
     public function __construct($element = null)
@@ -54,18 +54,17 @@ class KontorX_Gdata_Analytics_DataEntry extends Zend_Gdata_Kind_EventEntry
         switch ($absoluteNodeName) 
         {
             case $this->lookupNamespace('analytics') . ':' . 'metric';
-                $property = new KontorX_Gdata_Analytics_Extension_Metric();
-                $property->transferFromDOM($child);
+                $metric = new KontorX_Gdata_Analytics_Extension_Metric();
+                $metric->transferFromDOM($child);
                 
-                $this->__set('metric', $property);
+                $this->setMetric($metric);
                 break;
                 
             case $this->lookupNamespace('analytics') . ':' . 'dimension';
-                $property = new KontorX_Gdata_Analytics_Extension_Property();
-                $property->transferFromDOM($child);
+                $dimension = new KontorX_Gdata_Analytics_Extension_Dimension();
+                $dimension->transferFromDOM($child);
                 
-                $name = $property->getName();
-                $this->__set('dimension', $property);
+                $this->setDimension($dimension);
                 break;
                 
             default:
@@ -76,20 +75,73 @@ class KontorX_Gdata_Analytics_DataEntry extends Zend_Gdata_Kind_EventEntry
 
     
     /**
-     * Enter description here ...
-     * @return KontorX_Gdata_Analytics_Extension_Metric
+     * @param KontorX_Gdata_Analytics_Extension_Metric $metric
      */
-    public function getMetric()
+    public function setMetric(KontorX_Gdata_Analytics_Extension_Metric $metric)
     {
-        return $this->_metric;
+        $this->_metrics[$metric->getName()] = $metric;
+    }
+    
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return Ambigous <KontorX_Gdata_Analytics_Extension_Metric, mixed>
+     */
+    public function getMetric($name, $default = null)
+    {
+        return isset($this->_metrics[$name]) ? $this->_metrics[$name] : $default;
     }
     
     /**
      * Enter description here ...
-     * @return KontorX_Gdata_Analytics_Extension_Property
+     * @return array of @see KontorX_Gdata_Analytics_Extension_Metric
      */
-    public function getDimension()
+    public function getMetrics()
     {
-        return $this->_dimension;
+        return $this->_metrics;
+    }
+    
+	/**
+     * @param KontorX_Gdata_Analytics_Extension_Dimension $dimension
+     */
+    public function setDimension(KontorX_Gdata_Analytics_Extension_Dimension $dimension)
+    {
+        $this->_dimensions[$dimension->getName()] = $dimension;
+    }
+    
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return Ambigous <KontorX_Gdata_Analytics_Extension_Dimension, mixed>
+     */
+    public function getDimension($name, $default = null)
+    {
+        return isset($this->_dimensions[$name]) ? $this->_dimensions[$name] : $default;
+    }
+    
+    /**
+     * Enter description here ...
+     * @return array of @see KontorX_Gdata_Analytics_Extension_Dimension
+     */
+    public function getDimensions()
+    {
+        return $this->_dimensions;
+    }
+    
+    public function toArray()
+    {
+        $result = array();
+        
+        foreach ($this->_dimensions as $name => /* @var $dimension KontorX_Gdata_Analytics_Extension_Dimension */ $dimension)
+        {
+            $result[$name] = $dimension->getValue();
+        }
+        
+        foreach ($this->_metrics as $name => /* @var $metric KontorX_Gdata_Analytics_Extension_Metric */ $metric)
+        {
+            $result[$name] = $metric->getValue();
+        }
+        
+        return $result;
     }
 }

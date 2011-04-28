@@ -255,6 +255,36 @@ class KontorX_Gdata_Query_Analytics extends Zend_Gdata_Query
         return $this->_metrics;
     }
     
+    public function addSort($sort)
+    {
+        $this->_sort[] = (string) $sort;
+        return $this;
+    }
+    
+    public function setSort($sort)
+    {
+        $this->_sort = array();
+
+        if (is_array($sort)) 
+        {
+            $this->_sort = $sort;
+        }
+        else 
+        {
+            $sort = explode(',', $sort);
+            $sort = array_map('trim', $sort);
+            $sort = array_filter($sort);
+            array_map(array(&$this, 'addSort'), $sort);
+        }
+
+        return $this;
+    }
+    
+    public function getSort()
+    {
+        return $this->_sort;
+    }
+    
     public function setStartDate($date)
     {
         $this->_startDate = $date;
@@ -325,6 +355,11 @@ class KontorX_Gdata_Query_Analytics extends Zend_Gdata_Query
         $this->setParam('end-date', $this->getEndDate());
         
         # Optional
+        
+        if (!empty($this->_sort))
+        {
+            $this->setParam('sort', implode(',', $this->getSort()));
+        }
         
         if (!empty($this->_filters))
         {
