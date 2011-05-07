@@ -53,14 +53,14 @@ class KontorX_Gdata_Analytics_DataEntry extends Zend_Gdata_Kind_EventEntry
 
         switch ($absoluteNodeName) 
         {
-            case $this->lookupNamespace('analytics') . ':' . 'metric';
+            case $this->lookupNamespace('analytics') . ':' . 'metric':
                 $metric = new KontorX_Gdata_Analytics_Extension_Metric();
                 $metric->transferFromDOM($child);
                 
                 $this->setMetric($metric);
                 break;
                 
-            case $this->lookupNamespace('analytics') . ':' . 'dimension';
+            case $this->lookupNamespace('analytics') . ':' . 'dimension':
                 $dimension = new KontorX_Gdata_Analytics_Extension_Dimension();
                 $dimension->transferFromDOM($child);
                 
