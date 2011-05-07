@@ -6,6 +6,9 @@
  */
 class KontorX_Gdata_Analytics_DataFeed extends Zend_Gdata_Feed
 {
+    const ENTRIES_KEY = 'entries';
+    const AGGREGATES_KEY = 'aggregates';
+    
     /**
      * The classname for individual feed elements.
      * @var string
@@ -17,6 +20,11 @@ class KontorX_Gdata_Analytics_DataFeed extends Zend_Gdata_Feed
      * @var string
      */
     protected $_feedClassName = 'KontorX_Gdata_Analytics_DataFeed';
+    
+    /**
+     * @var KontorX_Gdata_Analytics_DataAggregate
+     */
+    protected $_aggregate;
 
     public function __construct($element = null)
     {
@@ -45,6 +53,14 @@ class KontorX_Gdata_Analytics_DataFeed extends Zend_Gdata_Feed
 
         switch ($absoluteNodeName) 
         {
+            case $this->lookupNamespace('analytics') . ':' . 'aggregates':
+                $newAggregate = new KontorX_Gdata_Analytics_DataAggregate($child);
+                $newAggregate->setHttpClient($this->getHttpClient());
+                $newAggregate->setMajorProtocolVersion($this->getMajorProtocolVersion());
+                $newAggregate->setMinorProtocolVersion($this->getMinorProtocolVersion());
+                $this->setAggregate($newAggregate);
+                
+                break;
             /*
              * TODO Segmenty 
              */
@@ -83,14 +99,33 @@ class KontorX_Gdata_Analytics_DataFeed extends Zend_Gdata_Feed
 //        return $this;
 //    }
 
+	/**
+     * @param KontorX_Gdata_Analytics_DataAggregate $aggregate
+     */
+    public function setAggregate(KontorX_Gdata_Analytics_DataAggregate $aggregate)
+    {
+        $this->_aggregate = $aggregate;
+    }
+    
+    /**
+     * @return KontorX_Gdata_Analytics_DataAggregate
+     */
+    public function getAggregate()
+    {
+        return $this->_aggregate;
+    }
+
     public function toArray()
     {
-        $result = array();
-        
+        $result = array(
+            self::AGGREGATES_KEY => $this->getAggregate()->toArray(),
+            self::ENTRIES_KEY => array()
+        );
+
         $this->rewind();
         while ($this->valid()) 
         {
-            $result[] = $this->current()->toArray();
+            $result[self::ENTRIES_KEY][] = $this->current()->toArray();
             $this->next();
         }
         

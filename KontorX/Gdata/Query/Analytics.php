@@ -6,6 +6,9 @@
  */
 class KontorX_Gdata_Query_Analytics extends Zend_Gdata_Query
 {
+    const OR_OPERATOR = ',';
+    const AND_OPERATOR = ';';
+    
     /**
      * The unique table ID used to retrieve the Analytics Report data. 
      * This ID is provided by the <ga:tableId> element for each entry in the account feed. 
@@ -161,26 +164,43 @@ class KontorX_Gdata_Query_Analytics extends Zend_Gdata_Query
         return $this->_ids;
     }
     
-    public function addFilter($filter)
+    public function andFilter($filter)
     {
-        $this->_filters[] = (string) $filter;
+        $this->addFilter($filter, self::AND_OPERATOR);
+    }
+    
+    public function orFilter($filter)
+    {
+        $this->addFilter($filter, self::OR_OPERATOR);
+    }
+    
+    public function addFilter($filter, $operator = self::AND_OPERATOR)
+    {
+        switch ($operator)
+        {
+            case self::OR_OPERATOR:
+            case self::AND_OPERATOR:
+                break;
+                
+            default:
+                $operator = self::AND_OPERATOR;
+        }
+
+        $this->_filters = ltrim($this->_filters, self::AND_OPERATOR.self::OR_OPERATOR) . $operator. ((string) $filter);
         return $this;
     }
     
-    public function setFilters($filters)
+    public function setFilters($filters, $operator = self::AND_OPERATOR)
     {
-        $this->_filters = array();
+        $this->_filters = null;
         
         if (is_array($filters)) 
         {
-            $this->_filters = $filters;
+            $this->_filters = implode($operator, $filters);
         }
         else 
         {
-            $filters = explode(',', $filters);
-            $filters = array_map('trim', $filters);
-            $filters = array_filter($filters);
-            array_map(array(&$this, 'addFilter'), $filters);
+            $this->_filters = $filters;
         }
 
         return $this;
@@ -363,7 +383,7 @@ class KontorX_Gdata_Query_Analytics extends Zend_Gdata_Query
         
         if (!empty($this->_filters))
         {
-            $this->setParam('filters', implode(',', $this->getFilters()));
+            $this->setParam('filters', $this->getFilters());
         }
         
         if (!empty($this->_dimensions))
