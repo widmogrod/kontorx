@@ -144,7 +144,7 @@ class KontorX_Import_Adapter_Csv implements KontorX_Import_Interface, Iterator
 
     protected $_result;
 
-    public function toArray()
+    public function toArray(array $mapToKeys = null)
     {
         if (null === $this->_result)
         {
@@ -152,7 +152,10 @@ class KontorX_Import_Adapter_Csv implements KontorX_Import_Interface, Iterator
             $this->rewind();
             while ($this->valid()) 
             {
-                $this->_result[] = $this->current();
+				$value = (null !== $mapToKeys)
+					? array_combine($mapToKeys, $this->current())
+					: $this->current();
+                $this->_result[] = $value;
                 $this->next();
             }
         }
