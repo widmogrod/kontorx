@@ -40,22 +40,22 @@ class KontorX_Controller_Action_Helper_FlashMessenger
         return $this;
     }
 
-    public function visit(KontorX_Model_Interface_Visitor $visitor)
+    public function visit($object)
 	{
 		switch(true)
 		{
-			case $visitor instanceof KontorX_Model_Interface_Messanger:
-				foreach($visitor->getMessages() as $data)
+			case $object instanceof KontorX_Model_Interface_Messanger:
+				foreach($object->getMessages() as $data)
 				{
-					list($message, $type) = $data;
+					extract($data);
 					$this->addMessage($message, $type);
 				}
 				break;
 				
 			default:
-				if (method_exists($visitor, 'getMessages')) 
+				if (method_exists($object, 'getMessages')) 
 				{
-					foreach($visitor->getMessages() as $message)
+					foreach($object->getMessages() as $message)
 					{
 						$this->addMessage($message);
 					}

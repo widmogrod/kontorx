@@ -6,6 +6,7 @@ ini_set('display_startup_error',1);
 set_include_path(implode(PATH_SEPARATOR, array(
 	'/usr/share/php/',
 	'/usr/share/php/Zend/',
+    '/usr/share/php/Zend/trunk/',
 	dirname(__FILE__) . '/../'
 )));
 
