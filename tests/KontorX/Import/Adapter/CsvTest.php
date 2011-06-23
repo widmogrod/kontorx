@@ -69,6 +69,19 @@ class KontorX_Import_Adapter_CsvTest extends UnitTestCase
 	    //$this->dump($result);
 	    $this->assertIdentical($result, $comparsion, 'toArray zwrócił nieoczekiwany wyjątek');
 	}
+	
+	public function testToArrayWithMapping()
+	{
+	    $instance = new KontorX_Import_Adapter_Csv($this->_filepath);
+		$mapToKeys = array('k1','k2','k3','k4');
+	    $result = $instance->toArray($mapToKeys);
+	    $comparsion = array(
+	        array('k1' => 'Wiersz1','k2' => 'wartosc','k3' => '123','k4' => 'Który to jest znak'),
+            array('k1' => 'Wiersz2','k2' => 'wartosc','k3' => '432','k4' => 'Który to jest znak*&@!^#')
+	    );
+	    //$this->dump($result);
+	    $this->assertIdentical($result, $comparsion, 'toArray zwrócił nieoczekiwany wyjątek');
+	}
 }
 
 $r = new KontorX_Import_Adapter_CsvTest();
