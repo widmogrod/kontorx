@@ -11,17 +11,37 @@ class KontorX_Util_Google
 	const TYPE_XPATH = 'TYPE_XPATH';
 	const TYPE_DEFAULT = 'TYPE_DEFAULT';
 	
-	private
-		$sUri = null,
-		$iCount = 100,
-		$sWord = null,
-		$aProxies = array(),
-		$aProxiesFaild = array(),
-		$sProxiesFile = null;
+	
+	protected $_siteUri = null;
+	protected $aProxies = array();
+	protected $aProxiesFaild = array();
+	protected $sProxiesFile = null;
 		
-	public function __construct($sUrl)
+	public function __construct($siteUri, $googleDomain = null)
 	{
-		$this->sUri = $sUrl;
+		$this->setSiteUri($siteUri);
+
+		if (null !== $googleDomain) {
+		    $this->setGoogleDomain($googleDomain);
+		}
+	}
+	
+	public function setSiteUri($siteUri)
+	{
+	    $siteUri = trim($siteUri);
+	    if (empty($siteUri))
+	    {
+	        require_once 'KontorX/Util/Google/Exception.php';
+	        $message = 'Site url can\'t by empty';
+	        throw new KontorX_Util_Google_Exception($message);
+	    }
+
+	    $this->_siteUri = $siteUri;
+	}
+	
+	public function getSiteUri()
+	{
+	    return $this->_siteUri;
 	}
 	
 	public function addProxy($proxy)
@@ -109,7 +129,7 @@ class KontorX_Util_Google
 		return $this->_timeout;
 	}
 	
-	protected $_type = self::TYPE_DEFAULT;
+	protected $_type = self::TYPE_XPATH;
 	
 	public function setType($type)
 	{
@@ -121,20 +141,29 @@ class KontorX_Util_Google
 				break;
 
 			default:
-				throw new Exception('Undefined type "'.$type.'"');
+			    require_once 'KontorX/Util/Google/Exception.php';
+    	        $message = 'Undefined type "%s"';
+    	        $message = sprintf($message, $type);
+    	        throw new KontorX_Util_Google_Exception($message);
 		}
 	}
-	
+
 	public function getType()
 	{
 		return $this->_type;
 	}
 
-	public function position($sWord, $iCount = null)
+	public function position($keyword = null, $perPage = null)
 	{
-		$this->sWord = $sWord;
-		$this->iCount = is_integer($iCount)
-			? $iCount : 100;
+	    if (null !== $keyword) {
+	        $this->setKeyword($keyword);
+	    }
+	    
+	    if (null !== $perPage) {
+	        $this->setPerPage($perPage);
+	    }
+	    
+	    $this->clearPositions();
 
 		if (count($this->aProxies) && true === $this->_useProxies)
 		{
@@ -164,17 +193,15 @@ class KontorX_Util_Google
 		if (!$sData)
 			return false;
 
-		// generowanie url'a z www i bez ..
-		$aInfo = pathinfo($this->sUri);
-		$sUri = strpos( $this->sUri, '://www') === false
-			? $aInfo['dirname'] . 'www.' . $aInfo['basename']
-			: $aInfo['dirname'] . '//' . substr( strrchr( $aInfo['basename'],'www.'), 2 );
-			
-			
-
+		$searchHostname = parse_url($this->getSiteUri(), PHP_URL_HOST);
+		if (!$searchHostname) {
+		    $searchHostname = pathinfo($this->getSiteUri(), PATHINFO_BASENAME);
+		}
+		
     	switch($this->getType())
     	{
     		case self::TYPE_XPATH:
+
 	    		require_once 'Zend/Dom/Query.php';
 		    	$query = new Zend_Dom_Query($sData);
 		
@@ -182,93 +209,289 @@ class KontorX_Util_Google
 		    								   '//h3[contains(normalize-space(@class), \'r\')]'.
 		    								   '//a[contains(normalize-space(@class), \'l\')]');
 		
-		    	if (!count($elements))
-		    	{
+		    	if (!count($elements)) {
 		    		return false;
 		    	}
-		    	
+
 		    	$position = false;
 		    	foreach($elements as $key => /* @var $element DOMElement */ $element)
 		    	{
 		    		$href = $element->getAttribute('href');
 
-		    		$sString = strip_tags($href);
-					if(strpos($sString, $this->sUri) !== false)
-						return $key+1;
-		
-					if(strpos($sString, $sUri) !== false)
-						return $key+1;
+		    		$href = strip_tags($href);
+					if (strpos($href, $searchHostname) !== false) 
+					{
+					    $position = $key+1;
+
+					    /*
+					     * Wędrówka od elementu a > h3
+					     * Następnie sprawdzenie czy istnieje poniżej element div 
+					     */
+					    $divElement = $element->parentNode->nextSibling;
+					    if ($divElement instanceof DOMElement) 
+					    {
+					        /*
+					         * Sprawdzenie czy poniżej elemenu div jest tabela
+					         * jeżeli tak to jest to pozycja MapGoogle
+					         * Zapisać pozycję i poszukiwanie pozycji dla wyszukiwania organicznego 
+					         */
+
+					        /* @var $tableElement DOMElement */
+					        $tableElement = $divElement->nextSibling;
+					        
+					        if ($tableElement instanceof DOMElement 
+					            && strtolower($tableElement->nodeName) == 'table')
+					        {
+					            if (null === $this->_localPosition) {
+					                $this->_localPosition = $position;
+					            }
+                                continue;
+					        }
+					    }
+					    
+					    if (null === $this->_orgnicPosition) {
+					        $this->_orgnicPosition = $position;
+					    }
+					}
 		    	}
+		    	
     			break;
 
     		default:
     		case self::TYPE_DEFAULT:
     			// lapiemy linki
-				// TODO Dodać lapanie w wynikach pola z pdf etc.
-				$aResults = array();
-				preg_match_all('@<li class=g><h3 class="r"><a href="([^"]+)" class=l@i', $sData, $aResults );
+				$matches = array();
+				preg_match_all('@<li class=g><h3 class="r"><a href="([^"]+)" class=l@i', $sData, $matches);
 		
 				// lementy pod kluczem 1 zawieraja tylko linki do strony
-				$aResults = (array) @$aResults[1];
-				
-				if (count($aResults) == 0) {
+				$matches = (array) @$matches[1];
+				if (count($matches) == 0) {
 					return false;
 				}
 		
-				$aReturn = array($this->sUri => false, $sUri=>false);
-		
-				// szuka pozycje w google.pl
-				foreach($aResults as $iKey => $sRowUrl)
+				// szuka pozycje w Google
+				foreach($matches as $key => $href)
 				{
-					$sString = strip_tags($sRowUrl);
-					if(strpos($sString, $this->sUri) !== false)
-						$aReturn[$this->sUri] = $iKey+1;
-		
-					if(strpos($sString, $sUri) !== false)
-						$aReturn[$sUri] = $iKey+1;
+				    $href = strip_tags($href);
+				    if (strpos($href, $searchHostname) !== false)  
+				    {
+				        if (null === $this->_orgnicPosition) 
+				        {
+				            $position = $key+1;
+					        return $this->_orgnicPosition = $position;
+					    }
+				    }
 				}
-		
-				// zwroc najwieksza pozycje
-				arsort($aReturn);
-				return (int) array_shift( $aReturn );
+				
     			break;
     	}
     	
-    	return false;
+    	$this->_localPosition = (null === $this->_localPosition) ? false : $this->_localPosition;
+    	$this->_orgnicPosition = (null === $this->_orgnicPosition) ? false : $this->_orgnicPosition;
+    	
+    	return $this->getOrganicPosition();;
 	}
 	
-	public function getData($sProxy = null)
+	protected $_googleDomain;
+	
+	/**
+	 * @todo validate
+	 * @param string $googleDomain
+	 */
+	public function setGoogleDomain($googleDomain)
 	{
-		// laczenie z Google.pl
-		$rCurl = curl_init();
+	    $googleDomain = parse_url($googleDomain, PHP_URL_HOST);
+	    $this->_googleDomain = $googleDomain;
+	}
+	
+    public function getGoogleDomain()
+	{
+	    if (null === $this->_googleDomain) 
+	    {
+	        $this->_googleDomain = 'www.google.pl';
+	    }
+	    return $this->_googleDomain;
+	}
+	
+	
+	protected $_keyword;
+	
+	public function setKeyword($keyword)
+	{
+	    $this->_keyword = $keyword;
+	}
+	
+	public function getKeyword($throwException = true)
+	{
+	    if (empty($this->_keyword) && $throwException) 
+	    {
+	        require_once 'KontorX/Util/Google/Exception.php';
+	        $message = 'Keyword is required. Use method $this->setKeyword() to set keyword.';
+	        throw new KontorX_Util_Google_Exception($message);
+	    }
+	    
+	    return $this->_keyword;
+	}
+	
+	/**
+	 * @var number
+	 */
+	protected $_onPage = 100;
+	
+	/**
+	 * @param integer $onPage
+	 * @throws KontorX_Util_Google_Exception
+	 */
+	public function setOnPage($onPage)
+	{
+	    if ($onPage < 10 || $onPage > 100)
+	    {
+	        require_once 'KontorX/Util/Google/Exception.php';
+	        $message = 'Google can display on page from 10 to 100 search results.';
+	        throw new KontorX_Util_Google_Exception($message);
+	    }
+	    
+	    $this->_onPage = (int) $onPage;
+	}
+	
+	/**
+	 * @return number
+	 */
+	public function getOnPage()
+	{
+	    return $this->_onPage;
+	}
+	
+	/**
+	 * @var number
+	 */
+	protected $_perPage = 1;
+	
+	/**
+	 * @param number $perPage
+	 * @throws KontorX_Util_Google_Exception
+	 */
+	public function setPerPage($perPage)
+	{
+	    if ($perPage < 0) 
+	    {
+	        require_once 'KontorX/Util/Google/Exception.php';
+	        $message = 'Per page value should be grater than 0';
+	        throw new KontorX_Util_Google_Exception($message);
+	    }
 
-		curl_setopt($rCurl, CURLOPT_HEADER, 0);
-		curl_setopt($rCurl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($rCurl, CURLOPT_VERBOSE, 0);
-		curl_setopt($rCurl, CURLOPT_REFERER, 'www.google.pl');
-		curl_setopt($rCurl, CURLOPT_URL, sprintf( 'http://www.google.pl/search?hl=pl&q=%s&num='.$this->iCount, urlencode($this->sWord)));
-		curl_setopt($rCurl, CURLOPT_TIMEOUT, $this->getTimeout());
+	    $this->_perPage = (int) $perPage;
+	}
+	
+	/**
+	 * @return number
+	 */
+	public function getPerPage()
+	{
+	    return $this->_perPage;
+	}
+	
+	/**
+	 * @var number
+	 */
+	protected $_orgnicPosition;
+	
+	/**
+	 * @return number
+	 */
+	public function getOrganicPosition()
+	{
+	    if (null === $this->_orgnicPosition) {
+	        $this->position();
+	    }
+	    return $this->_orgnicPosition;
+	}
+	
+	/**
+	 * @var number
+	 */
+	protected $_localPosition;
 
-		if (null !== $sProxy) {
-			curl_setopt($rCurl, CURLOPT_PROXY, $sProxy);
+	/**
+	 * @return number
+	 */
+	public function getLocalPosition()
+	{
+	    if (null === $this->_localPosition) {
+	        $this->position();
+	    }
+
+	    return $this->_localPosition;
+	}
+
+	public function clearPositions()
+	{
+	    $this->_localPosition = null;
+	    $this->_orgnicPosition = null;
+	}
+	
+	/**
+	 * @var array
+	 */
+	protected $_data = array();
+
+	/**
+	 * @param unknown_type $proxy
+	 * @return boolean|mixed
+	 */
+	public function getData($proxy = null)
+	{
+	    $cacheKey = $this->_cacheKey($proxy);
+	    if (isset($this->_data[$cacheKey])) {
+	        return $this->_data[$cacheKey];
+	    }
+
+		// laczenie z Google.
+		$curl = curl_init();
+
+		curl_setopt($curl, CURLOPT_HEADER, 0);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_VERBOSE, 0);
+		curl_setopt($curl, CURLOPT_REFERER, $this->getGoogleDomain());
+		curl_setopt($curl, CURLOPT_URL, sprintf( 'http://%s/search?hl=pl&q=%s&num=%d', $this->getGoogleDomain(),urlencode($this->getKeyword()), $this->getOnPage()));
+		curl_setopt($curl, CURLOPT_TIMEOUT, $this->getTimeout());
+
+		if (null !== $proxy) {
+			curl_setopt($curl, CURLOPT_PROXY, $proxy);
 		}
 
-		$sData = curl_exec($rCurl);
+		$result = curl_exec($curl);
 		
-		if (0 != curl_errno($rCurl)) 
+		if (0 != curl_errno($curl)) 
 		{
-			curl_close($rCurl);
+			curl_close($curl);
 			return false;			
 		}
 
 		// Jeżeli jest odpowiedź jest mniejsza niż 5000 znaków
 		// oznacza to że że odpowiedź z google nie zawiera wyników wyszukiwania
 		// tylko mechanizm ochronny googla przed nadmiernym pingowaniem
-		if (strlen($sData) < 5000)
+		if (strlen($result) < 5000)
 			return false;
 
-		curl_close($rCurl);
+		curl_close($curl);
 		
-		return $sData;
+		return $this->_data[$cacheKey] = $result;
+	}
+	
+	/**
+	 * Do przyśpieszenia testowania
+	 * @param string $data
+	 * @param string $proxy
+	 */
+	public function setData($data, $proxy = null)
+	{
+	    $cacheKey = $this->_cacheKey($proxy);
+	    $this->_data[$cacheKey] = (string) $data;
+	}
+
+	protected function _cacheKey($proxy = null)
+	{
+	    return $proxy . $this->getGoogleDomain() . $this->getKeyword() . $this->getOnPage();
 	}
 }
