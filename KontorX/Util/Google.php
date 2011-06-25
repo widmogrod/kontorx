@@ -289,7 +289,7 @@ class KontorX_Util_Google
     	$this->_localPosition = (null === $this->_localPosition) ? false : $this->_localPosition;
     	$this->_orgnicPosition = (null === $this->_orgnicPosition) ? false : $this->_orgnicPosition;
     	
-    	return $this->getOrganicPosition();;
+    	return $this->getOrganicPosition();
 	}
 	
 	protected $_googleDomain;
