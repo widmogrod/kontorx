@@ -17,9 +17,11 @@ class KontorX_Util_Google
 	protected $aProxiesFaild = array();
 	protected $sProxiesFile = null;
 		
-	public function __construct($siteUri, $googleDomain = null)
+	public function __construct($siteUri = null, $googleDomain = null)
 	{
-		$this->setSiteUri($siteUri);
+	    if (null !== $siteUri) {
+	        $this->setSiteUri($siteUri);
+	    }
 
 		if (null !== $googleDomain) {
 		    $this->setGoogleDomain($googleDomain);
